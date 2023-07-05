@@ -1,14 +1,17 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 const devConfig = {
-  apiKey: "AIzaSyAEs-7Ke1EEhDzzJgm2jsjMGscKzGdONTg",
-  authDomain: "paxify-reels-analytics.firebaseapp.com",
-  databaseURL: "https://paxify-reels-analytics-default-rtdb.firebaseio.com",
-  projectId: "paxify-reels-analytics",
-  storageBucket: "paxify-reels-analytics.appspot.com",
-  messagingSenderId: "1045743904613",
-  appId: "1:1045743904613:web:65bf104b710360945ee38c",
+  apiKey: publicRuntimeConfig.FIREBASE_API_KEY,
+  authDomain: publicRuntimeConfig.FIREBASE_AUTH_DOMAIN,
+  databaseURL: publicRuntimeConfig.FIREBASE_DATABASE_URL,
+  projectId: publicRuntimeConfig.FIREBASE_PROJECT_ID,
+  storageBucket: publicRuntimeConfig.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: publicRuntimeConfig.FIREBASE_MESSAGING_SENDER_ID,
+  appId: publicRuntimeConfig.FIREBASE_APP_ID,
 };
 
 let firebase: any = null;
