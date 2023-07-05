@@ -25,7 +25,7 @@ const Container = styled("div")<IInputContainerProps>`
     props.customBackgroundColor
       ? props.customBackgroundColor
       : props.disabled
-      ? THEME.body
+      ? THEME.body1
       : "white"};
   flex-direction: row;
   align-items: center;
