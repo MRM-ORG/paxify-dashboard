@@ -27,9 +27,9 @@ export const Input = styled("input")<InputInterface>`
   color: black;
   background-color: transparent;
   font-size: 14px;
-  font-weight: 500;
+  fontweight: 500;
   padding: 0;
-  text-align: left;
+  textalign: left;
   display: inline;
   flex-grow: 1;
   outline: none;

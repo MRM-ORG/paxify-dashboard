@@ -63,7 +63,7 @@ const Button = styled("button")<IButtonProps>`
 
 const FontLabel = styled("div")`
   font-size: 14px;
-  font-weight: 400;
+  fontweight: 400;
 `;
 
 const Children = styled(FontLabel)`

@@ -87,7 +87,7 @@ const SignUp: React.FC = () => {
     createUserWithEmailAndPassword(webAuth, values.email, values.password)
       .then((userCredential: any) => {
         const user = userCredential.user;
-        console.log("Signed in:", user);
+        console.info("Signed in:", user);
         localStorage.setItem("user", JSON.stringify(user));
         navigateNewPage(HOME_PAGE());
       })

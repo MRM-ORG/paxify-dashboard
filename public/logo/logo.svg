@@ -1,6 +1,6 @@
 <svg width="330" height="70" viewBox="0 0 330 70" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g>
-<text x="65%" y="65%" dominant-baseline="middle" text-anchor="middle" font-size="85" font-weight="500" font-family="sans-serif" fill="#343F52">Paxify</text>
+<text x="65%" y="65%" dominantBaseline="middle" textAnchor="middle" fontSize="85" fontWeight="500" fontFamily="sans-serif" fill="#343F52">Paxify</text>
 <path d="M43.42 67.48C42.51 68.86 40.42 69.98 38.77 69.98H18.63C16.98 69.98 16.37 68.85 17.28 67.48L40.11 32.96C41.02 31.58 43.11 30.46 44.76 30.46H64.9C66.55 30.46 67.16 31.59 66.25 32.96L43.42 67.48Z" fill="#4079E0"/>
 <path d="M23.9 2.51C24.81 1.13 26.9 0 28.55 0H49.33C50.98 0 51.59 1.13 50.68 2.51L27.2 38.3C26.29 39.68 24.2 40.81 22.55 40.81H1.77001C0.120015 40.81 -0.489985 39.68 0.420015 38.3L23.9 2.51Z" fill="#605EBA"/>
 </g>

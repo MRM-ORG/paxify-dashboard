@@ -13,7 +13,6 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   useEffect(() => {
     // Check firebase auth status here
     const user = localStorage.getItem("user");
-    console.log("USER STATUS", user);
     if (!user) {
       navigateNewPage(USER_LOGIN());
     } else {

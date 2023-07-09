@@ -10,7 +10,7 @@ interface IHyperlinkButtonProps {
 
 const Container = styled("div")<{ disabled: boolean }>`
   cursor: ${(props) => (props.disabled ? "none" : "pointer")};
-  text-align: left;
+  textalign: left;
   color: ${THEME.blue0};
   text-decoration: none;
 `;

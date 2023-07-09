@@ -7,6 +7,7 @@ export const THEME = {
   body1: "#667085",
 
   blue0: "#1570EF",
+  blue1: "rgb(102, 157, 246)",
 
   background0: "#f2f4f7",
   background1: "#343f52",

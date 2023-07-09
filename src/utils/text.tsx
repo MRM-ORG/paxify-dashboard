@@ -8,27 +8,27 @@ export const H1 = styled("h1")<{ color?: string }>`
 
 export const H2 = styled("h2")<{ color?: string; fontWeight?: string }>`
   font-size: 24px;
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "600")};
+  fontweight: ${(props) => (props.fontWeight ? props.fontWeight : "600")};
   color: ${(props) => (props.color ? props.color : THEME.primary)};
 `;
 
 export const H3 = styled("h3")<{ color?: string; fontWeight?: string }>`
   font-size: 18px;
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
+  fontweight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
   color: ${(props) => (props.color ? props.color : THEME.primary)};
 `;
 
 export const Body = styled("div")<{ color?: string; fontWeight?: string }>`
   font-size: 16px;
   line-height: 24px;
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
+  fontweight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
   color: ${(props) => (props.color ? props.color : THEME.body1)};
 `;
 
 export const BodyText = styled("div")<{ color?: string; fontWeight?: string }>`
   font-size: 14px;
   line-height: 24px;
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "500")};
+  fontweight: ${(props) => (props.fontWeight ? props.fontWeight : "500")};
   color: ${(props) => (props.color ? props.color : THEME.primary)};
 `;
 
@@ -46,6 +46,6 @@ export const GenericText = styled("div")<{
   font-size: ${(props) => (props.fontSize ? props.fontSize : "14px")};
   line-height: ${(props) =>
     props.lineHeight ? props.lineHeight : `calc(${props.fontSize} * 1.2)`};
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
+  fontweight: ${(props) => (props.fontWeight ? props.fontWeight : "400")};
   color: ${(props) => (props.color ? props.color : THEME.primary1)};
 `;

@@ -1,12 +1,18 @@
+import { Column, Row } from "@/styles/common";
+import { signOutUser } from "@/utils/auth";
 import { THEME } from "@/utils/theme";
 import { Inter } from "next/font/google";
 import Head from "next/head";
+import { useState } from "react";
 import styled from "styled-components";
-import { signOut } from "firebase/auth";
-import { webAuth } from "@/firebase/firebase";
-import { navigateNewPage } from "@/utils/navigate";
-import { USER_LOGIN } from "@/utils/routes";
-import { signOutUser } from "@/utils/auth";
+import Analytics from "../atoms/icons/analytics";
+import Stores from "../atoms/icons/stores";
+import StoreSelector from "../molecules/subviews/home/StoreSelector";
+import ViewAnalytics from "../molecules/subviews/home/ViewAnalytics";
+import Logo from "../atoms/icons/logo";
+import Logout from "../atoms/icons/logout";
+import Profile from "../atoms/icons/profile";
+import ManageProfile from "../molecules/subviews/home/Profile";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,29 +31,84 @@ const LeftPane = styled.div`
 `;
 
 const RightPane = styled.div`
+  overflow: auto;
   height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 24px;
   background-color: ${THEME.background0};
 `;
 
-const BottomBar = styled.div`
+const BottomBar = styled(Row)`
   padding: 24px 20px;
-  cursor: pointer;
+  justify-content: space-between;
 `;
 
-const TopBar = styled.div`
-  padding: 24px 20px;
+const TopBar = styled(Column)`
+  padding: 24px 10px;
 `;
 
 const Divider = styled.hr`
   border: 0.1px solid ${THEME.background0};
 `;
 
+const Option = styled(Row)<{ isActive?: boolean }>`
+  gap: 7.5px;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 10px 10px;
+  border-radius: 5px;
+  transition: 0.2s ease-in-out;
+  color: ${({ isActive }) => (isActive ? THEME.blue1 : THEME.white)};
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const SidebarOptions = [
+  {
+    id: 0,
+    title: "My Stores",
+    icon: <Stores />,
+  },
+  {
+    id: 1,
+    title: "Analytics",
+    icon: <Analytics />,
+  },
+  {
+    id: 2,
+    title: "Profile",
+    hide: true,
+  },
+];
+
 const Home: React.FC = () => {
+  const [stores, setStores] = useState<any[]>([]);
+  const [activeStep, setActiveStep] = useState(0);
+
   const handleUserSignOut = () => {
     signOutUser();
+  };
+
+  const _renderActiveStep = () => {
+    const commonProps = {
+      user: {
+        stores,
+        setStores,
+      },
+    };
+
+    switch (activeStep) {
+      case 0:
+        return <StoreSelector {...commonProps} />;
+      case 1:
+        return <ViewAnalytics {...commonProps} />;
+      case 2:
+        return <ManageProfile />;
+      default:
+        return <h1>Coming Soon...</h1>;
+    }
   };
 
   return (
@@ -62,16 +123,40 @@ const Home: React.FC = () => {
       <Grid className={inter.className}>
         <LeftPane>
           <TopBar>
-            <div>Stores</div>
+            {SidebarOptions.map(
+              (option) =>
+                !option?.hide && (
+                  <Option
+                    isActive={activeStep === option.id}
+                    onClick={() => setActiveStep(option.id)}
+                    key={option.id}>
+                    {option.icon}
+                    <div>{option.title}</div>
+                  </Option>
+                )
+            )}
           </TopBar>
           <div>
             <Divider />
-            <BottomBar onClick={handleUserSignOut}>Sign Out</BottomBar>
+            <BottomBar>
+              <Logo
+                fill={THEME.white}
+                width="100"
+                height="25"
+                fontSize="60"
+                xPosition="55%"
+              />
+              <Row gap="10px">
+                <Profile
+                  fill={activeStep === 2 ? THEME.blue1 : THEME.white}
+                  onClick={() => setActiveStep(2)}
+                />
+                <Logout onClick={handleUserSignOut} />
+              </Row>
+            </BottomBar>
           </div>
         </LeftPane>
-        <RightPane>
-          <h1>Welcome to Paxify</h1>
-        </RightPane>
+        <RightPane>{_renderActiveStep()}</RightPane>
       </Grid>
     </>
   );

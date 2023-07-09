@@ -1,4 +1,10 @@
-const Logo = ({ fill = "#343F52", width = "330", height = "70" }) => {
+const Logo = ({
+  fill = "#343F52",
+  width = "330",
+  height = "70",
+  fontSize = "85",
+  xPosition = "64%",
+}) => {
   return (
     <svg
       width={width}
@@ -8,13 +14,13 @@ const Logo = ({ fill = "#343F52", width = "330", height = "70" }) => {
       xmlns="http://www.w3.org/2000/svg">
       <g>
         <text
-          x="64%"
-          y="64%"
-          dominant-baseline="middle"
-          text-anchor="middle"
-          font-size="85"
-          font-weight="500"
-          font-family="sans-serif"
+          x={xPosition}
+          y="55%"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          font-size={fontSize}
+          fontWeight="500"
+          fontFamily="sans-serif"
           fill={fill}>
           Paxify
         </text>

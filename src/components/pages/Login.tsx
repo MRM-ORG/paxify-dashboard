@@ -47,7 +47,7 @@ const LeftPane = styled(Pane)`
   @media (max-width: 768px) {
     width: 100%;
     height: fit-content;
-    padding: 12px 32px 12px;
+    padding: 8px 32px;
   }
 `;
 
