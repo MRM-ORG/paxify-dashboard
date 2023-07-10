@@ -1,4 +1,5 @@
 import { child, get, getDatabase, ref } from "firebase/database";
+import { groupByDate, sortByDate } from "./helpers";
 
 const EVENTS_DB_INSTANCE = "events";
 const EVENTS_DB_TRACKING_SUBKEY = "tracking";
@@ -23,12 +24,9 @@ export const fetchStoreEvents = async (storeID: string) => {
 };
 
 export const transformPageViews = (data: any[]) => {
-  const modifiedData = data.map((obj) => ({
-    pageView: obj.name,
-    day: new Date(obj.time).toLocaleDateString(),
-  }));
+  const groupedData = sortByDate(groupByDate(data, "pageView"));
 
-  const groupedData = modifiedData.reduce(
+  const transformedData = groupedData.reduce(
     (
       result: {
         pageView: number;
@@ -51,26 +49,14 @@ export const transformPageViews = (data: any[]) => {
     []
   );
 
-  return groupedData;
+  return transformedData;
 };
 
 export const transformComponentInteractions = (data: any[]) => {
-  // Data is an array of objects with the following structure:
-  // {
-  //   name: "reels_interacted" | "reels_init",
-  //   time: 1634176800000,
-  // }
-
-  // We want to group the data by day
-  // We want to count the number of interactions per day
-
-  const modifiedData = data.map((obj) => ({
-    interaction: obj.name,
-    day: new Date(obj.time).toLocaleDateString(),
-  }));
+  const groupedData = sortByDate(groupByDate(data, "interaction"));
 
   const ratios = Object.entries(
-    modifiedData.reduce((acc, obj) => {
+    groupedData.reduce((acc, obj) => {
       const { interaction, day } = obj;
       if (interaction === "reels_init") {
         acc[day] = acc[day] || { initCount: 0, interactedCount: 0 };
@@ -81,11 +67,8 @@ export const transformComponentInteractions = (data: any[]) => {
       return acc;
     }, {} as Record<string, { initCount: number; interactedCount: number }>)
   ).map(([day, counts]) => ({
-    day: new Date(
-      2000,
-      // @ts-ignore
-      ...day.split("/").map((part) => parseInt(part) - 1)
-    ).toLocaleDateString("default", { day: "numeric", month: "long" }),
+    day,
+    // @ts-ignore
     ...counts,
   }));
 
@@ -111,13 +94,36 @@ export const transformComponentInteractions = (data: any[]) => {
   return interactedData;
 };
 
-export const transformStoryViews = (data: any[]) => {
-  const modifiedData = data.map((obj) => ({
-    interaction: obj.name,
-    day: new Date(obj.time).toLocaleDateString(),
-  }));
+export const transformAverageStoryViews = (data: any[]) => {
+  const groupedData = sortByDate(groupByDate(data, "event"));
 
-  const groupedData = modifiedData.reduce(
+  const transformedData = groupedData
+    .reduce((result: any, obj) => {
+      const { event, day } = obj;
+      const existingItem = result.find(
+        (item: any) => item.day.toString() === day.toString()
+      );
+
+      if (existingItem) {
+        event === "reels_opened" && existingItem.opened++;
+        event === "reels_story_viewed" && existingItem.storiesViewed++;
+      } else {
+        result.push({ opened: 0, storiesViewed: 0, day: day });
+      }
+      return result;
+    }, [])
+    .map((obj: any) => ({
+      day: obj.day,
+      average: obj.opened ? obj.storiesViewed / obj.opened : 0,
+    }));
+
+  return transformedData;
+};
+
+export const transformStoryViews = (data: any[]) => {
+  const groupedData = sortByDate(groupByDate(data, "interaction"));
+
+  const transformedData = groupedData.reduce(
     (
       result: {
         interaction: number;
@@ -140,19 +146,5 @@ export const transformStoryViews = (data: any[]) => {
     []
   );
 
-  // Sort by date
-  groupedData.sort((a, b) => {
-    const dateA = new Date(a.day);
-    const dateB = new Date(b.day);
-
-    if (dateA < dateB) {
-      return -1;
-    } else if (dateA > dateB) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-
-  return groupedData;
+  return transformedData;
 };

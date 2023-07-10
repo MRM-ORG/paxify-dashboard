@@ -1,6 +1,7 @@
 import Spacer from "@/components/atoms/Spacer";
 import {
   fetchStoreEvents,
+  transformAverageStoryViews,
   transformComponentInteractions,
   transformPageViews,
   transformStoryViews,
@@ -13,6 +14,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   VictoryAxis,
+  VictoryBar,
   VictoryChart,
   VictoryLine,
   VictoryTooltip,
@@ -55,7 +57,7 @@ const ChartContainer = styled.div`
   padding: 20px 0;
 `;
 
-const sharedStyles = {
+const commonToolTopStyles = {
   style: {
     fill: THEME.primary1, // Set the background color of the tooltip
   },
@@ -66,16 +68,35 @@ const sharedStyles = {
   },
 };
 
+const commonLineChartStyles = {
+  style: {
+    data: {
+      stroke: THEME.background1,
+    },
+  },
+};
+
+const commonBarChartStyles = {
+  style: {
+    data: {
+      fill: THEME.background1,
+    },
+  },
+};
+
 const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   const [activeStore, setActiveStore] = useState<{
     label: string;
     value: string;
   } | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Events
   const [pageViews, setPageViews] = useState<any[]>([]);
   const [interactions, setInteractions] = useState<any[]>([]);
   const [storyViews, setStoryViews] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [averageStoryViews, setAverageStoryViews] = useState<any[]>([]);
 
   useEffect(() => {
     if (activeStore == null) return;
@@ -102,16 +123,19 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
       );
 
       const rawStoryViews = storeEvents.tracking.filter(
-        (event: any) => event.name === "reels_story_viewed"
+        (event: any) =>
+          event.name === "reels_story_viewed" || event.name === "reels_opened"
       );
 
       const pageViews = transformPageViews(rawPageViews);
       const interactions = transformComponentInteractions(rawInteractions);
       const storyViews = transformStoryViews(rawStoryViews);
+      const averageStoryViews = transformAverageStoryViews(rawStoryViews);
 
       setPageViews(pageViews);
       setInteractions(interactions);
       setStoryViews(storyViews);
+      setAverageStoryViews(averageStoryViews);
       setLoading(false);
       setError(null);
     })();
@@ -172,12 +196,13 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                 containerComponent={
                   <VictoryVoronoiContainer
                     labels={({ datum }) => `Page Views: ${datum.pageView}`}
-                    labelComponent={<VictoryTooltip {...sharedStyles} />}
+                    labelComponent={<VictoryTooltip {...commonToolTopStyles} />}
                   />
                 }>
                 <VictoryAxis tickValues={[1, 2, 3, 4, 5]} />
                 <VictoryAxis dependentAxis tickFormat={(x) => x} />
                 <VictoryLine
+                  {...commonLineChartStyles}
                   interpolation="natural"
                   data={pageViews}
                   x="day"
@@ -192,18 +217,20 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                 domainPadding={20}
                 containerComponent={
                   <VictoryVoronoiContainer
-                    labels={({ datum }) => `Ratio: ${datum.ratio?.toFixed(2)}`}
-                    labelComponent={<VictoryTooltip {...sharedStyles} />}
+                    labels={({ datum }) =>
+                      `Ratio: ${datum.ratio?.toFixed(2) * 100}% `
+                    }
+                    labelComponent={<VictoryTooltip {...commonToolTopStyles} />}
                   />
                 }>
-                <VictoryAxis tickValues={[1, 2, 3, 4, 5]} />
-                <VictoryAxis dependentAxis tickFormat={(x) => x} />
-                <VictoryLine
-                  interpolation="natural"
+                <VictoryBar
+                  {...commonBarChartStyles}
                   data={interactions}
                   x="day"
                   y="ratio"
                 />
+                <VictoryAxis tickValues={[1, 2, 3, 4, 5]} />
+                <VictoryAxis dependentAxis tickFormat={(x) => `${x * 100}%`} />
               </VictoryChart>
             </Chart>
 
@@ -213,8 +240,8 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                 domainPadding={20}
                 containerComponent={
                   <VictoryVoronoiContainer
-                    labels={({ datum }) => `Views: ${datum.interaction}`}
-                    labelComponent={<VictoryTooltip {...sharedStyles} />}
+                    labels={({ datum }) => `Average: ${datum.average}`}
+                    labelComponent={<VictoryTooltip {...commonToolTopStyles} />}
                   />
                 }>
                 <VictoryAxis
@@ -223,6 +250,32 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                 />
                 <VictoryAxis dependentAxis tickFormat={(x) => x} />
                 <VictoryLine
+                  {...commonLineChartStyles}
+                  interpolation="natural"
+                  data={averageStoryViews}
+                  x="day"
+                  y="average"
+                />
+              </VictoryChart>
+            </Chart>
+
+            <Chart>
+              <H2>Total Story Views</H2>
+              <VictoryChart
+                domainPadding={20}
+                containerComponent={
+                  <VictoryVoronoiContainer
+                    labels={({ datum }) => `Views: ${datum.interaction}`}
+                    labelComponent={<VictoryTooltip {...commonToolTopStyles} />}
+                  />
+                }>
+                <VictoryAxis
+                  tickValues={[1, 2, 3, 4, 5]}
+                  tickFormat={(value) => `${value}`}
+                />
+                <VictoryAxis dependentAxis tickFormat={(x) => x} />
+                <VictoryLine
+                  {...commonLineChartStyles}
                   interpolation="natural"
                   data={storyViews}
                   x="day"
