@@ -16,9 +16,13 @@ import ManageProfile from "../molecules/subviews/home/Profile";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const Grid = styled.div`
+const UIContainer = styled.div`
   display: grid;
   grid-template-columns: 2fr 10fr;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const LeftPane = styled.div`
@@ -28,6 +32,10 @@ const LeftPane = styled.div`
   flex-direction: column;
   justify-content: space-between;
   background-color: ${THEME.background1};
+
+  @media (max-width: 768px) {
+    height: fit-content;
+  }
 `;
 
 const RightPane = styled.div`
@@ -120,7 +128,7 @@ const Home: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Grid className={inter.className}>
+      <UIContainer className={inter.className}>
         <LeftPane>
           <TopBar>
             {SidebarOptions.map(
@@ -157,7 +165,7 @@ const Home: React.FC = () => {
           </div>
         </LeftPane>
         <RightPane>{_renderActiveStep()}</RightPane>
-      </Grid>
+      </UIContainer>
     </>
   );
 };

@@ -7,23 +7,71 @@ export const transformDomain = (domain: string) => {
 };
 
 export const groupByDate = (data: any[], yColumn: string) => {
-  return data.map((obj) => ({
+  return sortByDate(data).map((obj) => ({
     [yColumn]: obj.name,
     day: new Date(obj.time).toLocaleDateString(),
   }));
 };
 
-export const sortByDate = (data: any[]) => {
-  return data.sort((a, b) => {
-    const dateA = new Date(a.day);
-    const dateB = new Date(b.day);
+function getWeekNumber(date: Date) {
+  // Copy date so don't modify original
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  // Set to nearest Thursday: current date + 4 - current day number
+  // Make Sunday's day number 7
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  // Get first day of year
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  // Calculate full weeks to nearest Thursday
+  const weekNo = Math.ceil(
+    ((d.valueOf() - yearStart.valueOf()) / 86400000 + 1) / 7
+  );
+  // Return week number
+  return weekNo;
+}
 
-    if (dateA < dateB) {
-      return -1;
-    } else if (dateA > dateB) {
-      return 1;
-    } else {
-      return 0;
-    }
+export const groupByWeek = (data: any[], yColumn: string) => {
+  return sortByDate(data).map((obj) => {
+    const date = new Date(obj.time);
+    const year = date.getFullYear();
+    const week = getWeekNumber(date);
+    return {
+      [yColumn]: obj.name,
+      week: `${year}-W${week}`,
+    };
   });
+};
+
+export const groupByMonth = (data: any[], yColumn: string) => {
+  return data.map((obj) => {
+    const date = new Date(obj.time);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // Adding 1 since getMonth() is zero-based
+    return {
+      [yColumn]: obj.name,
+      month: `${year}-${month.toString().padStart(2, "0")}`,
+    };
+  });
+};
+
+const sortByDate = (data: any[]) => {
+  return data.sort((a, b) => a.time - b.time);
+};
+
+export const getGroupedData = (key: string, event: string, data: any) => {
+  let groupedData = groupByDate(data, event);
+
+  switch (key) {
+    case "week":
+      // @ts-ignore
+      groupedData = groupByWeek(data, event);
+      break;
+    case "month":
+      // @ts-ignore
+      groupedData = groupByMonth(data, event);
+      break;
+  }
+
+  return groupedData;
 };

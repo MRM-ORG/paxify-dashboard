@@ -11,6 +11,7 @@ export const THEME = {
 
   background0: "#f2f4f7",
   background1: "#343f52",
+  background2: "#e8eaed",
 
   danger: "#FF4545",
 
