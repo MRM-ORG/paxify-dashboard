@@ -1,10 +1,9 @@
+import { NegativeArrow } from "@/components/atoms/icons/negativeArrow";
+import { PositiveArrow } from "@/components/atoms/icons/positiveArrow";
 import { Column, Row } from "@/styles/common";
+import { Body, GenericText } from "@/utils/text";
 import { THEME } from "@/utils/theme";
 import styled from "styled-components";
-import Image from "next/image";
-import { Body, GenericText } from "@/utils/text";
-import { PositiveArrow } from "@/components/atoms/icons/positiveArrow";
-import { NegativeArrow } from "@/components/atoms/icons/negativeArrow";
 
 interface IAnalyticsSummaryProps {
   label: string;

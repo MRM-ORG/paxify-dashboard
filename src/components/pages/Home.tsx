@@ -172,6 +172,12 @@ const Home: React.FC = () => {
   const [stores, setStores] = useState<any[]>([]);
   const [activeStep, setActiveStep] = useState(0);
 
+  const [activeStore, setActiveStore] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+  const [storeEvents, setStoreEvents] = useState<any>(null);
+
   useEffect(() => {
     // Function to handle clicks outside the header
     const handleClickOutside = (event: any) => {
@@ -201,11 +207,19 @@ const Home: React.FC = () => {
       },
     };
 
+    const viewAnalyticsProps = {
+      storeEvents,
+      setStoreEvents,
+      activeStore,
+      setActiveStore,
+      ...commonProps,
+    };
+
     switch (activeStep) {
       case 0:
         return <StoreSelector {...commonProps} />;
       case 1:
-        return <ViewAnalytics {...commonProps} />;
+        return <ViewAnalytics {...viewAnalyticsProps} />;
       case 2:
         return <ManageProfile />;
       default:

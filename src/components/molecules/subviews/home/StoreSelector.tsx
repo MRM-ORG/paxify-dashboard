@@ -46,13 +46,17 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       <Formik
         initialValues={{ store: "" }}
         onSubmit={(values: any) => {
+          const store = values.store.trim();
+          if (!store) return;
           user.setStores([
             ...user.stores,
             {
-              label: values.store,
-              value: transformDomain(values.store),
+              label: store,
+              value: transformDomain(store),
             },
           ]);
+
+          values.store = "";
         }}>
         <Form>
           <NewStore>

@@ -13,6 +13,8 @@ interface IChartsProps {
   data: any;
   filter: any;
   label: string;
+  toolTipLabel: string;
+  roundOff?: boolean;
 }
 
 const Chart = styled.div`
@@ -48,7 +50,13 @@ const commonBarChartStyles = {
   },
 };
 
-const AnalyticsChart: React.FC<IChartsProps> = ({ data, filter, label }) => {
+const AnalyticsChart: React.FC<IChartsProps> = ({
+  data,
+  filter,
+  label,
+  roundOff = false,
+  toolTipLabel,
+}) => {
   return (
     <Chart>
       <VictoryChart
@@ -56,13 +64,17 @@ const AnalyticsChart: React.FC<IChartsProps> = ({ data, filter, label }) => {
         domainPadding={20}
         containerComponent={
           <VictoryVoronoiContainer
-            labels={({ datum }) => `${label}: ${datum[label]}`}
+            labels={({ datum }) =>
+              `${toolTipLabel}: ${
+                roundOff ? datum[label].toFixed(2) : datum[label]
+              }`
+            }
             labelComponent={<VictoryTooltip {...commonToolTopStyles} />}
           />
         }>
         <VictoryAxis fixLabelOverlap tickFormat={(value) => `${value}`} />
         <VictoryAxis dependentAxis tickFormat={(x) => x} />
-        {data.length > 5 ? (
+        {data?.length > 5 ? (
           <VictoryLine
             {...commonLineChartStyles}
             interpolation="natural"
@@ -74,6 +86,7 @@ const AnalyticsChart: React.FC<IChartsProps> = ({ data, filter, label }) => {
           <VictoryBar
             {...commonBarChartStyles}
             data={data}
+            barWidth={30}
             x={filter.groupBy}
             y={label}
           />

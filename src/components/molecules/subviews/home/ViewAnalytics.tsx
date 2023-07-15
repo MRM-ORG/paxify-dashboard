@@ -7,25 +7,24 @@ import {
   transformPageViews,
   transformStoryViews,
 } from "@/utils/firebaseHelpers";
-import {
-  getPercentChange,
-  getSummaryObject,
-  transformDomain,
-} from "@/utils/helpers";
+import { getSummaryObject, transformDomain } from "@/utils/helpers";
+import { isMobileDevice } from "@/utils/responsive";
 import { H3 } from "@/utils/text";
-import { THEME } from "@/utils/theme";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AnalyticsChart from "../../AnalyticsCharts";
+import AnalyticsCard from "../../cards/AnalyticsCard";
 import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
 import OptionSelector from "../layoutSelector/OptionSelector";
 import TabbedSelector from "../layoutSelector/TabbedSelector";
 import LoadingPage from "../loading/LoadingPage";
-import AnalyticsCard from "../../cards/AnalyticsCard";
-import { isMobileDevice } from "@/utils/responsive";
 
 interface IViewAnalyticsProps {
+  storeEvents?: any;
+  setStoreEvents: (storeEvents: any) => void;
+  activeStore: any;
+  setActiveStore: (store: any) => void;
   user: {
     stores: any[];
     setStores: (stores: string[]) => void;
@@ -71,12 +70,13 @@ const SpacedRow = styled(Row)`
   }
 `;
 
-const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
-  const [activeStore, setActiveStore] = useState<{
-    label: string;
-    value: string;
-  } | null>(null);
-
+const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
+  user,
+  storeEvents,
+  activeStore,
+  setStoreEvents,
+  setActiveStore,
+}) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,20 +90,27 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   });
 
   // Events
-  const [pageViews, setPageViews] = useState<any[]>([]);
-  const [storeEvents, setStoreEvents] = useState<any>(null);
-  const [interactions, setInteractions] = useState<any[]>([]);
-  const [storyViews, setStoryViews] = useState<any[]>([]);
-  const [averageStoryViews, setAverageStoryViews] = useState<any[]>([]);
+  const [pageViews, setPageViews] = useState<any>([]);
+  const [interactions, setInteractions] = useState<any>([]);
+  const [storyViews, setStoryViews] = useState<any>([]);
+  const [averageStoryViews, setAverageStoryViews] = useState<any>([]);
   const [analyticsSummary, setAnalyticsSummary] = useState<any>([]);
 
   useEffect(() => {
-    if (activeStore == null) return;
     setLoading(true);
+    if (activeStore == null) {
+      setError("Please select a store");
+      return;
+    }
     (async () => {
       const storeEvents = await fetchStoreEvents(
         transformDomain(activeStore.value)
       );
+
+      if (storeEvents == null) {
+        setError("Error fetching store events");
+        return;
+      }
 
       setStoreEvents(storeEvents);
     })();
@@ -115,9 +122,6 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
 
   const getStoreAnalytics = () => {
     if (storeEvents == null) {
-      setError(
-        "No tracking data available for this store. Please ensure you have installed the app in your store and it is properly registered."
-      );
       return;
     }
 
@@ -160,20 +164,12 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    if (activeStore === null) {
-      setLoading(false);
-    }
-  }, [activeStore]);
-
-  useEffect(() => {
     if (error != null) {
       setLoading(false);
     }
   }, [error]);
 
   useEffect(() => {
-    console.log(filters);
-    console.log(pageViews);
     getStoreAnalytics();
   }, [filters]);
 
@@ -201,7 +197,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
 
       <SpacedRow>
         <Formik
-          initialValues={{ store: user.stores[0] ?? "" }}
+          initialValues={{ store: activeStore ?? "" }}
           onSubmit={(values) => {}}>
           {({ values }) => {
             return (
@@ -250,32 +246,34 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
 
       <Spacer height={20} />
 
-      <Summaries>
-        <AnalyticsCard
-          label="Page Views"
-          quantity={analyticsSummary?.pageViews?.quantity ?? 0}
-          percentChange={analyticsSummary?.pageViews?.percentChange}
-        />
-        <AnalyticsCard
-          label="Interactions Ratio"
-          quantity={`${
-            (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
-          }%`}
-          percentChange={analyticsSummary?.interactions?.percentChange}
-        />
-        <AnalyticsCard
-          label="Avg. Story Views"
-          quantity={
-            analyticsSummary?.averageStoryViews?.quantity?.toFixed(2) ?? 0
-          }
-          percentChange={analyticsSummary?.averageStoryViews?.percentChange}
-        />
-        <AnalyticsCard
-          label="Story Views"
-          quantity={analyticsSummary?.storyViews?.quantity ?? 0}
-          percentChange={analyticsSummary?.storyViews?.percentChange}
-        />
-      </Summaries>
+      {!loading && !error && (
+        <Summaries>
+          <AnalyticsCard
+            label="Page Views"
+            quantity={analyticsSummary?.pageViews?.quantity ?? 0}
+            percentChange={analyticsSummary?.pageViews?.percentChange}
+          />
+          <AnalyticsCard
+            label="Interactions Ratio"
+            quantity={`${
+              (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
+            }%`}
+            percentChange={analyticsSummary?.interactions?.percentChange}
+          />
+          <AnalyticsCard
+            label="Avg. Story Views"
+            quantity={
+              analyticsSummary?.averageStoryViews?.quantity?.toFixed(2) ?? 0
+            }
+            percentChange={analyticsSummary?.averageStoryViews?.percentChange}
+          />
+          <AnalyticsCard
+            label="Story Views"
+            quantity={analyticsSummary?.storyViews?.quantity ?? 0}
+            percentChange={analyticsSummary?.storyViews?.percentChange}
+          />
+        </Summaries>
+      )}
 
       {!isMobileDevice() && (
         <>
@@ -297,22 +295,27 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                     data={pageViews}
                     filter={filters}
                     label="pageView"
+                    toolTipLabel="Page Views"
                   />
                 )}
 
                 {activeTab === "Interactions Ratio" && (
                   <AnalyticsChart
+                    roundOff
                     data={interactions}
                     filter={filters}
                     label="ratio"
+                    toolTipLabel="Ratio"
                   />
                 )}
 
                 {activeTab === "Average Story Views" && (
                   <AnalyticsChart
+                    roundOff
                     data={averageStoryViews}
                     filter={filters}
                     label="average"
+                    toolTipLabel="Average Views"
                   />
                 )}
 
@@ -321,11 +324,12 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                     data={storyViews}
                     filter={filters}
                     label="interaction"
+                    toolTipLabel="Story Views"
                   />
                 )}
               </>
             )}
-            {error && <H3>{error}</H3>}
+            {error && !loading && <H3>{error}</H3>}
           </ChartUI>
         </>
       )}
