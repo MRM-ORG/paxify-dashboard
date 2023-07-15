@@ -1,10 +1,5 @@
 import { child, get, getDatabase, ref } from "firebase/database";
-import {
-  getGroupedData,
-  groupByDate,
-  groupByMonth,
-  groupByWeek,
-} from "./helpers";
+import { getGroupedData } from "./helpers";
 
 const EVENTS_DB_INSTANCE = "events";
 const EVENTS_DB_TRACKING_SUBKEY = "tracking";
@@ -45,34 +40,41 @@ export const transformPageViews = (
         day?: string;
         week?: string;
         month?: string;
+        device?: string;
       }[],
       obj
     ) => {
-      const { day, week, month } = obj;
+      const { day, week, month, device } = obj;
 
-      const existingItem = result.find((item: any) => {
-        return (
-          item[filters.groupBy] ===
-          (filters.groupBy === "day"
-            ? day
-            : filters.groupBy === "week"
-            ? week
-            : month)
-        );
-      });
-
-      if (existingItem) {
-        existingItem.pageView++;
-      } else {
-        result.push({
-          pageView: 1,
-          [filters.groupBy]:
-            filters.groupBy === "day"
+      if (
+        filters.traffic === "all" || //All traffic
+        device === filters.traffic || //Mobile traffic
+        (filters.traffic === "desktop" && (!device || device === "desktop")) //Desktop traffic (includes null/undefined)
+      ) {
+        const existingItem = result.find((item: any) => {
+          return (
+            item[filters.groupBy] ===
+            (filters.groupBy === "day"
               ? day
               : filters.groupBy === "week"
               ? week
-              : month,
+              : month)
+          );
         });
+
+        if (existingItem) {
+          existingItem.pageView++;
+        } else {
+          result.push({
+            pageView: 1,
+            [filters.groupBy]:
+              filters.groupBy === "day"
+                ? day
+                : filters.groupBy === "week"
+                ? week
+                : month,
+          });
+        }
       }
       return result;
     },
@@ -98,8 +100,15 @@ export const transformComponentInteractions = (
 
   const ratios = Object.entries(
     groupedData.reduce((acc, obj) => {
-      const { interaction, day, week, month } = obj;
-      if (interaction === "reels_init") {
+      const { interaction, day, week, month, device } = obj;
+
+      // Modify the condition to count events based on traffic filter
+      if (
+        interaction === "reels_init" &&
+        ((filters.traffic === "desktop" && (!device || device === "desktop")) ||
+          (filters.traffic === "mobile" && device === "mobile") ||
+          filters.traffic === "all")
+      ) {
         acc[_getDataOnKey(filters.groupBy, day, week, month)] = acc[day] || {
           initCount: 0,
           interactedCount: 0,
@@ -145,19 +154,27 @@ export const transformAverageStoryViews = (
   const groupedData = getGroupedData(filters.groupBy, EVENT, data);
 
   const transformedData = groupedData.reduce((result: any, obj) => {
-    const { event, day, week, month } = obj;
-    const existingItem = result.find(
-      (item: any) =>
-        item[filters.groupBy].toString() ===
-        _getDataOnKey(filters.groupBy, day, week, month).toString()
-    );
+    const { event, day, week, month, device } = obj;
 
-    if (existingItem) {
-      event === "reels_opened" && existingItem.opened++;
-      event === "reels_story_viewed" && existingItem.storiesViewed++;
-    } else {
-      result.push({ opened: 0, storiesViewed: 0, day, month, week });
+    if (
+      filters.traffic === "all" || //All traffic
+      device === filters.traffic || //Mobile traffic
+      (filters.traffic === "desktop" && (!device || device === "desktop")) //Desktop traffic (includes null/undefined)
+    ) {
+      const existingItem = result.find(
+        (item: any) =>
+          item[filters.groupBy].toString() ===
+          _getDataOnKey(filters.groupBy, day, week, month).toString()
+      );
+
+      if (existingItem) {
+        event === "reels_opened" && existingItem.opened++;
+        event === "reels_story_viewed" && existingItem.storiesViewed++;
+      } else {
+        result.push({ opened: 0, storiesViewed: 0, day, month, week });
+      }
     }
+
     return result;
   }, []);
 
@@ -191,18 +208,26 @@ export const transformStoryViews = (
       }[],
       obj
     ) => {
-      const { day, week, month } = obj;
-      const existingItem = result.find(
-        (item: any) =>
-          item[filters.groupBy].toString() ===
-          _getDataOnKey(filters.groupBy, day, week, month).toString()
-      );
+      const { day, week, month, device } = obj;
 
-      if (existingItem) {
-        existingItem.interaction++;
-      } else {
-        result.push({ interaction: 1, day, week, month });
+      if (
+        filters.traffic === "all" || //All traffic
+        device === filters.traffic || //Mobile traffic
+        (filters.traffic === "desktop" && (!device || device === "desktop")) //Desktop traffic (includes null/undefined)
+      ) {
+        const existingItem = result.find(
+          (item: any) =>
+            item[filters.groupBy].toString() ===
+            _getDataOnKey(filters.groupBy, day, week, month).toString()
+        );
+
+        if (existingItem) {
+          existingItem.interaction++;
+        } else {
+          result.push({ interaction: 1, day, week, month });
+        }
       }
+
       return result;
     },
     []

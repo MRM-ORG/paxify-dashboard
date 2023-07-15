@@ -7,24 +7,23 @@ import {
   transformPageViews,
   transformStoryViews,
 } from "@/utils/firebaseHelpers";
-import { transformDomain } from "@/utils/helpers";
+import {
+  getPercentChange,
+  getSummaryObject,
+  transformDomain,
+} from "@/utils/helpers";
 import { H3 } from "@/utils/text";
 import { THEME } from "@/utils/theme";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryLine,
-  VictoryTooltip,
-  VictoryVoronoiContainer,
-} from "victory";
+import AnalyticsChart from "../../AnalyticsCharts";
 import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
 import OptionSelector from "../layoutSelector/OptionSelector";
 import TabbedSelector from "../layoutSelector/TabbedSelector";
 import LoadingPage from "../loading/LoadingPage";
+import AnalyticsCard from "../../cards/AnalyticsCard";
+import { isMobileDevice } from "@/utils/responsive";
 
 interface IViewAnalyticsProps {
   user: {
@@ -44,12 +43,6 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const Chart = styled.div`
-  width: 100%;
-  height: 500px;
-  border: 1px solid ${THEME.primary};
-`;
-
 const ChartUI = styled.div`
   gap: 20px;
   display: flex;
@@ -57,37 +50,26 @@ const ChartUI = styled.div`
   padding: 20px 0;
 `;
 
+const Summaries = styled(Row)`
+  gap: 20px;
+  flex-wrap: nowrap;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+`;
+
 const SpacedRow = styled(Row)`
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
-
-const commonToolTopStyles = {
-  style: {
-    fill: THEME.primary1, // Set the background color of the tooltip
-  },
-  flyoutStyle: {
-    stroke: THEME.primary1, // Set the border color of the tooltip container
-    strokeWidth: 1, // Set the border width of the tooltip container
-    fill: THEME.background0, // Set the background color of the tooltip container
-  },
-};
-
-const commonLineChartStyles = {
-  style: {
-    data: {
-      stroke: THEME.background1,
-    },
-  },
-};
-
-const commonBarChartStyles = {
-  style: {
-    data: {
-      fill: THEME.background1,
-    },
-  },
-};
 
 const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   const [activeStore, setActiveStore] = useState<{
@@ -113,6 +95,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   const [interactions, setInteractions] = useState<any[]>([]);
   const [storyViews, setStoryViews] = useState<any[]>([]);
   const [averageStoryViews, setAverageStoryViews] = useState<any[]>([]);
+  const [analyticsSummary, setAnalyticsSummary] = useState<any>([]);
 
   useEffect(() => {
     if (activeStore == null) return;
@@ -189,8 +172,27 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
   }, [error]);
 
   useEffect(() => {
+    console.log(filters);
+    console.log(pageViews);
     getStoreAnalytics();
   }, [filters]);
+
+  useEffect(() => {
+    setAnalyticsSummary({
+      pageViews: {
+        ...getSummaryObject(pageViews, "pageView"),
+      },
+      interactions: {
+        ...getSummaryObject(interactions, "ratio"),
+      },
+      storyViews: {
+        ...getSummaryObject(storyViews, "interaction"),
+      },
+      averageStoryViews: {
+        ...getSummaryObject(averageStoryViews, "average"),
+      },
+    });
+  }, [pageViews, interactions, storyViews, averageStoryViews]);
 
   return (
     <Container>
@@ -219,8 +221,9 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
             );
           }}
         </Formik>
+
         <Row gap="15px">
-          {/* <OptionSelector
+          <OptionSelector
             options={["Traffic", "All", "Mobile", "Desktop"]}
             onChange={(tab) =>
               setFilters((prev: any) => {
@@ -230,7 +233,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
                 };
               })
             }
-          /> */}
+          />
           <OptionSelector
             options={["Group By", "Day", "Week", "Month"]}
             onChange={(tab) =>
@@ -244,146 +247,88 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({ user }) => {
           />
         </Row>
       </SpacedRow>
+
       <Spacer height={20} />
 
-      <TabbedSelector
-        tabs={[
-          "Page Views",
-          "Interactions Ratio",
-          "Average Story Views",
-          "Total Story Views",
-        ]}
-        onChange={(tab) => setActiveTab(tab)}
-      />
+      <Summaries>
+        <AnalyticsCard
+          label="Page Views"
+          quantity={analyticsSummary?.pageViews?.quantity ?? 0}
+          percentChange={analyticsSummary?.pageViews?.percentChange}
+        />
+        <AnalyticsCard
+          label="Interactions Ratio"
+          quantity={`${
+            (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
+          }%`}
+          percentChange={analyticsSummary?.interactions?.percentChange}
+        />
+        <AnalyticsCard
+          label="Avg. Story Views"
+          quantity={
+            analyticsSummary?.averageStoryViews?.quantity?.toFixed(2) ?? 0
+          }
+          percentChange={analyticsSummary?.averageStoryViews?.percentChange}
+        />
+        <AnalyticsCard
+          label="Story Views"
+          quantity={analyticsSummary?.storyViews?.quantity ?? 0}
+          percentChange={analyticsSummary?.storyViews?.percentChange}
+        />
+      </Summaries>
 
-      <ChartUI>
-        {!loading && activeStore && !error && (
-          <>
-            {activeTab === "Page Views" && (
-              <Chart>
-                <VictoryChart
-                  width={800}
-                  domainPadding={20}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={({ datum }) => `Page Views: ${datum.pageView}`}
-                      labelComponent={
-                        <VictoryTooltip {...commonToolTopStyles} />
-                      }
-                    />
-                  }>
-                  <VictoryAxis
-                    fixLabelOverlap
-                    tickFormat={(value) => `${value}`}
-                  />
-                  <VictoryAxis dependentAxis tickFormat={(x) => x} />
-                  <VictoryLine
-                    {...commonLineChartStyles}
-                    interpolation="natural"
+      {!isMobileDevice() && (
+        <>
+          <TabbedSelector
+            tabs={[
+              "Page Views",
+              "Interactions Ratio",
+              "Average Story Views",
+              "Total Story Views",
+            ]}
+            onChange={(tab) => setActiveTab(tab)}
+          />
+
+          <ChartUI>
+            {!loading && activeStore && !error && (
+              <>
+                {activeTab === "Page Views" && (
+                  <AnalyticsChart
                     data={pageViews}
-                    x={filters.groupBy}
-                    y="pageView"
+                    filter={filters}
+                    label="pageView"
                   />
-                </VictoryChart>
-              </Chart>
-            )}
+                )}
 
-            {activeTab === "Interactions Ratio" && (
-              <Chart>
-                <VictoryChart
-                  width={800}
-                  domainPadding={20}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={({ datum }) =>
-                        `Ratio: ${datum.ratio?.toFixed(2) * 100}% `
-                      }
-                      labelComponent={
-                        <VictoryTooltip {...commonToolTopStyles} />
-                      }
-                    />
-                  }>
-                  <VictoryBar
-                    {...commonBarChartStyles}
+                {activeTab === "Interactions Ratio" && (
+                  <AnalyticsChart
                     data={interactions}
-                    x={filters.groupBy}
-                    y="ratio"
+                    filter={filters}
+                    label="ratio"
                   />
-                  <VictoryAxis
-                    fixLabelOverlap
-                    tickFormat={(value) => `${value}`}
-                  />
-                  <VictoryAxis
-                    dependentAxis
-                    tickFormat={(x) => `${x * 100}%`}
-                  />
-                </VictoryChart>
-              </Chart>
-            )}
+                )}
 
-            {activeTab === "Average Story Views" && (
-              <Chart>
-                <VictoryChart
-                  width={800}
-                  domainPadding={20}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={({ datum }) =>
-                        `Average: ${datum.average.toFixed(2)}`
-                      }
-                      labelComponent={
-                        <VictoryTooltip {...commonToolTopStyles} />
-                      }
-                    />
-                  }>
-                  <VictoryAxis
-                    fixLabelOverlap
-                    tickFormat={(value) => `${value}`}
-                  />
-                  <VictoryAxis dependentAxis tickFormat={(x) => x} />
-                  <VictoryLine
-                    {...commonLineChartStyles}
-                    interpolation="natural"
+                {activeTab === "Average Story Views" && (
+                  <AnalyticsChart
                     data={averageStoryViews}
-                    x={filters.groupBy}
-                    y="average"
+                    filter={filters}
+                    label="average"
                   />
-                </VictoryChart>
-              </Chart>
-            )}
+                )}
 
-            {activeTab === "Total Story Views" && (
-              <Chart>
-                <VictoryChart
-                  width={800}
-                  domainPadding={20}
-                  containerComponent={
-                    <VictoryVoronoiContainer
-                      labels={({ datum }) => `Views: ${datum.interaction}`}
-                      labelComponent={
-                        <VictoryTooltip {...commonToolTopStyles} />
-                      }
-                    />
-                  }>
-                  <VictoryAxis
-                    fixLabelOverlap
-                    tickFormat={(value) => `${value}`}
-                  />
-                  <VictoryAxis dependentAxis tickFormat={(x) => x} />
-                  <VictoryLine
-                    {...commonLineChartStyles}
-                    interpolation="natural"
+                {activeTab === "Total Story Views" && (
+                  <AnalyticsChart
                     data={storyViews}
-                    x={filters.groupBy}
-                    y="interaction"
+                    filter={filters}
+                    label="interaction"
                   />
-                </VictoryChart>
-              </Chart>
+                )}
+              </>
             )}
-          </>
-        )}
-        {error && <H3>{error}</H3>}
-      </ChartUI>
+            {error && <H3>{error}</H3>}
+          </ChartUI>
+        </>
+      )}
       <LoadingPage isLoading={loading} />
     </Container>
   );

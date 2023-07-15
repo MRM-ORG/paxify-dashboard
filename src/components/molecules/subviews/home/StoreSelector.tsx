@@ -14,11 +14,20 @@ interface IStoreSelectorProps {
   };
 }
 
+const Container = styled(Column)`
+  gap: 10px;
+  max-width: 100%;
+`;
+
 const NewStore = styled(Row)`
   gap: 25px;
   max-width: 500px;
   flex-wrap: nowrap;
   align-items: flex-end;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const RegisteredDomains = styled.div`
@@ -28,7 +37,7 @@ const RegisteredDomains = styled.div`
 
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   return (
-    <Column gap="10px">
+    <Container>
       <h1>My Stores</h1>
       <p>
         Here are all the stores under your ownership. You can also add or remove
@@ -69,7 +78,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       {user.stores?.map((store) => (
         <p key={store.value}>{store.label}</p>
       ))}
-    </Column>
+    </Container>
   );
 };
 

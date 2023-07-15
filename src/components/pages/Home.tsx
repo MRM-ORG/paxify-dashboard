@@ -3,7 +3,7 @@ import { signOutUser } from "@/utils/auth";
 import { THEME } from "@/utils/theme";
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useState } from "react";
+import { LegacyRef, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Analytics from "../atoms/icons/analytics";
 import Stores from "../atoms/icons/stores";
@@ -13,8 +13,25 @@ import Logo from "../atoms/icons/logo";
 import Logout from "../atoms/icons/logout";
 import Profile from "../atoms/icons/profile";
 import ManageProfile from "../molecules/subviews/home/Profile";
+import { isMobileDevice } from "@/utils/responsive";
+import Spacer from "../atoms/Spacer";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const navLinks = [
+  {
+    name: "Home",
+    href: "#home",
+  },
+  {
+    name: "Features",
+    href: "#features",
+  },
+  {
+    name: "Pricing",
+    href: "#pricing",
+  },
+];
 
 const UIContainer = styled.div`
   display: grid;
@@ -73,6 +90,64 @@ const Option = styled(Row)<{ isActive?: boolean }>`
   }
 `;
 
+const MobileMenuButton = styled.div`
+  cursor: pointer;
+  margin-left: 10px;
+  padding: 0;
+  user-select: text;
+  -webkit-user-select: text;
+`;
+
+const MobileBurgerLine = styled.div`
+  width: 25px;
+  height: 3px;
+  background-color: ${THEME.white};
+  margin-top: 5px;
+  margin-bottom: 5px;
+  transition: transform 300ms ease-out;
+`;
+
+const MobileNavMenuFlex = styled.div`
+  position: absolute;
+  width: 90%;
+  flex-direction: column;
+  padding: 30px 40px;
+  padding-bottom: 22px;
+  background-color: ${THEME.primary};
+  transition: transform 300ms ease-out;
+`;
+
+const MobileNavMenu = styled.div`
+  z-index: 1;
+  margin: 0;
+  width: 100%;
+  grid-column-gap: 50px;
+  grid-row-gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0;
+  padding-left: 0;
+  display: block;
+  list-style: none;
+`;
+
+const MobileNavLink = styled.a`
+  height: auto;
+  min-width: 100%;
+  display: inline-block;
+  color: ${THEME.white};
+  padding: 6px 0;
+  margin-left: 25px;
+  font-size: 16px;
+  text-decoration: none;
+  transition: opacity 200ms ease-in-out;
+  z-index: 10;
+
+  &:hover {
+    color: ${THEME.primary1};
+  }
+`;
+
 const SidebarOptions = [
   {
     id: 0,
@@ -92,8 +167,27 @@ const SidebarOptions = [
 ];
 
 const Home: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const headerRef = useRef<HTMLElement | null>(null);
   const [stores, setStores] = useState<any[]>([]);
   const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    // Function to handle clicks outside the header
+    const handleClickOutside = (event: any) => {
+      if (headerRef.current && !headerRef.current.contains(event.target)) {
+        setIsExpanded(false);
+      }
+    };
+
+    // Add event listener to handle clicks outside the header
+    document.addEventListener("click", handleClickOutside);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   const handleUserSignOut = () => {
     signOutUser();
@@ -130,22 +224,25 @@ const Home: React.FC = () => {
 
       <UIContainer className={inter.className}>
         <LeftPane>
-          <TopBar>
-            {SidebarOptions.map(
-              (option) =>
-                !option?.hide && (
-                  <Option
-                    isActive={activeStep === option.id}
-                    onClick={() => setActiveStep(option.id)}
-                    key={option.id}>
-                    {option.icon}
-                    <div>{option.title}</div>
-                  </Option>
-                )
-            )}
-          </TopBar>
-          <div>
-            <Divider />
+          {!isMobileDevice() && (
+            <TopBar>
+              {SidebarOptions.map(
+                (option) =>
+                  !option?.hide && (
+                    <Option
+                      isActive={activeStep === option.id}
+                      onClick={() => setActiveStep(option.id)}
+                      key={option.id}>
+                      {option.icon}
+                      <div>{option.title}</div>
+                    </Option>
+                  )
+              )}
+            </TopBar>
+          )}
+          <div style={{ zIndex: 1 }}>
+            {!isMobileDevice() && <Divider />}
+
             <BottomBar>
               <Logo
                 fill={THEME.white}
@@ -154,13 +251,96 @@ const Home: React.FC = () => {
                 fontSize="60"
                 xPosition="55%"
               />
-              <Row gap="10px">
-                <Profile
-                  fill={activeStep === 2 ? THEME.blue1 : THEME.white}
-                  onClick={() => setActiveStep(2)}
-                />
-                <Logout onClick={handleUserSignOut} />
-              </Row>
+              {!isMobileDevice() && (
+                <Row gap="10px">
+                  <Profile
+                    fill={activeStep === 2 ? THEME.blue1 : THEME.white}
+                    onClick={() => setActiveStep(2)}
+                  />
+                  <Logout onClick={handleUserSignOut} />
+                </Row>
+              )}
+              {isMobileDevice() && (
+                <>
+                  <MobileMenuButton
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      setIsExpanded(!isExpanded);
+                    }}
+                    ref={headerRef as LegacyRef<HTMLDivElement>}
+                    aria-label="menu"
+                    role="button"
+                    tabIndex={0}
+                    aria-controls="w-nav-overlay-1"
+                    aria-haspopup="menu"
+                    aria-expanded={isExpanded}>
+                    <div>
+                      <MobileBurgerLine
+                        style={{
+                          transformStyle: "preserve-3d",
+                          transform: isExpanded
+                            ? "translate3d(0px, 8px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(-45deg) skew(0deg, 0deg)"
+                            : "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        }}
+                      />
+                      <MobileBurgerLine
+                        style={{
+                          transformStyle: "preserve-3d",
+                          transform: isExpanded
+                            ? "translate3d(0px, 0px, 0px) scale3d(0, 0, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)"
+                            : "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        }}
+                      />
+                      <MobileBurgerLine
+                        style={{
+                          transformStyle: "preserve-3d",
+                          transform: isExpanded
+                            ? "translate3d(0px, -8px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(45deg) skew(0deg, 0deg)"
+                            : "translate3d(0px, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg)",
+                        }}
+                      />
+                    </div>
+                  </MobileMenuButton>
+                  <MobileNavMenuFlex
+                    style={{
+                      transform: isExpanded
+                        ? "translateY(150px)"
+                        : "translateY(-150px)",
+                    }}>
+                    <MobileNavMenu role="list">
+                      {SidebarOptions.map(
+                        (option) =>
+                          !option.hide && (
+                            <Option
+                              key={option.id}
+                              isActive={activeStep === option.id}
+                              onClick={() => setActiveStep(option.id)}>
+                              {option.icon}
+                              <div>{option.title}</div>
+                            </Option>
+                          )
+                      )}
+                      <Spacer height={5} />
+                      <Divider />
+                      <Spacer height={5} />
+                      <Option gap="10px" onClick={() => setActiveStep(2)}>
+                        <Row gap="10px">
+                          <Profile
+                            fill={activeStep === 2 ? THEME.blue1 : THEME.white}
+                          />
+                          <div>Profile</div>
+                        </Row>
+                      </Option>
+                      <Option onClick={handleUserSignOut}>
+                        <Row gap="10px">
+                          <Logout />
+                          <div>Logout</div>
+                        </Row>
+                      </Option>
+                    </MobileNavMenu>
+                  </MobileNavMenuFlex>
+                </>
+              )}
             </BottomBar>
           </div>
         </LeftPane>

@@ -9,6 +9,7 @@ export const transformDomain = (domain: string) => {
 export const groupByDate = (data: any[], yColumn: string) => {
   return sortByDate(data).map((obj) => ({
     [yColumn]: obj.name,
+    device: obj.device,
     day: new Date(obj.time).toLocaleDateString(),
   }));
 };
@@ -74,4 +75,31 @@ export const getGroupedData = (key: string, event: string, data: any) => {
   }
 
   return groupedData;
+};
+
+export const getSummaryObject = (data: any, label: string) => {
+  // console.log(data);
+  return {
+    label,
+    quantity: data[data.length - 1]?.[label],
+    percentChange: getPercentChange(
+      data[data.length - 1]?.[label],
+      data[data.length - 2]?.[label]
+    ),
+  };
+};
+
+export const getPercentChange = (
+  currentValue: number,
+  previousValue: number
+) => {
+  const difference = currentValue - previousValue;
+  const percentChange = (
+    difference ? (difference / previousValue) * 100 : 0
+  ).toFixed(2);
+
+  if (Number(percentChange) > 1000) {
+    return 1000;
+  }
+  return percentChange;
 };
