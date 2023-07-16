@@ -19,6 +19,7 @@ import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingle
 import OptionSelector from "../layoutSelector/OptionSelector";
 import TabbedSelector from "../layoutSelector/TabbedSelector";
 import LoadingPage from "../loading/LoadingPage";
+import RangeDatePicker from "../../inputs/RangeDatePicker";
 
 interface IViewAnalyticsProps {
   storeEvents?: any;
@@ -53,6 +54,10 @@ const Summaries = styled(Row)`
   gap: 20px;
   flex-wrap: nowrap;
   margin-bottom: 20px;
+
+  @media (max-width: 1440px) {
+    flex-wrap: wrap;
+  }
 
   @media (max-width: 768px) {
     flex-wrap: wrap;
@@ -96,8 +101,11 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
   const [averageStoryViews, setAverageStoryViews] = useState<any>([]);
   const [analyticsSummary, setAnalyticsSummary] = useState<any>([]);
 
+  const [customDateRange, setCustomDateRange] = useState<any>([null, null]);
+
   useEffect(() => {
     setLoading(true);
+
     if (activeStore == null) {
       setError("Please select a store");
       return;
@@ -197,7 +205,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
 
       <SpacedRow>
         <Formik
-          initialValues={{ store: activeStore ?? "" }}
+          initialValues={{ store: activeStore }}
           onSubmit={(values) => {}}>
           {({ values }) => {
             return (
@@ -218,30 +226,36 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
           }}
         </Formik>
 
-        <Row gap="15px">
-          <OptionSelector
-            options={["Traffic", "All", "Mobile", "Desktop"]}
-            onChange={(tab) =>
-              setFilters((prev: any) => {
-                return {
-                  ...prev,
-                  traffic: tab.toLocaleLowerCase(),
-                };
-              })
-            }
-          />
-          <OptionSelector
-            options={["Group By", "Day", "Week", "Month"]}
-            onChange={(tab) =>
-              setFilters((prev: any) => {
-                return {
-                  ...prev,
-                  groupBy: tab.toLocaleLowerCase(),
-                };
-              })
-            }
-          />
-        </Row>
+        {!error && !loading && (
+          <Row gap="15px">
+            <OptionSelector
+              options={["Traffic", "All", "Mobile", "Desktop"]}
+              onChange={(tab) =>
+                setFilters((prev: any) => {
+                  return {
+                    ...prev,
+                    traffic: tab.toLocaleLowerCase(),
+                  };
+                })
+              }
+            />
+            <OptionSelector
+              options={["Group By", "Day", "Week", "Month"]}
+              onChange={(tab) =>
+                setFilters((prev: any) => {
+                  return {
+                    ...prev,
+                    groupBy: tab.toLocaleLowerCase(),
+                  };
+                })
+              }
+            />
+            {/* <RangeDatePicker
+              dateRange={customDateRange}
+              setDateRange={setCustomDateRange}
+            /> */}
+          </Row>
+        )}
       </SpacedRow>
 
       <Spacer height={20} />
@@ -277,15 +291,17 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
 
       {!isMobileDevice() && (
         <>
-          <TabbedSelector
-            tabs={[
-              "Page Views",
-              "Interactions Ratio",
-              "Average Story Views",
-              "Total Story Views",
-            ]}
-            onChange={(tab) => setActiveTab(tab)}
-          />
+          {!loading && !error && (
+            <TabbedSelector
+              tabs={[
+                "Page Views",
+                "Interactions Ratio",
+                "Average Story Views",
+                "Total Story Views",
+              ]}
+              onChange={(tab) => setActiveTab(tab)}
+            />
+          )}
 
           <ChartUI>
             {!loading && activeStore && !error && (
