@@ -103,3 +103,16 @@ export const getPercentChange = (
   }
   return percentChange;
 };
+
+export const checkIfWithinSubscriptionThreshold = (
+  type: string,
+  newStoreTotal: number
+) => {
+  if (type === "basic") {
+    if (newStoreTotal >= 1) {
+      return false;
+    }
+    return true;
+  }
+  return false;
+};

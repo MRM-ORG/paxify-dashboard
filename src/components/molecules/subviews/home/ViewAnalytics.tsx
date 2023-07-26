@@ -250,10 +250,10 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
                 })
               }
             />
-            {/* <RangeDatePicker
+            <RangeDatePicker
               dateRange={customDateRange}
               setDateRange={setCustomDateRange}
-            /> */}
+            />
           </Row>
         )}
       </SpacedRow>

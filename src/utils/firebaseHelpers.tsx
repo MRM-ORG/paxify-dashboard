@@ -1,8 +1,9 @@
-import { child, get, getDatabase, ref } from "firebase/database";
-import { getGroupedData } from "./helpers";
+import { child, get, getDatabase, ref, set } from "firebase/database";
+import { checkIfWithinSubscriptionThreshold, getGroupedData } from "./helpers";
 
 const EVENTS_DB_INSTANCE = "events";
 const EVENTS_DB_TRACKING_SUBKEY = "tracking";
+const EVENTS_DB_SUBSCRIPTIONS = "subscriptions";
 
 export const fetchStoreEvents = async (storeID: string) => {
   const db = getDatabase();
@@ -234,4 +235,87 @@ export const transformStoryViews = (
   );
 
   return transformedData;
+};
+
+export const createUserSubscriptionInstance = async (userId: string) => {
+  // Write key to firebase
+  const db = getDatabase();
+  const subscriptionsRef = ref(db, EVENTS_DB_SUBSCRIPTIONS);
+
+  try {
+    const snapshot = await get(child(subscriptionsRef, userId));
+    if (snapshot.exists()) {
+      return;
+    }
+    await set(child(subscriptionsRef, userId), {
+      subscription: {
+        type: "basic",
+        startDate: Date.now(),
+        endDate: null,
+      },
+      stores: [],
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const fetchCurrentUserStores = async (userId: string) => {
+  const db = getDatabase();
+  const subscriptionsRef = ref(db, EVENTS_DB_SUBSCRIPTIONS);
+
+  try {
+    const snapshot = await get(child(subscriptionsRef, userId));
+    if (snapshot.exists()) {
+      return snapshot.val().stores;
+    }
+    return [];
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const registerStore = (
+  domain: string,
+  userId: string
+): Promise<void> => {
+  return new Promise(async (resolve, reject) => {
+    const db = getDatabase();
+    const subscriptionsRef = ref(db, EVENTS_DB_SUBSCRIPTIONS);
+
+    try {
+      const snapshot = await get(child(subscriptionsRef, userId));
+      if (snapshot.exists()) {
+        const stores = snapshot.val().stores;
+        const subscriptionType = snapshot.val().subscription.type;
+        let newStores: any = [];
+        if (stores) {
+          if (
+            checkIfWithinSubscriptionThreshold(subscriptionType, stores.length)
+          ) {
+            newStores = [...stores, { label: domain, value: domain }];
+          } else {
+            // Return error
+            reject(new Error("Subscription threshold reached"));
+            return;
+          }
+        } else {
+          newStores = [{ label: domain, value: domain }];
+        }
+
+        await set(child(subscriptionsRef, userId), {
+          ...snapshot.val(),
+          stores: newStores,
+        });
+
+        resolve(); // Resolve the promise when everything is successful
+      } else {
+        // Handle the case when the snapshot doesn't exist
+        reject(new Error("Snapshot does not exist"));
+      }
+    } catch (error) {
+      console.error(error);
+      reject(error); // Reject the promise if there's an error
+    }
+  });
 };

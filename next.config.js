@@ -10,6 +10,8 @@ const nextConfig = {
     FIREBASE_MESSAGE_SENDER_ID:
       process.env.NEXT_PUBLIC_FIREBASE_MESSAGE_SENDER_ID,
     FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    STRIPE_BACKEND_URL: process.env.NEXT_PUBLIC_STRIPE_BACKEND_URL,
   },
   compiler: {
     styledComponents: true,

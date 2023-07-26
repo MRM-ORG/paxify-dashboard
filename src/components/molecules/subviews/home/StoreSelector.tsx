@@ -1,11 +1,16 @@
 import { Column, Row } from "@/styles/common";
 import { Form, Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormikLabelledTextInput from "../../inputs/formik/FormikLabelledTextInput";
 import PrimaryButton from "@/components/atoms/buttons/PrimaryButton";
 import { THEME } from "@/utils/theme";
 import { styled } from "styled-components";
 import { transformDomain } from "@/utils/helpers";
+import {
+  createUserSubscriptionInstance,
+  fetchCurrentUserStores,
+  registerStore,
+} from "@/utils/firebaseHelpers";
 
 interface IStoreSelectorProps {
   user: {
@@ -36,6 +41,27 @@ const RegisteredDomains = styled.div`
 `;
 
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
+  const [stores, setStores] = useState<any>([]);
+  const [activeUser, setActiveUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") as string);
+      const { uid } = user;
+      setActiveUser(uid);
+
+      createUserSubscriptionInstance(uid);
+
+      fetchCurrentUserStores(uid).then((stores) => {
+        setStores(stores);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  console.log(stores);
+
   return (
     <Container>
       <h1>My Stores</h1>
@@ -48,13 +74,21 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
         onSubmit={(values: any) => {
           const store = values.store.trim();
           if (!store) return;
-          user.setStores([
-            ...user.stores,
-            {
-              label: store,
-              value: transformDomain(store),
-            },
-          ]);
+
+          registerStore(store, activeUser as string)
+            .then(() => {
+              setStores([
+                ...user?.stores,
+                {
+                  label: store,
+                  value: transformDomain(store),
+                },
+              ]);
+            })
+            .catch((err) => {
+              alert(err);
+              console.error(err);
+            });
 
           values.store = "";
         }}>
@@ -79,8 +113,8 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       </Formik>
 
       <RegisteredDomains>My Existing Stores</RegisteredDomains>
-      {user.stores?.map((store) => (
-        <p key={store.value}>{store.label}</p>
+      {stores?.map((store: any) => (
+        <p key={store.value}>{store.value}</p>
       ))}
     </Container>
   );
