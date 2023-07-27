@@ -30,6 +30,7 @@ const Container = styled(Row)`
 
   @media (max-width: 768px) {
     flex-direction: column;
+    height: 100vh;
   }
 `;
 

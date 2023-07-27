@@ -15,10 +15,13 @@ import {
   DASHBOARD_ANALYTICS,
   DASHBOARD_SUBSCRIPTIONS,
   DASHBOARD_PROFILE,
+  USER_LOGIN,
+  USER_REGISTER,
 } from "@/utils/routes";
 import { THEME } from "@/utils/theme";
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
+import { useRouter } from "next/router";
 import { LegacyRef, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -120,23 +123,6 @@ const MobileNavMenu = styled.div`
   list-style: none;
 `;
 
-const MobileNavLink = styled.a`
-  height: auto;
-  min-width: 100%;
-  display: inline-block;
-  color: ${THEME.white};
-  padding: 6px 0;
-  margin-left: 25px;
-  font-size: 16px;
-  text-decoration: none;
-  transition: opacity 200ms ease-in-out;
-  z-index: 10;
-
-  &:hover {
-    color: ${THEME.primary1};
-  }
-`;
-
 const SidebarOptions = [
   {
     id: 0,
@@ -160,6 +146,8 @@ const SidebarOptions = [
   },
 ];
 
+const UnProtectedRoutes = [USER_LOGIN(), USER_REGISTER()];
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -173,6 +161,27 @@ export default function App({ Component, pageProps }: AppProps) {
   const handleUserSignOut = () => {
     signOutUser();
   };
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (UnProtectedRoutes.includes(window.location.pathname)) {
+      document
+        .getElementById("uiContainer")
+        ?.setAttribute("style", "grid-template-columns: 1fr");
+      document.getElementById("header")?.setAttribute("style", "display: none");
+    } else {
+      document
+        .getElementById("uiContainer")
+        ?.setAttribute(
+          "style",
+          `grid-template-columns: ${
+            window.innerWidth > 768 ? "2fr 10fr" : "1fr"
+          }`
+        );
+      document.getElementById("header")?.setAttribute("style", "display: flex");
+    }
+  }, [router.pathname]);
 
   useEffect(() => {
     switch (activeStep) {
@@ -210,8 +219,8 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <UIContainer className={inter.className}>
-      <LeftPane>
+    <UIContainer id="uiContainer" className={inter.className}>
+      <LeftPane id="header">
         {!isMobileDevice() && (
           <TopBar>
             {SidebarOptions.map(
@@ -228,7 +237,7 @@ export default function App({ Component, pageProps }: AppProps) {
             )}
           </TopBar>
         )}
-        <div style={{ zIndex: 1 }}>
+        <div id="mobileHeader" style={{ zIndex: 1 }}>
           {!isMobileDevice() && <Divider />}
 
           <BottomBar>
