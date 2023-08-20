@@ -10,7 +10,7 @@ export const THEME = {
   blue1: "rgb(102, 157, 246)",
 
   background0: "#f2f4f7",
-  background1: "#343f52",
+  background1: "#130623",
   background2: "#e8eaed",
 
   positive: "#BCFFD7",

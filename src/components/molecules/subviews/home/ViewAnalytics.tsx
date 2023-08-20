@@ -1,7 +1,7 @@
+import { getStoreEvents } from "@/apiCalls/tracking";
 import Spacer from "@/components/atoms/Spacer";
 import { Row } from "@/styles/common";
 import {
-  fetchStoreEvents,
   transformAverageStoryViews,
   transformComponentInteractions,
   transformPageViews,
@@ -11,6 +11,7 @@ import { getSummaryObject, transformDomain } from "@/utils/helpers";
 import { isMobileDevice } from "@/utils/responsive";
 import { H3 } from "@/utils/text";
 import { Form, Formik } from "formik";
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AnalyticsChart from "../../AnalyticsCharts";
@@ -19,7 +20,6 @@ import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingle
 import OptionSelector from "../layoutSelector/OptionSelector";
 import TabbedSelector from "../layoutSelector/TabbedSelector";
 import LoadingPage from "../loading/LoadingPage";
-import RangeDatePicker from "../../inputs/RangeDatePicker";
 
 interface IViewAnalyticsProps {
   storeEvents?: any;
@@ -39,6 +39,7 @@ const StoreSelector = styled.div`
 const Container = styled.div`
   width: 100%;
   display: flex;
+  padding: 24px;
   overflow: auto;
   flex-direction: column;
 `;
@@ -111,9 +112,14 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       return;
     }
     (async () => {
-      const storeEvents = await fetchStoreEvents(
+      const user = JSON.parse(localStorage.getItem("user") as string);
+
+      const apiResponse = await getStoreEvents(
+        user.uid,
         transformDomain(activeStore.value)
       );
+
+      const storeEvents = apiResponse.data;
 
       if (storeEvents == null) {
         setError("Error fetching store events");
@@ -199,158 +205,165 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
   }, [pageViews, interactions, storyViews, averageStoryViews]);
 
   return (
-    <Container>
-      <h1>Analytics</h1>
-      <Spacer height={10} />
+    <>
+      <Head>
+        <title>Paxify | Analytics</title>
+        <meta name="description" content="Paxify analytics" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Container>
+        <h1>Analytics</h1>
+        <Spacer height={10} />
 
-      <SpacedRow>
-        <Formik
-          initialValues={{ store: activeStore }}
-          onSubmit={(values) => {}}>
-          {({ values }) => {
-            return (
-              <Form>
-                <StoreSelector>
-                  <FormikLabelledSingleSelect
-                    name="store"
-                    label="Active Store"
-                    onChange={(val) => {
-                      setActiveStore(val);
-                    }}
-                    placeholder="Store to view analytics"
-                    options={user.stores}
-                  />
-                </StoreSelector>
-              </Form>
-            );
-          }}
-        </Formik>
+        <SpacedRow>
+          <Formik
+            initialValues={{ store: activeStore }}
+            onSubmit={(values) => {}}>
+            {({ values }) => {
+              return (
+                <Form>
+                  <StoreSelector>
+                    <FormikLabelledSingleSelect
+                      name="store"
+                      label="Active Store"
+                      onChange={(val) => {
+                        setActiveStore(val);
+                      }}
+                      placeholder="Store to view analytics"
+                      options={user.stores}
+                    />
+                  </StoreSelector>
+                </Form>
+              );
+            }}
+          </Formik>
 
-        {!error && !loading && (
-          <Row gap="15px">
-            <OptionSelector
-              options={["Traffic", "All", "Mobile", "Desktop"]}
-              onChange={(tab) =>
-                setFilters((prev: any) => {
-                  return {
-                    ...prev,
-                    traffic: tab.toLocaleLowerCase(),
-                  };
-                })
-              }
-            />
-            <OptionSelector
-              options={["Group By", "Day", "Week", "Month"]}
-              onChange={(tab) =>
-                setFilters((prev: any) => {
-                  return {
-                    ...prev,
-                    groupBy: tab.toLocaleLowerCase(),
-                  };
-                })
-              }
-            />
-            <RangeDatePicker
+          {!error && !loading && (
+            <Row gap="15px">
+              <OptionSelector
+                options={["Traffic", "All", "Mobile", "Desktop"]}
+                onChange={(tab) =>
+                  setFilters((prev: any) => {
+                    return {
+                      ...prev,
+                      traffic: tab.toLocaleLowerCase(),
+                    };
+                  })
+                }
+              />
+              <OptionSelector
+                options={["Group By", "Day", "Week", "Month"]}
+                onChange={(tab) =>
+                  setFilters((prev: any) => {
+                    return {
+                      ...prev,
+                      groupBy: tab.toLocaleLowerCase(),
+                    };
+                  })
+                }
+              />
+              {/* <RangeDatePicker
               dateRange={customDateRange}
               setDateRange={setCustomDateRange}
-            />
-          </Row>
-        )}
-      </SpacedRow>
-
-      <Spacer height={20} />
-
-      {!loading && !error && (
-        <Summaries>
-          <AnalyticsCard
-            label="Page Views"
-            quantity={analyticsSummary?.pageViews?.quantity ?? 0}
-            percentChange={analyticsSummary?.pageViews?.percentChange}
-          />
-          <AnalyticsCard
-            label="Interactions Ratio"
-            quantity={`${
-              (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
-            }%`}
-            percentChange={analyticsSummary?.interactions?.percentChange}
-          />
-          <AnalyticsCard
-            label="Avg. Story Views"
-            quantity={
-              analyticsSummary?.averageStoryViews?.quantity?.toFixed(2) ?? 0
-            }
-            percentChange={analyticsSummary?.averageStoryViews?.percentChange}
-          />
-          <AnalyticsCard
-            label="Story Views"
-            quantity={analyticsSummary?.storyViews?.quantity ?? 0}
-            percentChange={analyticsSummary?.storyViews?.percentChange}
-          />
-        </Summaries>
-      )}
-
-      {!isMobileDevice() && (
-        <>
-          {!loading && !error && (
-            <TabbedSelector
-              tabs={[
-                "Page Views",
-                "Interactions Ratio",
-                "Average Story Views",
-                "Total Story Views",
-              ]}
-              onChange={(tab) => setActiveTab(tab)}
-            />
+            /> */}
+            </Row>
           )}
+        </SpacedRow>
 
-          <ChartUI>
-            {!loading && activeStore && !error && (
-              <>
-                {activeTab === "Page Views" && (
-                  <AnalyticsChart
-                    data={pageViews}
-                    filter={filters}
-                    label="pageView"
-                    toolTipLabel="Page Views"
-                  />
-                )}
+        <Spacer height={20} />
 
-                {activeTab === "Interactions Ratio" && (
-                  <AnalyticsChart
-                    roundOff
-                    data={interactions}
-                    filter={filters}
-                    label="ratio"
-                    toolTipLabel="Ratio"
-                  />
-                )}
+        {!loading && !error && (
+          <Summaries>
+            <AnalyticsCard
+              label="Page Views"
+              quantity={analyticsSummary?.pageViews?.quantity ?? 0}
+              percentChange={analyticsSummary?.pageViews?.percentChange}
+            />
+            <AnalyticsCard
+              label="Interactions Ratio"
+              quantity={`${
+                (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
+              }%`}
+              percentChange={analyticsSummary?.interactions?.percentChange}
+            />
+            <AnalyticsCard
+              label="Avg. Story Views"
+              quantity={
+                analyticsSummary?.averageStoryViews?.quantity?.toFixed(2) ?? 0
+              }
+              percentChange={analyticsSummary?.averageStoryViews?.percentChange}
+            />
+            <AnalyticsCard
+              label="Story Views"
+              quantity={analyticsSummary?.storyViews?.quantity ?? 0}
+              percentChange={analyticsSummary?.storyViews?.percentChange}
+            />
+          </Summaries>
+        )}
 
-                {activeTab === "Average Story Views" && (
-                  <AnalyticsChart
-                    roundOff
-                    data={averageStoryViews}
-                    filter={filters}
-                    label="average"
-                    toolTipLabel="Average Views"
-                  />
-                )}
-
-                {activeTab === "Total Story Views" && (
-                  <AnalyticsChart
-                    data={storyViews}
-                    filter={filters}
-                    label="interaction"
-                    toolTipLabel="Story Views"
-                  />
-                )}
-              </>
+        {!isMobileDevice() && (
+          <>
+            {!loading && !error && (
+              <TabbedSelector
+                tabs={[
+                  "Page Views",
+                  "Interactions Ratio",
+                  "Average Story Views",
+                  "Total Story Views",
+                ]}
+                onChange={(tab) => setActiveTab(tab)}
+              />
             )}
-            {error && !loading && <H3>{error}</H3>}
-          </ChartUI>
-        </>
-      )}
-      <LoadingPage isLoading={loading} />
-    </Container>
+
+            <ChartUI>
+              {!loading && activeStore && !error && (
+                <>
+                  {activeTab === "Page Views" && (
+                    <AnalyticsChart
+                      data={pageViews}
+                      filter={filters}
+                      label="pageView"
+                      toolTipLabel="Page Views"
+                    />
+                  )}
+
+                  {activeTab === "Interactions Ratio" && (
+                    <AnalyticsChart
+                      roundOff
+                      data={interactions}
+                      filter={filters}
+                      label="ratio"
+                      toolTipLabel="Ratio"
+                    />
+                  )}
+
+                  {activeTab === "Average Story Views" && (
+                    <AnalyticsChart
+                      roundOff
+                      data={averageStoryViews}
+                      filter={filters}
+                      label="average"
+                      toolTipLabel="Average Views"
+                    />
+                  )}
+
+                  {activeTab === "Total Story Views" && (
+                    <AnalyticsChart
+                      data={storyViews}
+                      filter={filters}
+                      label="interaction"
+                      toolTipLabel="Story Views"
+                    />
+                  )}
+                </>
+              )}
+              {error && !loading && <H3>{error}</H3>}
+            </ChartUI>
+          </>
+        )}
+        <LoadingPage isLoading={loading} />
+      </Container>
+    </>
   );
 };
 

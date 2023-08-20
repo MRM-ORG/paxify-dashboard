@@ -1,7 +1,6 @@
-import StoreSelector from "@/components/molecules/subviews/home/StoreSelector";
+import { fetchUserStores } from "@/apiCalls/auth";
 import ViewAnalytics from "@/components/molecules/subviews/home/ViewAnalytics";
 import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
-import { fetchCurrentUserStores } from "@/utils/firebaseHelpers";
 import { useEffect, useState } from "react";
 
 export default function AnalyticsPage() {
@@ -16,9 +15,8 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    fetchCurrentUserStores(user.uid)
+    fetchUserStores(user.uid)
       .then((stores) => {
-        console.log(stores);
         setStores(stores);
         setIsLoading(false);
       })
@@ -32,7 +30,7 @@ export default function AnalyticsPage() {
 
     setActiveStore({
       label: stores[0].label,
-      value: stores[0].value,
+      value: stores[0].domain,
     });
   }, [stores]);
 

@@ -1,29 +1,24 @@
 import { Column, Row } from "@/styles/common";
+import { signInUser } from "@/utils/auth";
 import { navigateNewPage } from "@/utils/navigate";
 import { isMobileDevice } from "@/utils/responsive";
 import { HOME_PAGE, USER_REGISTER } from "@/utils/routes";
 import { GenericText, H2 } from "@/utils/text";
 import { THEME } from "@/utils/theme";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 import { Form, Formik } from "formik";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Spacer from "../atoms/Spacer";
 import HyperlinkButton from "../atoms/buttons/HyperlinkButton";
 import PrimaryButton from "../atoms/buttons/PrimaryButton";
+import Logo from "../atoms/icons/logo";
 import FormikLabelledTextInput from "../molecules/inputs/formik/FormikLabelledTextInput";
-
-import { webAuth } from "@/firebase/firebase";
 import {
   LoginForm,
   LoginValidationSchema,
 } from "../schemas/LoginValidationSchema";
-import { use, useEffect, useState } from "react";
-import Logo from "../atoms/icons/logo";
-import { signInUser } from "@/utils/auth";
+import Image from "next/image";
 
 const Container = styled(Row)`
   height: 100%;
@@ -79,13 +74,25 @@ const SignInContainer = styled(Column)`
   }
 `;
 
+export const LogoContainer = styled(Row)`
+  gap: 10px;
+  color: white;
+  font-size: 14px;
+  align-items: flex-end;
+`;
+
 const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      navigateNewPage(HOME_PAGE());
+    const user = localStorage.getItem("user") as string;
+    try {
+      const userObj = JSON.parse(user);
+      if (userObj.emailVerified) {
+        navigateNewPage(HOME_PAGE());
+      }
+    } catch (error) {
+      console.error(error);
     }
   }, []);
 
@@ -98,14 +105,22 @@ const Login: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Paxify | Login</title>
+        <title>Paxify | Dashboard</title>
         <meta name="description" content="Paxify dashboard" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container>
         <LeftPane>
-          <Logo fill="white" width="150px" />
+          <LogoContainer>
+            <Image
+              src="/logo/reelife.png"
+              alt="Paxify Logo"
+              width={125}
+              height={45}
+            />
+            By Paxify
+          </LogoContainer>
           {!isMobileDevice() && (
             <Label>
               <GenericText color={THEME.white} fontSize="36px" fontWeight="500">
@@ -137,9 +152,9 @@ const Login: React.FC = () => {
                 />
                 <Spacer height={25} />
                 <Column gap="15px">
-                  <HyperlinkButton onClick={() => alert("TODO")}>
+                  {/* <HyperlinkButton onClick={() => alert("TODO")}>
                     Forget Password?
-                  </HyperlinkButton>
+                  </HyperlinkButton> */}
                   <Row gap="2px">
                     <div>Don&apos;t have an account?</div>
                     <HyperlinkButton

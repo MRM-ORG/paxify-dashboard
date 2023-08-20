@@ -78,7 +78,6 @@ export const getGroupedData = (key: string, event: string, data: any) => {
 };
 
 export const getSummaryObject = (data: any, label: string) => {
-  // console.log(data);
   return {
     label,
     quantity: data[data.length - 1]?.[label],

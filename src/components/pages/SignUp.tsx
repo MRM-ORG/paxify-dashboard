@@ -1,10 +1,16 @@
+import { registerUser } from "@/apiCalls/auth";
+import { webAuth } from "@/firebase/firebase";
 import { Column, Row } from "@/styles/common";
 import { navigateNewPage } from "@/utils/navigate";
+import { isMobileDevice } from "@/utils/responsive";
 import { HOME_PAGE, USER_LOGIN } from "@/utils/routes";
 import { GenericText, H2 } from "@/utils/text";
 import { THEME } from "@/utils/theme";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Form, Formik } from "formik";
 import Head from "next/head";
+import Image from "next/image";
+import { useState } from "react";
 import styled from "styled-components";
 import Spacer from "../atoms/Spacer";
 import HyperlinkButton from "../atoms/buttons/HyperlinkButton";
@@ -14,11 +20,7 @@ import {
   SignUpForm,
   SignUpValidationSchema,
 } from "../schemas/SignUpValidationSchema";
-import { isMobileDevice } from "@/utils/responsive";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { webAuth } from "@/firebase/firebase";
-import { useEffect, useState } from "react";
-import Logo from "../atoms/icons/logo";
+import { LogoContainer } from "./Login";
 
 const Container = styled(Row)`
   height: 100%;
@@ -88,8 +90,12 @@ const SignUp: React.FC = () => {
       .then((userCredential: any) => {
         const user = userCredential.user;
         console.info("Signed in:", user);
-        localStorage.setItem("user", JSON.stringify(user));
-        navigateNewPage(HOME_PAGE());
+
+        const uid = user.uid;
+        registerUser(uid).then(() => {
+          localStorage.setItem("user", JSON.stringify(user));
+          navigateNewPage(HOME_PAGE());
+        });
       })
       .catch((error: any) => {
         console.error(error);
@@ -108,7 +114,15 @@ const SignUp: React.FC = () => {
       </Head>
       <Container>
         <LeftPane>
-          <Logo fill="white" width="150px" />
+          <LogoContainer>
+            <Image
+              src="/logo/reelife.png"
+              alt="Paxify Logo"
+              width={125}
+              height={45}
+            />
+            By Paxify
+          </LogoContainer>
           {!isMobileDevice() && (
             <Label>
               <GenericText color={THEME.white} fontSize="36px" fontWeight="500">
