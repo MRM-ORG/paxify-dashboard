@@ -32,7 +32,7 @@ interface IViewAnalyticsProps {
   };
 }
 
-const StoreSelector = styled.div`
+export const StoreSelector = styled.div`
   width: 250px;
 `;
 
@@ -114,19 +114,24 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
     (async () => {
       const user = JSON.parse(localStorage.getItem("user") as string);
 
-      const apiResponse = await getStoreEvents(
-        user.uid,
-        transformDomain(activeStore.value)
-      );
+      try {
+        const apiResponse = await getStoreEvents(
+          user.uid,
+          transformDomain(activeStore.value)
+        );
 
-      const storeEvents = apiResponse.data;
+        const storeEvents = apiResponse.data;
 
-      if (storeEvents == null) {
-        setError("Error fetching store events");
-        return;
+        if (storeEvents == null) {
+          setError("Error fetching store events");
+          return;
+        }
+
+        setStoreEvents(storeEvents);
+      } catch (error) {
+        setLoading(false);
+        setError(error as string);
       }
-
-      setStoreEvents(storeEvents);
     })();
   }, [activeStore]);
 

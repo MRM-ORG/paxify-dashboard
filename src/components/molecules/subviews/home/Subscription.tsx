@@ -9,8 +9,21 @@ import { OFFICIAL_WEBSITE_PRICING } from "@/utils/routes";
 import { H2, H3 } from "@/utils/text";
 import UsageBar from "@/components/atoms/UsageBar";
 import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
+import { Form, Formik } from "formik";
+import { StoreSelector } from "./ViewAnalytics";
+import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
 
-interface IProfileProps {}
+interface IProfileProps {
+  user: {
+    stores: any[];
+    setStores: (stores: string[]) => void;
+  };
+  activeStore: {
+    label: string;
+    value: string;
+  } | null;
+  setActiveStore: (store: { label: string; value: string }) => void;
+}
 
 const SUBSCRIPTIONS = [
   {
@@ -308,7 +321,11 @@ const Resource = styled.div`
   min-width: 100px;
 `;
 
-const Subscription: React.FC<IProfileProps> = () => {
+const Subscription: React.FC<IProfileProps> = ({
+  user,
+  activeStore,
+  setActiveStore,
+}) => {
   const { publicRuntimeConfig } = getConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -317,10 +334,10 @@ const Subscription: React.FC<IProfileProps> = () => {
   const currentPlan = "Basic";
 
   useEffect(() => {
-    fetchDomainResourcesForMonth("localhost:5173").then((res) => {
+    fetchDomainResourcesForMonth(activeStore?.label as string).then((res) => {
       setResources(res);
     });
-  }, []);
+  }, [activeStore]);
 
   const handleFormSubmit = async (event: any) => {
     event.preventDefault();
@@ -362,6 +379,28 @@ const Subscription: React.FC<IProfileProps> = () => {
       </Head>
       <ModifiedColumn style={{ padding: "24px", maxWidth: "100%" }} gap="20px">
         <Heading>Billing & Resource Monitoring</Heading>
+
+        <Formik
+          initialValues={{ store: activeStore?.label as string }}
+          onSubmit={(values) => {}}>
+          {({ values }) => {
+            return (
+              <Form>
+                <StoreSelector>
+                  <FormikLabelledSingleSelect
+                    name="store"
+                    label="Select Store"
+                    onChange={(val) => {
+                      setActiveStore(val);
+                    }}
+                    placeholder="Store to view resources"
+                    options={user.stores}
+                  />
+                </StoreSelector>
+              </Form>
+            );
+          }}
+        </Formik>
 
         {resources && (
           <ResourceContainer>
