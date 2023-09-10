@@ -1,5 +1,9 @@
 import { Column, Row } from "@/styles/common";
-import { signInUser } from "@/utils/auth";
+import {
+  isUserVerified,
+  sendFirebaseVerificationEmail,
+  signInUser,
+} from "@/utils/auth";
 import { navigateNewPage } from "@/utils/navigate";
 import { isMobileDevice } from "@/utils/responsive";
 import { HOME_PAGE, USER_REGISTER } from "@/utils/routes";
@@ -19,6 +23,8 @@ import {
   LoginValidationSchema,
 } from "../schemas/LoginValidationSchema";
 import Image from "next/image";
+import { sendEmailVerification } from "firebase/auth";
+import { webAuth } from "@/firebase/firebase";
 
 const Container = styled(Row)`
   height: 100%;
@@ -84,21 +90,21 @@ export const LogoContainer = styled(Row)`
 const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const user = localStorage.getItem("user") as string;
-    try {
-      const userObj = JSON.parse(user);
-      if (userObj.emailVerified) {
-        navigateNewPage(HOME_PAGE());
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
   const onLogin = async (values: any) => {
+    const user = webAuth.currentUser;
+
     setIsLoading(true);
     await signInUser(values.email, values.password);
+    if (isUserVerified()) {
+      navigateNewPage(HOME_PAGE());
+    } else {
+      if (user) {
+        sendFirebaseVerificationEmail();
+        alert(
+          "We have sent you a verification email. Please verify your email to continue. If you have not received the email, please check your spam folder."
+        );
+      }
+    }
     setIsLoading(false);
   };
 

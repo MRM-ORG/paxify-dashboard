@@ -40,13 +40,11 @@ const RegisteredDomains = styled.div`
 
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   const [stores, setStores] = useState<any>([]);
-  const [activeUser, setActiveUser] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user") as string);
       const { uid } = user;
-      setActiveUser(uid);
 
       fetchUserStores(uid).then((stores) => {
         setStores(stores);
@@ -91,7 +89,9 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
                 ]);
               })
               .catch((err) => {
-                alert(err);
+                alert(
+                  "An error occured, please make sure your subscription allows you to add more stores."
+                );
                 console.error(err);
               });
 
@@ -111,7 +111,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
                 width="200px"
                 action="login"
                 background={THEME.buttonPrimary}>
-                Validate
+                Register Store
               </PrimaryButton>
             </NewStore>
           </Form>

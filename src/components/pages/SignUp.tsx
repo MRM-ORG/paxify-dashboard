@@ -21,6 +21,7 @@ import {
   SignUpValidationSchema,
 } from "../schemas/SignUpValidationSchema";
 import { LogoContainer } from "./Login";
+import { sendFirebaseVerificationEmail } from "@/utils/auth";
 
 const Container = styled(Row)`
   height: 100%;
@@ -89,12 +90,15 @@ const SignUp: React.FC = () => {
     createUserWithEmailAndPassword(webAuth, values.email, values.password)
       .then((userCredential: any) => {
         const user = userCredential.user;
-        console.info("Signed in:", user);
 
         const uid = user.uid;
         registerUser(uid).then(() => {
           localStorage.setItem("user", JSON.stringify(user));
-          navigateNewPage(HOME_PAGE());
+          alert(
+            "We have sent you a verification email. Please verify your email to continue. If you have not received the email, please check your spam folder."
+          );
+          sendFirebaseVerificationEmail();
+          navigateNewPage(USER_LOGIN());
         });
       })
       .catch((error: any) => {

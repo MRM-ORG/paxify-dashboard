@@ -328,15 +328,18 @@ const Subscription: React.FC<IProfileProps> = ({
 }) => {
   const { publicRuntimeConfig } = getConfig();
   const [isLoading, setIsLoading] = useState(false);
+  const [resourceLoading, setResourceLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [resources, setResources] = useState<any>(null);
 
   const currentPlan = "Basic";
 
   useEffect(() => {
-    fetchDomainResourcesForMonth(activeStore?.label as string).then((res) => {
-      setResources(res);
-    });
+    fetchDomainResourcesForMonth(activeStore?.label as string)
+      .then((res) => {
+        setResources(res);
+      })
+      .finally(() => setResourceLoading(false));
   }, [activeStore]);
 
   const handleFormSubmit = async (event: any) => {
@@ -381,7 +384,9 @@ const Subscription: React.FC<IProfileProps> = ({
         <Heading>Billing & Resource Monitoring</Heading>
 
         <Formik
-          initialValues={{ store: activeStore?.label as string }}
+          initialValues={{
+            store: { label: activeStore?.label, value: activeStore?.label },
+          }}
           onSubmit={(values) => {}}>
           {({ values }) => {
             return (
@@ -472,7 +477,7 @@ const Subscription: React.FC<IProfileProps> = ({
         </Row>
         <LoadingPage isLoading={isLoading} />
       </ModifiedColumn>
-      <LoadingPage isLoading={!resources} />
+      <LoadingPage isLoading={resourceLoading} />
     </>
   );
 };

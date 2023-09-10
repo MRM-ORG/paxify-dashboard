@@ -10,6 +10,7 @@ import { THEME } from "@/utils/theme";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
+import { isUserVerified } from "@/utils/auth";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -66,9 +67,8 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   };
 
   useEffect(() => {
-    // Check firebase auth status here
     const user = localStorage.getItem("user");
-    if (!user) {
+    if (!user || !isUserVerified()) {
       navigateNewPage(USER_LOGIN());
     } else {
       setIsLoading(false);

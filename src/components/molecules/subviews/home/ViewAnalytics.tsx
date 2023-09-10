@@ -117,7 +117,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       try {
         const apiResponse = await getStoreEvents(
           user.uid,
-          transformDomain(activeStore.value)
+          transformDomain(activeStore.value || activeStore.label)
         );
 
         const storeEvents = apiResponse.data;
@@ -222,7 +222,9 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
 
         <SpacedRow>
           <Formik
-            initialValues={{ store: activeStore }}
+            initialValues={{
+              store: { label: activeStore?.label, value: activeStore?.label },
+            }}
             onSubmit={(values) => {}}>
             {({ values }) => {
               return (
