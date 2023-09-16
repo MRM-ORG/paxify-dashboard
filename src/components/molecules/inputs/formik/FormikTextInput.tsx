@@ -6,7 +6,7 @@ import InputContainer, { IInputContainerProps } from "../InputContainer";
 export interface IFormikTextInputProps extends IInputContainerProps {
   placeholder: string;
   name: string;
-  type?: "password" | "text" | "number";
+  type?: "password" | "text" | "number" | "email";
   inputContainerStyle?: string;
   isError?: boolean;
   leftDecoration?: JSX.Element;
@@ -29,7 +29,7 @@ export const Input = styled("input")<InputInterface>`
   font-size: 14px;
   fontweight: 500;
   padding: 0;
-  textalign: left;
+  text-align: left;
   display: inline;
   flex-grow: 1;
   outline: none;

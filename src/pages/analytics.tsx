@@ -10,6 +10,8 @@ export default function AnalyticsPage() {
   const [activeStore, setActiveStore] = useState<{
     label: string;
     value: string;
+    id: string;
+    verified: boolean;
   } | null>(null);
   const [storeEvents, setStoreEvents] = useState<any>(null);
 
@@ -29,8 +31,10 @@ export default function AnalyticsPage() {
     if (!stores?.length) return;
 
     setActiveStore({
-      label: stores[0].label,
+      label: stores[0].name,
       value: stores[0].domain,
+      id: stores[0].id,
+      verified: stores[0].verified,
     });
   }, [stores]);
 

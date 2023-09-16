@@ -12,17 +12,15 @@ import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
 import { Form, Formik } from "formik";
 import { StoreSelector } from "./ViewAnalytics";
 import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
+import { IStoryProps } from "@/pages/subscriptions";
 
 interface IProfileProps {
   user: {
     stores: any[];
     setStores: (stores: string[]) => void;
   };
-  activeStore: {
-    label: string;
-    value: string;
-  } | null;
-  setActiveStore: (store: { label: string; value: string }) => void;
+  activeStore: IStoryProps | null;
+  setActiveStore: (store: IStoryProps) => void;
 }
 
 const SUBSCRIPTIONS = [
@@ -335,8 +333,11 @@ const Subscription: React.FC<IProfileProps> = ({
   const currentPlan = "Basic";
 
   useEffect(() => {
-    fetchDomainResourcesForMonth(activeStore?.label as string)
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    fetchDomainResourcesForMonth(user.uid, activeStore?.id as string)
       .then((res) => {
+        console.log("res", res);
         setResources(res);
       })
       .finally(() => setResourceLoading(false));
@@ -416,17 +417,20 @@ const Subscription: React.FC<IProfileProps> = ({
 
             <Row gap="15px">
               <Resource>Components</Resource>
-              <UsageBar consumed={resources["components"]} available={3} />
+              <UsageBar consumed={resources["components"]} available={1} />
             </Row>
 
             <Row gap="15px">
               <Resource>Page Views</Resource>
-              <UsageBar consumed={resources["pageViews"]} available={50000} />
+              <UsageBar consumed={resources["storyViews"]} available={50000} />
             </Row>
 
             <Row gap="15px">
               <Resource>API Calls</Resource>
-              <UsageBar consumed={resources["apiCalls"]} available={200000} />
+              <UsageBar
+                consumed={resources["totalApiCalls"]}
+                available={200000}
+              />
             </Row>
           </ResourceContainer>
         )}

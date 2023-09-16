@@ -1,6 +1,7 @@
 import { navigateNewPage } from "@/utils/navigate";
 import {
   DASHBOARD_ANALYTICS,
+  DASHBOARD_PROFILE,
   DASHBOARD_STORES,
   DASHBOARD_SUBSCRIPTIONS,
   HOME_PAGE,
@@ -61,7 +62,9 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
       return DASHBOARD_STORES;
     } else if (tab === 1) {
       return DASHBOARD_ANALYTICS;
-    } else {
+    } else if (tab === 2) {
+      return DASHBOARD_PROFILE;
+    } else if (tab === 3) {
       return DASHBOARD_SUBSCRIPTIONS;
     }
   };

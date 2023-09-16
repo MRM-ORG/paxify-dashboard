@@ -3,20 +3,30 @@ import Subscription from "@/components/molecules/subviews/home/Subscription";
 import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
 import { useState, useEffect } from "react";
 
+export interface IStoryProps {
+  id: string;
+  value: string;
+  label: string;
+  verified: boolean;
+}
+
 export default function SubscriptionsPage() {
   const [stores, setStores] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [activeStore, setActiveStore] = useState<{
-    label: string;
-    value: string;
-  } | null>(null);
+  const [activeStore, setActiveStore] = useState<IStoryProps | null>(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     fetchUserStores(user.uid)
       .then((stores) => {
-        setStores(stores);
+        const modifiedStores = stores.map((store: any) => ({
+          id: store.id,
+          label: store.name,
+          value: store.domain,
+          verified: store.verified,
+        }));
+        setStores(modifiedStores);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -27,10 +37,7 @@ export default function SubscriptionsPage() {
   useEffect(() => {
     if (!stores?.length) return;
 
-    setActiveStore({
-      label: stores[0].label,
-      value: stores[0].domain,
-    });
+    setActiveStore(stores[0]);
   }, [stores]);
 
   const commonProps = {

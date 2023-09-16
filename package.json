@@ -28,5 +28,8 @@
     "typescript": "5.1.6",
     "victory": "^36.6.11",
     "yup": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/react-modal": "^3.16.0"
   }
 }

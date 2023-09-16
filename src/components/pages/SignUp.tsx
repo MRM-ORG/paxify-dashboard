@@ -92,7 +92,7 @@ const SignUp: React.FC = () => {
         const user = userCredential.user;
 
         const uid = user.uid;
-        registerUser(uid).then(() => {
+        registerUser(values.name, values.email, uid).then(() => {
           localStorage.setItem("user", JSON.stringify(user));
           alert(
             "We have sent you a verification email. Please verify your email to continue. If you have not received the email, please check your spam folder."
@@ -140,9 +140,21 @@ const SignUp: React.FC = () => {
             <H2 color={THEME.primary}>Sign Up</H2>
             <Formik
               onSubmit={onSignUp}
-              initialValues={{ email: "", password: "", confirmPassword: "" }}
+              initialValues={{
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+              }}
               validationSchema={SignUpValidationSchema}>
               <Form>
+                <FormikLabelledTextInput
+                  type="text"
+                  label={SignUpForm.formField.name.label}
+                  name={SignUpForm.formField.name.name}
+                  placeholder={SignUpForm.formField.name.placeholder}
+                />
+                <Spacer height={16} />
                 <FormikLabelledTextInput
                   type="text"
                   label={SignUpForm.formField.email.label}

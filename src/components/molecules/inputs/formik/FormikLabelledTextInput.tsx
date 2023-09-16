@@ -21,7 +21,7 @@ const Container = styled("div")`
   width: 100%;
   display: flex;
   flex-direction: column;
-  textalign: left;
+  text-align: left;
 `;
 
 const Label = styled("label")``;

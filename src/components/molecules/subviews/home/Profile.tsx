@@ -1,7 +1,17 @@
+import styled from "styled-components";
+
 interface IProfileProps {}
 
+const Container = styled.div`
+  padding: 24px;
+`;
+
 const ManageProfile: React.FC<IProfileProps> = () => {
-  return <h1>My Profile</h1>;
+  return (
+    <Container>
+      <h1>Settings</h1>
+    </Container>
+  );
 };
 
 export default ManageProfile;
