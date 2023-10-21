@@ -22,6 +22,7 @@ import FormikLabelledTextInput from "../../inputs/formik/FormikLabelledTextInput
 import LoadingPage from "../loading/LoadingPage";
 import Switch from "@/components/atoms/Switch";
 import Delete from "@/components/atoms/icons/delete";
+import TabbedSelector from "../layoutSelector/TabbedSelector";
 
 interface IStoreSelectorProps {
   user: {
@@ -84,6 +85,7 @@ const Script = styled(Row)`
   border-radius: 8px;
   border: 1px solid #eaeaea;
   justify-content: space-between;
+  flex-wrap: nowrap;
 
   &:hover {
     background-color: #f5f5f5;
@@ -99,6 +101,10 @@ const Success = styled.div`
   color: green;
 `;
 
+const Code = styled.code`
+  max-width: 90%;
+`;
+
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   const [stores, setStores] = useState<any>([]);
   const [activeStore, setActiveStore] = useState<any>();
@@ -106,18 +112,20 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [activeTabShopify, setActiveTabShopify] = useState(true);
 
-  let VERIFICATION_SCRIPT: any = null;
+  let VERIFICATION_SCRIPT_SHOPIFY: any = null;
+  let VERIFICATION_SCRIPT_MANUAL: any = null;
 
   try {
     const signInUser = JSON.parse(localStorage.getItem("user") as string);
     const { uid } = signInUser;
 
-    VERIFICATION_SCRIPT = `<script>
-          var uid = ${uid};
-          var storeId = ${activeStore?.id};
-</script>
-<script src="https://cdn.jsdelivr.net/gh/MRM-ORG/builds@latest/reelife/auth.js"></script>`;
+    // <script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js" }} defer="defer"></script>
+    // <script src="https://cdn.jsdelivr.net/gh/MRM-ORG/builds@latest/reelife/auth.js"></script>
+
+    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = ${uid}; var storeId = ${activeStore?.id};</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js" }} defer="defer"></script>`;
+    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = ${uid}; var storeId = ${activeStore?.id};</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js"></script>`;
   } catch (error) {
     console.error(error);
     alert("An error occured, please try again later.");
@@ -127,12 +135,15 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
     try {
       const user = JSON.parse(localStorage.getItem("user") as string);
       const { uid } = user;
+      setIsLoading(true);
 
       fetchUserStores(uid).then((stores) => {
         setStores(stores);
       });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -164,7 +175,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   }, [showInstructions]);
 
   useEffect(() => {
-    isCopied && navigator.clipboard.writeText(VERIFICATION_SCRIPT);
+    isCopied && navigator.clipboard.writeText(VERIFICATION_SCRIPT_SHOPIFY);
 
     setTimeout(() => {
       setIsCopied(false);
@@ -284,16 +295,32 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
         isVisible={showInstructions}
         onClose={() => setShowInstructions(false)}>
         <Instructions>
-          <h2>Verification Instructions</h2>
+          <h2>Domain Verification</h2>
+
+          <TabbedSelector
+            tabs={["Shopify", "Install Manually"]}
+            onChange={() => setActiveTabShopify(!activeTabShopify)}
+          />
+
           <p>
             To verify domain ownership, please add the following script to the
             {" <head >"} element as far up as possible. Don’t add more than one
             script to your store.
           </p>
-          <Script onClick={() => setIsCopied(true)}>
-            <pre>{VERIFICATION_SCRIPT}</pre>
-            {!isCopied ? <Copy /> : <CopyDone />}
-          </Script>
+
+          {activeTabShopify && (
+            <Script onClick={() => setIsCopied(true)}>
+              <Code>{VERIFICATION_SCRIPT_SHOPIFY}</Code>
+              {!isCopied ? <Copy /> : <CopyDone />}
+            </Script>
+          )}
+
+          {!activeTabShopify && (
+            <Script onClick={() => setIsCopied(true)}>
+              <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
+              {!isCopied ? <Copy /> : <CopyDone />}
+            </Script>
+          )}
           <p>
             Once completed, publish a new store version and then click on Verify
           </p>

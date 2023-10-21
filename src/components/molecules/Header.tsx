@@ -162,7 +162,7 @@ const Header: React.FC<IHeaderProps> = (props) => {
 
         <BottomBar>
           <LogoContainer>
-            <Image
+            <img
               src="/logo/reelife.png"
               alt="Paxify Logo"
               width={125}
