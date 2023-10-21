@@ -10,8 +10,6 @@ export default function AnalyticsPage() {
   const [activeStore, setActiveStore] = useState<{
     label: string;
     value: string;
-    id: string;
-    verified: boolean;
   } | null>(null);
   const [storeEvents, setStoreEvents] = useState<any>(null);
 
@@ -19,7 +17,9 @@ export default function AnalyticsPage() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     fetchUserStores(user.uid)
       .then((stores) => {
+        if(Array.isArray(stores)) {
         setStores(stores);
+      }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -31,10 +31,8 @@ export default function AnalyticsPage() {
     if (!stores?.length) return;
 
     setActiveStore({
-      label: stores[0].name,
+      label: stores[0].label,
       value: stores[0].domain,
-      id: stores[0].id,
-      verified: stores[0].verified,
     });
   }, [stores]);
 
@@ -55,9 +53,9 @@ export default function AnalyticsPage() {
 
   return (
     !isLoading && (
-      <ProtectedAuthWrapper>
         <ViewAnalytics {...viewAnalyticsProps} />
-      </ProtectedAuthWrapper>
+      // <ProtectedAuthWrapper>
+      // </ProtectedAuthWrapper>
     )
   );
 }

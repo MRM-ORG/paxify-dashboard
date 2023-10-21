@@ -9,19 +9,8 @@ import { OFFICIAL_WEBSITE_PRICING } from "@/utils/routes";
 import { H2, H3 } from "@/utils/text";
 import UsageBar from "@/components/atoms/UsageBar";
 import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
-import { Form, Formik } from "formik";
-import { StoreSelector } from "./ViewAnalytics";
-import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
-import { IStoryProps } from "@/pages/subscriptions";
 
-interface IProfileProps {
-  user: {
-    stores: any[];
-    setStores: (stores: string[]) => void;
-  };
-  activeStore: IStoryProps | null;
-  setActiveStore: (store: IStoryProps) => void;
-}
+interface IProfileProps {}
 
 const SUBSCRIPTIONS = [
   {
@@ -319,29 +308,19 @@ const Resource = styled.div`
   min-width: 100px;
 `;
 
-const Subscription: React.FC<IProfileProps> = ({
-  user,
-  activeStore,
-  setActiveStore,
-}) => {
+const Subscription: React.FC<IProfileProps> = () => {
   const { publicRuntimeConfig } = getConfig();
   const [isLoading, setIsLoading] = useState(false);
-  const [resourceLoading, setResourceLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [resources, setResources] = useState<any>(null);
 
   const currentPlan = "Basic";
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-    fetchDomainResourcesForMonth(user.uid, activeStore?.id as string)
-      .then((res) => {
-        console.log("res", res);
-        setResources(res);
-      })
-      .finally(() => setResourceLoading(false));
-  }, [activeStore]);
+    fetchDomainResourcesForMonth("localhost:5173").then((res) => {
+      setResources(res);
+    });
+  }, []);
 
   const handleFormSubmit = async (event: any) => {
     event.preventDefault();
@@ -384,30 +363,6 @@ const Subscription: React.FC<IProfileProps> = ({
       <ModifiedColumn style={{ padding: "24px", maxWidth: "100%" }} gap="20px">
         <Heading>Billing & Resource Monitoring</Heading>
 
-        <Formik
-          initialValues={{
-            store: { label: activeStore?.label, value: activeStore?.label },
-          }}
-          onSubmit={(values) => {}}>
-          {({ values }) => {
-            return (
-              <Form>
-                <StoreSelector>
-                  <FormikLabelledSingleSelect
-                    name="store"
-                    label="Select Store"
-                    onChange={(val) => {
-                      setActiveStore(val);
-                    }}
-                    placeholder="Store to view resources"
-                    options={user.stores}
-                  />
-                </StoreSelector>
-              </Form>
-            );
-          }}
-        </Formik>
-
         {resources && (
           <ResourceContainer>
             <Row gap="15px">
@@ -417,20 +372,17 @@ const Subscription: React.FC<IProfileProps> = ({
 
             <Row gap="15px">
               <Resource>Components</Resource>
-              <UsageBar consumed={resources["components"]} available={1} />
+              <UsageBar consumed={resources["components"]} available={3} />
             </Row>
 
             <Row gap="15px">
               <Resource>Page Views</Resource>
-              <UsageBar consumed={resources["storyViews"]} available={50000} />
+              <UsageBar consumed={resources["pageViews"]} available={50000} />
             </Row>
 
             <Row gap="15px">
               <Resource>API Calls</Resource>
-              <UsageBar
-                consumed={resources["totalApiCalls"]}
-                available={200000}
-              />
+              <UsageBar consumed={resources["apiCalls"]} available={200000} />
             </Row>
           </ResourceContainer>
         )}
@@ -481,7 +433,7 @@ const Subscription: React.FC<IProfileProps> = ({
         </Row>
         <LoadingPage isLoading={isLoading} />
       </ModifiedColumn>
-      <LoadingPage isLoading={resourceLoading} />
+      {/* <LoadingPage isLoading={!resources} /> */}
     </>
   );
 };

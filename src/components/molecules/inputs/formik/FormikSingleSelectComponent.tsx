@@ -46,7 +46,7 @@ const FormikSingleSelectComponent: React.FC<
   useEffect(() => {
     if (props.options == null) return;
 
-    const result = props.options.find((opt) => opt.value === field.value);
+    const result = props?.options?.find((opt) => opt.value === field.value);
     if (result) {
       setLabel(result.label);
     }

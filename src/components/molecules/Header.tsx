@@ -15,8 +15,6 @@ import Profile from "../atoms/icons/profile";
 import Stores from "../atoms/icons/stores";
 import { LogoContainer } from "../pages/Login";
 import Image from "next/image";
-import { navigateNewPage } from "@/utils/navigate";
-import { DASHBOARD_PROFILE } from "@/utils/routes";
 
 interface IHeaderProps {
   activeTab: number;
@@ -135,10 +133,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
     signOutUser();
   };
 
-  const handleProfileClick = () => {
-    navigateNewPage(DASHBOARD_PROFILE());
-  };
-
   return (
     <LeftPane id="header">
       {!isMobileDevice() && (
@@ -246,7 +240,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
                   <Option gap="10px" onClick={() => props.onClick(2)}>
                     <Row gap="10px">
                       <Profile
-                        onClick={handleProfileClick}
                         fill={props.activeTab === 2 ? THEME.blue1 : THEME.white}
                       />
                       <div>Profile</div>

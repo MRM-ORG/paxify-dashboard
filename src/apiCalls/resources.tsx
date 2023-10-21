@@ -2,10 +2,9 @@ import axios from "axios";
 import { BACKEND_URL } from "../constants";
 
 export async function fetchDomainResourcesForMonth(
-  uid: string,
-  storeId: string
+  domain: string
 ): Promise<any> {
-  const API = `${BACKEND_URL}/firebase/resources/${uid}/${storeId}`;
+  const API = `${BACKEND_URL}/firebase/resources/${domain}`;
 
   return axios
     .get(API)

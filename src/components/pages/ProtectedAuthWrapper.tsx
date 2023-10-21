@@ -1,7 +1,6 @@
 import { navigateNewPage } from "@/utils/navigate";
 import {
   DASHBOARD_ANALYTICS,
-  DASHBOARD_PROFILE,
   DASHBOARD_STORES,
   DASHBOARD_SUBSCRIPTIONS,
   HOME_PAGE,
@@ -11,7 +10,6 @@ import { THEME } from "@/utils/theme";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
-import { isUserVerified } from "@/utils/auth";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -62,16 +60,15 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
       return DASHBOARD_STORES;
     } else if (tab === 1) {
       return DASHBOARD_ANALYTICS;
-    } else if (tab === 2) {
-      return DASHBOARD_PROFILE;
-    } else if (tab === 3) {
+    } else {
       return DASHBOARD_SUBSCRIPTIONS;
     }
   };
 
   useEffect(() => {
+    // Check firebase auth status here
     const user = localStorage.getItem("user");
-    if (!user || !isUserVerified()) {
+    if (!user) {
       navigateNewPage(USER_LOGIN());
     } else {
       setIsLoading(false);

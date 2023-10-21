@@ -21,7 +21,6 @@ import {
   SignUpValidationSchema,
 } from "../schemas/SignUpValidationSchema";
 import { LogoContainer } from "./Login";
-import { sendFirebaseVerificationEmail } from "@/utils/auth";
 
 const Container = styled(Row)`
   height: 100%;
@@ -90,15 +89,12 @@ const SignUp: React.FC = () => {
     createUserWithEmailAndPassword(webAuth, values.email, values.password)
       .then((userCredential: any) => {
         const user = userCredential.user;
+        console.info("Signed in:", user);
 
         const uid = user.uid;
-        registerUser(values.name, values.email, uid).then(() => {
+        registerUser(uid).then(() => {
           localStorage.setItem("user", JSON.stringify(user));
-          alert(
-            "We have sent you a verification email. Please verify your email to continue. If you have not received the email, please check your spam folder."
-          );
-          sendFirebaseVerificationEmail();
-          navigateNewPage(USER_LOGIN());
+          navigateNewPage(HOME_PAGE());
         });
       })
       .catch((error: any) => {
@@ -140,21 +136,9 @@ const SignUp: React.FC = () => {
             <H2 color={THEME.primary}>Sign Up</H2>
             <Formik
               onSubmit={onSignUp}
-              initialValues={{
-                name: "",
-                email: "",
-                password: "",
-                confirmPassword: "",
-              }}
+              initialValues={{ email: "", password: "", confirmPassword: "" }}
               validationSchema={SignUpValidationSchema}>
               <Form>
-                <FormikLabelledTextInput
-                  type="text"
-                  label={SignUpForm.formField.name.label}
-                  name={SignUpForm.formField.name.name}
-                  placeholder={SignUpForm.formField.name.placeholder}
-                />
-                <Spacer height={16} />
                 <FormikLabelledTextInput
                   type="text"
                   label={SignUpForm.formField.email.label}

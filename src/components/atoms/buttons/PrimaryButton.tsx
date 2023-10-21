@@ -33,7 +33,7 @@ const Button = styled("button")<IButtonProps>`
   border-radius: 9px;
   color: white;
   background-color: ${(props) =>
-    props.backgroundColor ? props.backgroundColor : THEME.primary1};
+    props.backgroundColor ? props.backgroundColor : THEME.body1};
   background: ${(props) => props.background};
   cursor: pointer;
   transition: 200ms;

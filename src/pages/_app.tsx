@@ -1,41 +1,34 @@
-import { GTM_HEAD_SCRIPT, GTM_BODY_IFRAME } from "@/constants";
-import "@/styles/globals.css";
-import type { AppProps } from "next/app";
-import { useEffect } from "react";
+import type { ReactElement, ReactNode } from 'react';
+// import {Inter} from 'next/font/google'
+import type { NextPage } from 'next';
+import { ConfigProvider } from 'antd';
+import theme from '../theme/theme'; // Assuming you have your custom theme defined here
+import type { AppProps } from 'next/app';
+import "../styles/globals.css"
 
-export default function App({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    const addGTMScriptToHead = () => {
-      if (document.getElementById("gtm-dashboard-script")) return;
-      const gtmScript = document.createElement("script");
-      gtmScript.id = "gtm-dashboard-script";
-      gtmScript.src = GTM_HEAD_SCRIPT;
-      gtmScript.async = true;
+// Define a type for NextPage components with layout
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
-      const head = document.head || document.getElementsByTagName("head")[0];
-      head.appendChild(gtmScript);
-    };
+// const inter = Inter({ subsets: ['latin'],weight: ['100','200','300','400','500','600','700','800','900'] })
 
-    const addGTMIFrameToBody = () => {
-      if (document.getElementById("gtm-dashboard-frame")) return;
-      const noscript = document.createElement("noscript");
-      const iframe = document.createElement("iframe");
-      iframe.id = "gtm-dashboard-frame";
-      iframe.src = GTM_BODY_IFRAME;
-      iframe.height = "0";
-      iframe.width = "0";
-      iframe.style.display = "none";
-      iframe.style.visibility = "hidden";
+// Extend AppProps to include a Component property with layout
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
 
-      noscript.appendChild(iframe);
+// MyApp component is the main entry point for your Next.js app
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  // Use the layout defined at the page level, if available
+  const getLayout = Component.getLayout ?? ((page) => page);
 
-      const body = document.body || document.getElementsByTagName("body")[0];
-      body.insertBefore(noscript, body.firstChild);
-    };
-
-    addGTMScriptToHead();
-    addGTMIFrameToBody();
-  }, []);
-
-  return <Component {...pageProps} />;
+  // Wrap the Component with ConfigProvider to apply the theme
+  return (
+    <main>
+      <ConfigProvider theme={theme}>
+      {getLayout(<Component {...pageProps} />)}
+      </ConfigProvider>
+    </main>
+  );
 }
