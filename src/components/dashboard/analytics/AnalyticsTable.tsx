@@ -60,22 +60,47 @@ const data: TableRow[] = [
 
 const AnalyticsTable:NextPage<Props> = ({ stories, analytics }) => {
   const storyAnalytics = analytics?.filter((obj: { name: string; }) => obj.name === "reels_story_viewed");
-  console.log({storyAnalytics})
+  console.log({analytics})
   const analyticsCount: { [storyTitle: string]: number } = {};
-  analytics.forEach((analytic: any) => {
-    const storyTitle = analytic.story?.player[0]?.layout?.title;
+  storyAnalytics?.forEach((analytic: any) => {
+    const storyTitle = analytic?.story?.player[0]?.layout?.title;
     if (storyTitle) {
       analyticsCount[storyTitle] = (analyticsCount[storyTitle] || 0) + 1;
     }
   });
-  
+
+  const ctaAnalytics = analytics?.filter((obj: { name: string; }) => obj.name === "cta_clicked");
+  console.log({ctaAnalytics})
+  const ctaCount: { [storyTitle: string]: number } = {};
+  ctaAnalytics?.forEach((analytic: any) => {
+    console.log({analytic})
+    const storyTitle = analytic?.story?.layout?.title;
+    if (storyTitle) {
+      ctaCount[storyTitle] = (ctaCount[storyTitle] || 0) + 1;
+    }
+  });
+  const impressions = analytics?.filter((obj: { name: string; }) => obj.name === "reels_init")
+
+  function countTitleMatches(impressions: any[], titleToMatch: any) {
+    return impressions.reduce((totalMatches, impression) => {
+      const story = impression.story;
+      if (story && story.player && story.player[0] && story.player[0].layout) {
+        const storyTitle = story.player[0].layout.title;
+        if (storyTitle === titleToMatch) {
+          return totalMatches + 1;
+        }
+      }
+      return totalMatches;
+    }, 0);
+  }
   // Update the stories with the analytics count
   stories.forEach((story: any) => {
     const storyTitle = story.player[0]?.layout?.title;
     if (storyTitle) {
       story.analyticsCount = analyticsCount[storyTitle] || 0;
-      story.reach = analytics?.filter((obj: { name: string; }) => obj.name === "reels_init").length;
-      story.impression = analytics?.filter((obj: { name: string; }) => obj.name === "reels_init").length;
+      story.ctaCount = ctaCount[storyTitle] || 0;
+      story.reach = countTitleMatches(impressions, storyTitle);
+      story.impression = countTitleMatches(impressions, storyTitle);
       story.skip = 0;
       story.share = 0;
       story.complete = 0;
@@ -90,7 +115,7 @@ const AnalyticsTable:NextPage<Props> = ({ stories, analytics }) => {
       className:"text-[12px]",
       dataIndex: 'player',
       key: 'player',
-      render: (_text: any, player: any) => (
+      render: (_text: any, story: any) => (
         <Link href="interaction" className="flex items-center space-x-3 w-fit cursor-pointer">
         <div className='flex items-center'>
             <div className="relative rounded-full overflow-hidden w-16 h-16">
@@ -98,14 +123,14 @@ const AnalyticsTable:NextPage<Props> = ({ stories, analytics }) => {
                 <div className="absolute inset-1 rounded-full bg-white">
                     <img
                         style={{ borderRadius: "50%" }}
-                        src={player[0]?.content?.source}
+                        src={story?.player[0]?.content?.source}
                         alt={"https://cdn.britannica.com/36/123536-050-95CB0C6E/Variety-fruits-vegetables.jpg"}
                         className="w-full h-full object-cover"
                     />
                 </div>
             </div>
         </div>
-        <p className="text-sm text-center max-w-[130px] break-words font-medium text-primary">{player[0]?.layout?.title}</p>
+        <p className="text-sm text-center max-w-[130px] break-words font-medium text-primary">{story?.player[0]?.layout?.title}</p>
     </Link>
       )
     },
@@ -145,9 +170,9 @@ const AnalyticsTable:NextPage<Props> = ({ stories, analytics }) => {
     {
       title: ()=>{return <div className="flex space-x-2"><p>Click</p><InfoCircleOutlined /> </div>},
       className:"text-[12px]",
-      dataIndex: 'analyticsCount',
-      key: 'analyticsCount',
-      sorter: (a: any, b: any) => a.analyticsCount - b.analyticsCount,
+      dataIndex: 'ctaCount',
+      key: 'ctaCount',
+      sorter: (a: any, b: any) => a.ctaCount - b.ctaCount,
     },
     {
       title: ()=>{return <div className="flex space-x-2"><p>Skip</p><InfoCircleOutlined /> </div>},

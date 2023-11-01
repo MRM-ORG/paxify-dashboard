@@ -120,14 +120,14 @@ const Performance:NextPage<Props> = ({ analytics }) => {
         ) : null,
         link:false
     },
-    {
-        text:"Active Users",
-        number:"1.5k",
-        label:"17.4%",
-        increase:true,
-        children:<h1>Active Users</h1>,
-        link:false
-    },
+    // {
+    //     text:"Active Users",
+    //     number:"1.5k",
+    //     label:"17.4%",
+    //     increase:true,
+    //     children:<h1>Active Users</h1>,
+    //     link:false
+    // },
     {
         text:"Event Tracker",
         children:<h1>Event Tracker</h1>,

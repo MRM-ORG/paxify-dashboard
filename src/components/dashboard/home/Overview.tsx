@@ -35,19 +35,19 @@ const Overview:NextPage<Props> = ({analytics}) => {
                 <Card>
                     <div className='flex flex-col items-center space-y-3'>
                         <h1 className='text-[#3a3a62] text-lg font-medium'>Avg. Engagement Rate <InfoCircleOutlined className="text-[0.8rem] ml-1 cursor-pointer relative bottom-[1.5px] " /></h1>
-                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_story_viewed").length)).toFixed(2)}%</h1>
+                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "reels_story_viewed").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length)).toFixed(2)}%</h1>
                     </div>
                 </Card>
                 <Card>
                     <div className='flex flex-col items-center space-y-3'>
                         <h1 className='text-[#3a3a62] text-lg font-medium'>Avg. CTR <InfoCircleOutlined className="text-[0.8rem] ml-2 cursor-pointer relative bottom-[1.5px]" /></h1>
-                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_story_viewed").length)).toFixed(2)}%</h1>
+                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "cta_clicked").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length)).toFixed(2)}%</h1>
                     </div>
                 </Card>
                 <Card>
                     <div className='flex flex-col items-center space-y-3'>
                         <h1 className='text-[#3a3a62]  text-lg font-medium'>Avg. Response Rate <InfoCircleOutlined className="text-[0.8rem] ml-1 cursor-pointer relative bottom-[1.5px]" /></h1>
-                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_story_viewed").length)).toFixed(2)}%</h1>
+                        <h1 className='text-[#3a3a62] text-xl font-extrabold'>{((analytics.filter((obj: { name: string; }) => obj.name === "reels_opened").length) / (analytics.filter((obj: { name: string; }) => obj.name === "reels_init").length)).toFixed(2)}%</h1>
                     </div>
                 </Card>
             </div>
