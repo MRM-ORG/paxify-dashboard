@@ -216,7 +216,7 @@ const StudioCreator = () => {
   const saveImage = (e: any) => {
     e.preventDefault();
     const img = store
-      .toDataURL({ ignoreBackground: true })
+      .toDataURL({ ignoreBackground: false })
       .then(async (res) => {
         setImage(res);
         showModal();
