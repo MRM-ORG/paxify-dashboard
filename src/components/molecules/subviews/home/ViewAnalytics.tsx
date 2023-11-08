@@ -12,7 +12,7 @@ import { isMobileDevice } from "@/utils/responsive";
 import { H3 } from "@/utils/text";
 import { Form, Formik } from "formik";
 import Head from "next/head";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import AnalyticsChart from "../../AnalyticsCharts";
 import AnalyticsCard from "../../cards/AnalyticsCard";
@@ -32,7 +32,7 @@ interface IViewAnalyticsProps {
   };
 }
 
-export const StoreSelector = styled.div`
+const StoreSelector = styled.div`
   width: 250px;
 `;
 
@@ -114,23 +114,19 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
     (async () => {
       const user = JSON.parse(localStorage.getItem("user") as string);
 
-      try {
-        const apiResponse = await getStoreEvents(user.uid, activeStore.id);
+      const apiResponse = await getStoreEvents(
+        user.uid,
+        transformDomain(activeStore.value)
+      );
 
-        const storeEvents = apiResponse.data;
+      const storeEvents = apiResponse.data;
 
-        if (storeEvents == null) {
-          setError("Error fetching store events");
-          return;
-        }
-
-        console.log("Events", storeEvents);
-
-        setStoreEvents(storeEvents);
-      } catch (error) {
-        setLoading(false);
-        setError(error as string);
+      if (storeEvents == null) {
+        setError("Error fetching store events");
+        return;
       }
+
+      setStoreEvents(storeEvents);
     })();
   }, [activeStore]);
 
@@ -147,12 +143,12 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       (event: any) => event.name === "reels_opened"
     );
 
-    const rawInteractions = storeEvents.analytics.filter(
+    const rawInteractions = storeEvents.tracking.filter(
       (event: any) =>
         event.name === "reels_interacted" || event.name === "reels_opened"
     );
 
-    const rawStoryViews = storeEvents.analytics.filter(
+    const rawStoryViews = storeEvents.tracking.filter(
       (event: any) =>
         event.name === "reels_story_viewed" || event.name === "reels_opened"
     );
@@ -178,6 +174,11 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
     setLoading(false);
     setError(null);
   };
+
+  useEffect(() => {
+    if (activeStore != null) return;
+    setActiveStore(user.stores[0] ?? null);
+  }, []);
 
   useEffect(() => {
     if (error != null) {
@@ -206,15 +207,6 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
     });
   }, [pageViews, interactions, storyViews, averageStoryViews]);
 
-  const userStores = user.stores.map((store) => {
-    return {
-      label: store.name,
-      value: store.domain,
-      id: store.id,
-      verified: store.verified,
-    };
-  });
-
   return (
     <>
       <Head>
@@ -228,14 +220,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
 
         <SpacedRow>
           <Formik
-            initialValues={{
-              store: {
-                id: activeStore?.id,
-                label: activeStore?.label,
-                value: activeStore?.label,
-                verified: activeStore?.verified,
-              },
-            }}
+            initialValues={{ store: activeStore }}
             onSubmit={(values) => {}}>
             {({ values }) => {
               return (
@@ -248,7 +233,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
                         setActiveStore(val);
                       }}
                       placeholder="Store to view analytics"
-                      options={userStores}
+                      options={user.stores}
                     />
                   </StoreSelector>
                 </Form>
@@ -300,9 +285,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
             <AnalyticsCard
               label="Interactions Ratio"
               quantity={`${
-                !isNaN(analyticsSummary?.interactions?.quantity)
-                  ? (analyticsSummary?.interactions?.quantity * 100).toFixed(2)
-                  : 0.0
+                (analyticsSummary?.interactions?.quantity * 100).toFixed(2) ?? 0
               }%`}
               percentChange={analyticsSummary?.interactions?.percentChange}
             />

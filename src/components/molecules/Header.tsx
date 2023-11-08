@@ -15,8 +15,6 @@ import Profile from "../atoms/icons/profile";
 import Stores from "../atoms/icons/stores";
 import { LogoContainer } from "../pages/Login";
 import Image from "next/image";
-import { navigateNewPage } from "@/utils/navigate";
-import { DASHBOARD_PROFILE } from "@/utils/routes";
 
 interface IHeaderProps {
   activeTab: number;
@@ -107,22 +105,27 @@ const MobileNavMenu = styled.div`
 const SidebarOptions = [
   {
     id: 0,
-    title: "My Stores",
+    title: "Add Stores",
     icon: <Stores />,
   },
-  {
-    id: 1,
-    title: "Analytics",
-    icon: <Analytics />,
-  },
+  // {
+  //   id: 1,
+  //   title: "Analytics",
+  //   icon: <Analytics />,
+  // },
   {
     id: 2,
     title: "Profile",
     hide: true,
   },
   {
+    id: 4,
+    title: "Dashboard",
+    icon: <Analytics />,
+  },
+  {
     id: 3,
-    title: "Resource Usage",
+    title: "Subscriptions",
     icon: <Card />,
   },
 ];
@@ -133,10 +136,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
 
   const handleUserSignOut = () => {
     signOutUser();
-  };
-
-  const handleProfileClick = () => {
-    navigateNewPage(DASHBOARD_PROFILE());
   };
 
   return (
@@ -246,7 +245,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
                   <Option gap="10px" onClick={() => props.onClick(2)}>
                     <Row gap="10px">
                       <Profile
-                        onClick={handleProfileClick}
                         fill={props.activeTab === 2 ? THEME.blue1 : THEME.white}
                       />
                       <div>Profile</div>

@@ -9,3 +9,5 @@ export const DASHBOARD_STORES = () => `/`;
 export const DASHBOARD_ANALYTICS = () => `/analytics`;
 export const DASHBOARD_SUBSCRIPTIONS = () => `/subscriptions`;
 export const DASHBOARD_PROFILE = () => `/profile`;
+
+export const MAIN_DASHBOARD = () => `/dashboard/home`;

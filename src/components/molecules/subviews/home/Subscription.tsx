@@ -9,19 +9,8 @@ import { OFFICIAL_WEBSITE_PRICING } from "@/utils/routes";
 import { H2, H3 } from "@/utils/text";
 import UsageBar from "@/components/atoms/UsageBar";
 import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
-import { Form, Formik } from "formik";
-import { StoreSelector } from "./ViewAnalytics";
-import FormikLabelledSingleSelect from "../../inputs/formik/FormikLabelledSingleSelect";
-import { IStoryProps } from "@/pages/subscriptions";
 
-interface IProfileProps {
-  user: {
-    stores: any[];
-    setStores: (stores: string[]) => void;
-  };
-  activeStore: IStoryProps | null;
-  setActiveStore: (store: IStoryProps) => void;
-}
+interface IProfileProps {}
 
 const SUBSCRIPTIONS = [
   {
@@ -247,6 +236,7 @@ const Container = styled.div`
 const Heading = styled.h1``;
 
 const ModifiedColumn = styled(Column)`
+  width: 100%;
   flex-wrap: nowrap;
 `;
 
@@ -319,60 +309,24 @@ const Resource = styled.div`
   min-width: 100px;
 `;
 
-const Subscription: React.FC<IProfileProps> = ({
-  user,
-  activeStore,
-  setActiveStore,
-}) => {
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "stripe-pricing-table": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >;
+    }
+  }
+}
+
+const Subscription: React.FC<IProfileProps> = () => {
   const { publicRuntimeConfig } = getConfig();
   const [isLoading, setIsLoading] = useState(false);
-  const [resourceLoading, setResourceLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [resources, setResources] = useState<any>(null);
 
   const currentPlan = "Basic";
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-    fetchDomainResourcesForMonth(user.uid, activeStore?.id as string)
-      .then((res) => {
-        console.log("res", res);
-        setResources(res);
-      })
-      .finally(() => setResourceLoading(false));
-  }, [activeStore]);
-
-  const handleFormSubmit = async (event: any) => {
-    event.preventDefault();
-
-    if (selectedPlan === "Premium") {
-      setIsLoading(true);
-      const response = await fetch(
-        `${publicRuntimeConfig.STRIPE_BACKEND_URL}/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            lookup_key: "reels_pro",
-          }),
-        }
-      ).then((res) => {
-        setIsLoading(false);
-        return res.json();
-      });
-      const { url } = response;
-
-      window.location.href = url;
-    }
-
-    if (selectedPlan === "Enterprise") {
-      // Open mail client with subject line "Enterprise Plan"
-      window.location.href = `mailto:paxifydev@gmail.com?subject=Enterprise Plan&body=Hi, Paxify, I'm interested in the Enterprise Plan for Reels Life.`;
-    }
-  };
 
   return (
     <>
@@ -382,106 +336,15 @@ const Subscription: React.FC<IProfileProps> = ({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <ModifiedColumn style={{ padding: "24px", maxWidth: "100%" }} gap="20px">
-        <Heading>Billing & Resource Monitoring</Heading>
+        <Heading>Manage Subscription</Heading>
 
-        <Formik
-          initialValues={{
-            store: { label: activeStore?.label, value: activeStore?.label },
-          }}
-          onSubmit={(values) => {}}>
-          {({ values }) => {
-            return (
-              <Form>
-                <StoreSelector>
-                  <FormikLabelledSingleSelect
-                    name="store"
-                    label="Select Store"
-                    onChange={(val) => {
-                      setActiveStore(val);
-                    }}
-                    placeholder="Store to view resources"
-                    options={user.stores}
-                  />
-                </StoreSelector>
-              </Form>
-            );
-          }}
-        </Formik>
+        <stripe-pricing-table
+          pricing-table-id="prctbl_1O9Z7aAZBT51e6S41rqDFNZf"
+          publishable-key="pk_test_51NXppaAZBT51e6S4cKWQ0uRZbEduqv5fgb3mv4dZmo5BGTY5JZwHQa4Xo6s0xFxEh41SbgM54kCaR11fTbNsVq5q00mOJX4TpX"></stripe-pricing-table>
 
-        {resources && (
-          <ResourceContainer>
-            <Row gap="15px">
-              <Resource>Stores</Resource>
-              <UsageBar consumed={resources["stores"]} available={1} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>Components</Resource>
-              <UsageBar consumed={resources["components"]} available={1} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>Page Views</Resource>
-              <UsageBar consumed={resources["storyViews"]} available={50000} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>API Calls</Resource>
-              <UsageBar
-                consumed={resources["totalApiCalls"]}
-                available={200000}
-              />
-            </Row>
-          </ResourceContainer>
-        )}
-
-        <strong>
-          <i>*Metrics reset at the start of every month</i>
-        </strong>
-
-        <H2>Current Plan</H2>
-        <Row gap="20px">
-          <Container>
-            {SUBSCRIPTIONS.map((subscription) => (
-              <Card onSubmit={handleFormSubmit} key={subscription.id}>
-                <Column>
-                  <Row>
-                    <div>{subscription?.name}</div>
-                  </Row>
-                  <Row>
-                    {!subscription?.isEnterprise && <div> $</div>}
-                    <Price>{subscription?.price}</Price>
-                    {!subscription?.isEnterprise && <div>/mo</div>}
-                  </Row>
-                </Column>
-                <Divider />
-                {/* <Column gap="2px">
-                  {subscription?.features.map((feature: any) => (
-                    <Row key={feature.id}>{feature?.label}</Row>
-                  ))}
-                </Column> */}
-                <input type="hidden" name="lookup_key" value="pro_plan" />
-                <Subscribe
-                  onClick={() => {
-                    // setSelectedPlan(subscription.name);
-                    window.location.href = subscription?.cta?.href;
-                  }}
-                  // disable={currentPlan === subscription.name}
-                  id="checkout-and-portal-button"
-                  type="submit">
-                  <Button>
-                    {currentPlan === subscription.name
-                      ? "Learn More"
-                      : subscription?.cta?.label}
-                  </Button>
-                </Subscribe>
-              </Card>
-            ))}
-          </Container>
-        </Row>
         <LoadingPage isLoading={isLoading} />
       </ModifiedColumn>
-      <LoadingPage isLoading={resourceLoading} />
+      {/* <LoadingPage isLoading={!resources} /> */}
     </>
   );
 };

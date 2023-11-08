@@ -5,9 +5,7 @@ export async function getStoreEvents(
   uid: string,
   domain: string
 ): Promise<any> {
-  const API = `${BACKEND_URL}/firebase/analytics/${uid}/${encodeURIComponent(
-    domain
-  )}`;
+  const API = `${BACKEND_URL}/firebase/tracking/${uid}/${domain}`;
 
   return axios
     .get(API)

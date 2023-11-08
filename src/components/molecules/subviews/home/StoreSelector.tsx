@@ -3,26 +3,23 @@ import {
   getStoreVerificationStatus,
   registerStore,
 } from "@/apiCalls/auth";
-import ModalComponent from "@/components/atoms/Modal";
 import PrimaryButton from "@/components/atoms/buttons/PrimaryButton";
-import Copy from "@/components/atoms/icons/copy";
-import CopyDone from "@/components/atoms/icons/copyDone";
-import Tooltip from "@/components/atoms/icons/tooltip";
-import {
-  StoreRegisterForm,
-  StoreRegisterSchema,
-} from "@/components/schemas/StoreRegisterSchema";
 import { Column, Row } from "@/styles/common";
+import { transformDomain } from "@/utils/helpers";
 import { THEME } from "@/utils/theme";
 import { Form, Formik } from "formik";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import FormikLabelledTextInput from "../../inputs/formik/FormikLabelledTextInput";
-import LoadingPage from "../loading/LoadingPage";
-import Switch from "@/components/atoms/Switch";
-import Delete from "@/components/atoms/icons/delete";
 import TabbedSelector from "../layoutSelector/TabbedSelector";
+import LoadingPage from "../loading/LoadingPage";
+import ModalComponent from "../../../atoms/Modal";
+import Tooltip from "../../../atoms/icons/tooltip";
+import Copy from "../../../atoms/icons/copy";
+import CopyDone from "../../../atoms/icons/copyDone";
+import Switch from "../../../atoms/Switch";
+import Delete from "../../../atoms/icons/delete";
 
 interface IStoreSelectorProps {
   user: {
@@ -38,10 +35,10 @@ const Container = styled(Column)`
 `;
 
 const NewStore = styled(Row)`
-  gap: 16px;
+  gap: 25px;
   max-width: 500px;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: nowrap;
+  align-items: flex-end;
 
   @media (max-width: 768px) {
     flex-wrap: wrap;
@@ -58,7 +55,7 @@ const Store = styled(Row)`
   border-radius: 8px;
   width: 100%;
   justify-content: space-between;
-  background-color: ${THEME.white};
+  background-color: ${THEME.background0};
   transition: all 0.2s ease-in-out;
 
   &:hover {
@@ -106,8 +103,11 @@ const Code = styled.code`
 `;
 
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
+  // return null;
+
   const [stores, setStores] = useState<any>([]);
   const [activeStore, setActiveStore] = useState<any>();
+  const [activeUser, setActiveUser] = useState<any>();
   const [showInstructions, setShowInstructions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(null);
@@ -136,9 +136,12 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       const user = JSON.parse(localStorage.getItem("user") as string);
       const { uid } = user;
       setIsLoading(true);
+      setActiveUser(uid);
 
       fetchUserStores(uid).then((stores) => {
-        setStores(stores);
+        if (Array.isArray(stores)) {
+          setStores(stores);
+        }
       });
     } catch (error) {
       console.error(error);
@@ -181,6 +184,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       setIsCopied(false);
     }, 1500);
   }, [isCopied]);
+  console.log({ stores });
 
   return (
     <>
@@ -190,77 +194,57 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Container>
-        <h1>Domain Management</h1>
+        <h1>My Stores</h1>
         <p>
           Here are all the stores under your ownership. You can also add or
           remove stores, if that is covered under the subscription.
         </p>
         <Formik
-          validateOnChange={false}
-          validateOnBlur={false}
-          initialValues={{ storeName: "", storeDomain: "" }}
-          validationSchema={StoreRegisterSchema}
+          initialValues={{ store: "" }}
           onSubmit={(values: any) => {
-            const storeName = values.storeName.trim();
-            const storeDomain = values.storeDomain.trim();
-            if (!storeDomain || !storeName) return;
+            const store = values.store.trim();
+            if (!store) return;
 
             const loggedInUser = JSON.parse(
               localStorage.getItem("user") as string
             );
             const { uid } = loggedInUser;
 
-            setIsLoading(true);
-
-            registerStore(uid, storeName, storeDomain)
+            registerStore(uid, store)
               .then(() => {
-                const user = JSON.parse(localStorage.getItem("user") as string);
-                const { uid } = user;
-
-                fetchUserStores(uid).then((stores) => {
-                  setStores(stores);
-                });
+                setStores([
+                  ...user?.stores,
+                  {
+                    label: store,
+                    value: transformDomain(store),
+                  },
+                ]);
               })
               .catch((err) => {
-                alert(
-                  "An error occured, please make sure your subscription allows you to add more stores."
-                );
+                alert(err);
                 console.error(err);
-              })
-              .finally(() => setIsLoading(false));
+              });
 
-            values.storeName = "";
-            values.storeDomain = "";
+            values.store = "";
           }}>
-          {({ values, errors }) => {
-            // console.log(values, errors);
-            return (
-              <Form>
-                <NewStore>
-                  <FormikLabelledTextInput
-                    type="text"
-                    label={StoreRegisterForm.formField.store.label}
-                    name={StoreRegisterForm.formField.store.name}
-                    placeholder={StoreRegisterForm.formField.store.placeholder}
-                  />
-                  <FormikLabelledTextInput
-                    type="text"
-                    label={StoreRegisterForm.formField.domain.label}
-                    name={StoreRegisterForm.formField.domain.name}
-                    placeholder={StoreRegisterForm.formField.domain.placeholder}
-                  />
-                  <PrimaryButton
-                    onClick={() => {}}
-                    type="submit"
-                    width="200px"
-                    action="login"
-                    background={THEME.buttonPrimary}>
-                    Register Store
-                  </PrimaryButton>
-                </NewStore>
-              </Form>
-            );
-          }}
+          <Form>
+            <NewStore>
+              <FormikLabelledTextInput
+                type="text"
+                label="Add a Store"
+                name="store"
+                placeholder="Enter store domain"
+              />
+              <PrimaryButton
+                onClick={() => {}}
+                type="submit"
+                width="200px"
+                action="login"
+                background={THEME.buttonPrimary}>
+                Validate
+              </PrimaryButton>
+            </NewStore>
+          </Form>
         </Formik>
 
         {JSON.stringify(stores) !== "{}" && (
@@ -290,6 +274,20 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             <Delete onClick={() => {}} />
           </Store>
         ))}
+
+        {/* <RegisteredDomains>My Existing Stores</RegisteredDomains>
+        {stores?.map((store: any) => (
+          <Row key={store.label} gap="90px">
+            <p>{store.label}</p>
+            <p>{store.accessToken}</p>
+          </Row>
+        ))}
+        {stores?.map((store: any) => (
+          <Row key={store?.id} gap="90px">
+            <p>{store?.name}</p>
+            <p>{store?.domain}</p>
+          </Row>
+        ))} */}
       </Container>
       <ModalComponent
         isVisible={showInstructions}
@@ -318,7 +316,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           {!activeTabShopify && (
             <Script onClick={() => setIsCopied(true)}>
               <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
-              {!isCopied ? <Copy /> : <CopyDone />}
+              {/* {!isCopied ? <Copy /> : <CopyDone />} */}
             </Script>
           )}
           <p>
