@@ -1,8 +1,12 @@
 import type { MenuProps } from "antd";
+import getConfig from "next/config";
 import Link from "next/link";
 
-// export const BACKEND_URL = "https://backend.paxify.io";
-export const BACKEND_URL = "http://localhost:8000";
+const { publicRuntimeConfig } = getConfig();
+
+export const BACKEND_URL = publicRuntimeConfig.BACKEND_URL;
+
+console.log("BACKEND_URL", BACKEND_URL);
 
 // Dashboard sidebar constants like Name ,icons etc
 type MenuItem = Required<MenuProps>["items"][number];
