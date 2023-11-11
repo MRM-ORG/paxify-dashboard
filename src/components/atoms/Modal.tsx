@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from "react";
-import Modal from "react-modal";
 import { isMobileDevice } from "@/utils/responsive";
+import React, { useRef } from "react";
+import Modal from "react-modal";
 
 interface IModalComponentProps {
   isVisible: boolean;
@@ -35,7 +35,8 @@ const ModalComponent: React.FC<IModalComponentProps> = (props) => {
       isOpen={props.isVisible}
       style={customStyles}
       onRequestClose={props.onClose}>
-      <div ref={modalRef}>{props.children}</div>
+      {/* @ts-ignore */}
+      <div ref={modalRef}>{props.children as React.ReactNode}</div>
     </Modal>
   );
 };

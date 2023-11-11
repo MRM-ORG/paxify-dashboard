@@ -36,7 +36,7 @@ const Container = styled(Column)`
 
 const NewStore = styled(Row)`
   gap: 25px;
-  max-width: 500px;
+  max-width: 700px;
   flex-wrap: nowrap;
   align-items: flex-end;
 
@@ -121,11 +121,8 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
     const signInUser = JSON.parse(localStorage.getItem("user") as string);
     const { uid } = signInUser;
 
-    // <script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js" }} defer="defer"></script>
-    // <script src="https://cdn.jsdelivr.net/gh/MRM-ORG/builds@latest/reelife/auth.js"></script>
-
-    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = ${uid}; var storeId = ${activeStore?.id};</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js" }} defer="defer"></script>`;
-    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = ${uid}; var storeId = ${activeStore?.id};</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/MRM-ORG/builds/reelife/auth.js"></script>`;
+    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js" }} defer="defer"></script>`;
+    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js"></script>`;
   } catch (error) {
     console.error(error);
     alert("An error occured, please try again later.");
@@ -184,7 +181,6 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       setIsCopied(false);
     }, 1500);
   }, [isCopied]);
-  console.log({ stores });
 
   return (
     <>
@@ -200,9 +196,18 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           remove stores, if that is covered under the subscription.
         </p>
         <Formik
-          initialValues={{ store: "" }}
+          initialValues={{ name: "", store: "" }}
           onSubmit={(values: any) => {
             const store = values.store.trim();
+            const name = values.name.trim();
+
+            console.log(stores);
+
+            if (stores && stores.length > 0) {
+              alert("You can only add one store at the moment.");
+              return;
+            }
+
             if (!store) return;
 
             const loggedInUser = JSON.parse(
@@ -210,13 +215,13 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             );
             const { uid } = loggedInUser;
 
-            registerStore(uid, store)
+            registerStore(uid, { name, store })
               .then(() => {
                 setStores([
                   ...user?.stores,
                   {
-                    label: store,
-                    value: transformDomain(store),
+                    name,
+                    domain: store,
                   },
                 ]);
               })
@@ -231,7 +236,13 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             <NewStore>
               <FormikLabelledTextInput
                 type="text"
-                label="Add a Store"
+                label="Label"
+                name="name"
+                placeholder="What do you call this store?"
+              />
+              <FormikLabelledTextInput
+                type="text"
+                label="Domain Name"
                 name="store"
                 placeholder="Enter store domain"
               />
@@ -257,12 +268,13 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             <p>{store.domain}</p>
             <Row gap="5px">
               <VerificationBadge isVerified={store.verified}>
-                {store.verified ? "Verified" : "Pending Verified"}
+                {store.verified ? "Verified" : "Pending Verification"}
               </VerificationBadge>
               {window?.innerWidth > 768 && (
                 <Tooltip
                   onClick={() => {
                     setActiveStore(store);
+                    setActiveTabShopify(true);
                     setShowInstructions(true);
                   }}
                 />
@@ -296,14 +308,22 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           <h2>Domain Verification</h2>
 
           <TabbedSelector
-            tabs={["Shopify", "Install Manually"]}
+            tabs={["Shopify", "Others"]}
             onChange={() => setActiveTabShopify(!activeTabShopify)}
           />
 
           <p>
             To verify domain ownership, please add the following script to the
-            {" <head >"} element as far up as possible. Don’t add more than one
-            script to your store.
+            {!activeTabShopify ? (
+              <>
+                <b> theme.liquid</b> file.
+              </>
+            ) : (
+              <>
+                <b> {`<head >`}</b> tag as far up as possible.
+              </>
+            )}{" "}
+            Don’t add more than one script to your store.
           </p>
 
           {activeTabShopify && (
@@ -316,12 +336,10 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           {!activeTabShopify && (
             <Script onClick={() => setIsCopied(true)}>
               <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
-              {/* {!isCopied ? <Copy /> : <CopyDone />} */}
+              {!isCopied ? <Copy /> : <CopyDone />}
             </Script>
           )}
-          <p>
-            Once completed, publish a new store version and then click on Verify
-          </p>
+          <p>Once completed, visit the store and then click on Verify</p>
           <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
             Verify
           </PrimaryButton>

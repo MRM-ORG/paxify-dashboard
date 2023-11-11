@@ -160,7 +160,6 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       filters
     );
 
-    console.log("Interactions", rawInteractions, interactions);
     const storyViews = transformStoryViews(rawStoryViews, filters);
     const averageStoryViews = transformAverageStoryViews(
       rawStoryViews,

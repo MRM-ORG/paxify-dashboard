@@ -11,6 +11,7 @@ import { THEME } from "@/utils/theme";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
+import { isUserVerified } from "@/utils/auth";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -57,7 +58,6 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   };
 
   const mapTabToRoute = (tab: any) => {
-    console.log(tab);
     if (tab === 0) {
       return DASHBOARD_STORES;
     } else if (tab === 3) {
@@ -70,7 +70,11 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   useEffect(() => {
     // Check firebase auth status here
     const user = localStorage.getItem("user");
+
     if (!user) {
+      navigateNewPage(USER_LOGIN());
+    } else if (!isUserVerified()) {
+      alert("Please verify your email, before proceeding.");
       navigateNewPage(USER_LOGIN());
     } else {
       setIsLoading(false);

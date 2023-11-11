@@ -1,9 +1,7 @@
-import { CaretUpOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import Link from "next/link";
-import AreaChart from "./components/dashboard/home/AreaChart";
 
-// export const BACKEND_URL = "https://subscriptions.paxify.io";
+// export const BACKEND_URL = "https://backend.paxify.io";
 export const BACKEND_URL = "http://localhost:8000";
 
 // Dashboard sidebar constants like Name ,icons etc
