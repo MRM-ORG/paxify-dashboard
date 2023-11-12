@@ -47,13 +47,13 @@ export const isUserVerified = () => {
   }
 };
 
-export const sendFirebaseVerificationEmail = () => {
-  const user = webAuth.currentUser;
+export const getUser = (): User | null => {
+  const user = localStorage.getItem("user") as string;
   try {
-    sendEmailVerification(user as User)
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err));
+    const userObj = JSON.parse(user);
+    return userObj;
   } catch (error) {
     console.error(error);
+    return null;
   }
 };

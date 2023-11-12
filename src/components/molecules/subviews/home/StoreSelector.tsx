@@ -201,8 +201,6 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             const store = values.store.trim();
             const name = values.name.trim();
 
-            console.log(stores);
-
             if (stores && stores.length > 0) {
               alert("You can only add one store at the moment.");
               return;
@@ -216,12 +214,13 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             const { uid } = loggedInUser;
 
             registerStore(uid, { name, store })
-              .then(() => {
+              .then((res) => {
                 setStores([
                   ...user?.stores,
                   {
                     name,
                     domain: store,
+                    id: res.store.id,
                   },
                 ]);
               })

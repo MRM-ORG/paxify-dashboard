@@ -3,7 +3,7 @@ import { webAuth } from "@/firebase/firebase";
 import { Column, Row } from "@/styles/common";
 import { navigateNewPage } from "@/utils/navigate";
 import { isMobileDevice } from "@/utils/responsive";
-import { HOME_PAGE, USER_LOGIN } from "@/utils/routes";
+import { USER_LOGIN } from "@/utils/routes";
 import { GenericText, H2 } from "@/utils/text";
 import { THEME } from "@/utils/theme";
 import {
@@ -24,7 +24,6 @@ import {
   SignUpValidationSchema,
 } from "../schemas/SignUpValidationSchema";
 import { LogoContainer } from "./Login";
-import { sendFirebaseVerificationEmail } from "@/utils/auth";
 
 const Container = styled(Row)`
   height: 100%;
@@ -99,14 +98,19 @@ const SignUp: React.FC = () => {
           email: values.email.trim(),
         };
 
-        registerUser(uid, payload).then(() => {
-          sendFirebaseVerificationEmail();
-          localStorage.setItem("user", JSON.stringify(user));
-          alert(
-            "We have sent you a verification email. Please verify your email to continue."
-          );
-          navigateNewPage(USER_LOGIN());
-        });
+        registerUser(uid, payload)
+          .then(() => {
+            sendEmailVerification(user).then(() => {
+              localStorage.setItem("user", JSON.stringify(user));
+              alert(
+                "We have sent you a verification email. Please verify your email to continue."
+              );
+              navigateNewPage(USER_LOGIN());
+            });
+          })
+          .catch((error: any) => {
+            console.error(error);
+          });
       })
       .catch((error: any) => {
         console.error(error);

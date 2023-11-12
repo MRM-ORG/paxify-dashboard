@@ -1,8 +1,10 @@
 export const THEME = {
   primary: "#343f52",
   primary1: "#605dba",
+  primary2: "rgb(14 0 74)",
 
   white: "#ffffff",
+  white2: "rgb(244 253 255)",
 
   body1: "#667085",
 

@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface ISharedStylesProps {
   gap?: string;
+  alignItem?: string;
 }
 
 const CommonProperties = styled("div")`
@@ -10,7 +11,7 @@ const CommonProperties = styled("div")`
 `;
 
 export const Row = styled(CommonProperties)<ISharedStylesProps>`
-  align-items: center;
+  align-items: ${(props) => (props.alignItem ? props.alignItem : "center")};
   gap: ${(props) => (props.gap ? props.gap : "0")};
 `;
 
