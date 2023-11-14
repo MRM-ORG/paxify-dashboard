@@ -115,3 +115,87 @@ export const checkIfWithinSubscriptionThreshold = (
   }
   return false;
 };
+
+export const getLiquidFileContents = (uid: string, storeId: string) =>
+  `{% capture reelsSettingsLiquid %}
+  {
+    "id": "{{ section.settings.id }}",
+  }
+{% endcapture %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/paxify-llc/builds@main/reelife/paxify-reelife.css">
+
+<script>
+  function loadScript(src, callback) {
+    var script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = callback;
+    document.head.appendChild(script);
+  }
+
+  loadScript("https://cdn.jsdelivr.net/gh/paxify-llc/builds@main/reelife/paxify-reelife.js", function () {
+    const settings = {{ reelsSettingsLiquid | strip_newlines | remove: "  " }};
+    const reels = new ReelsInitializer({
+      uid: "${uid}",
+      storeId: "${storeId}",
+      elementId: settings.id,
+    });
+
+    reels.render();
+  });
+</script>
+
+<style>
+  .shared-dom {
+    width: 100%;
+    height: 110px;
+  }
+  .sub-rect {
+    border-radius: 100%;
+    width: 70px;
+    height: 70px;
+    float: left;
+    margin: 20px 20px 20px 0;
+  }
+  .pure-background {
+    background-color: #eee;
+  }
+
+  @media (min-width: 769px) {
+    .shared-dom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div id="{{ section.settings.id }}">
+  <div class="shared-dom">
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+    <div class="sub-rect pure-background"></div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Stories",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "id",
+      "label": "Container Id",
+      "default": "reelife-stories"
+    }
+  ]
+}
+{% endschema %}`;

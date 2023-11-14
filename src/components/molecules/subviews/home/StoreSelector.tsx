@@ -5,7 +5,7 @@ import {
 } from "@/apiCalls/auth";
 import PrimaryButton from "@/components/atoms/buttons/PrimaryButton";
 import { Column, Row } from "@/styles/common";
-import { transformDomain } from "@/utils/helpers";
+import { getLiquidFileContents, transformDomain } from "@/utils/helpers";
 import { THEME } from "@/utils/theme";
 import { Form, Formik } from "formik";
 import Head from "next/head";
@@ -112,7 +112,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
-  const [activeTabShopify, setActiveTabShopify] = useState(true);
+  const [isFirstStep, setIsFirstStep] = useState(true);
 
   let VERIFICATION_SCRIPT_SHOPIFY: any = null;
   let VERIFICATION_SCRIPT_MANUAL: any = null;
@@ -181,6 +181,30 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
       setIsCopied(false);
     }, 1500);
   }, [isCopied]);
+
+  const handleLiquidFileDownload = () => {
+    const user = JSON.parse(localStorage.getItem("user") as string);
+    const { uid } = user;
+    const storeId = activeStore.id;
+    const fileContent = getLiquidFileContents(uid, storeId);
+
+    // Create a Blob containing the file content
+    const blob = new Blob([fileContent], { type: "text/plain" });
+
+    // Create a URL for the Blob
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create an anchor element to trigger the download
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = "paxify-reelife.liquid"; // Set the desired file name
+
+    // Trigger a click event on the anchor element to start the download
+    a.click();
+
+    // Clean up by revoking the Blob URL
+    URL.revokeObjectURL(blobUrl);
+  };
 
   return (
     <>
@@ -273,7 +297,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
                 <Tooltip
                   onClick={() => {
                     setActiveStore(store);
-                    setActiveTabShopify(true);
+                    setIsFirstStep(true);
                     setShowInstructions(true);
                   }}
                 />
@@ -285,63 +309,55 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             <Delete onClick={() => {}} />
           </Store>
         ))}
-
-        {/* <RegisteredDomains>My Existing Stores</RegisteredDomains>
-        {stores?.map((store: any) => (
-          <Row key={store.label} gap="90px">
-            <p>{store.label}</p>
-            <p>{store.accessToken}</p>
-          </Row>
-        ))}
-        {stores?.map((store: any) => (
-          <Row key={store?.id} gap="90px">
-            <p>{store?.name}</p>
-            <p>{store?.domain}</p>
-          </Row>
-        ))} */}
       </Container>
       <ModalComponent
         isVisible={showInstructions}
         onClose={() => setShowInstructions(false)}>
         <Instructions>
-          <h2>Domain Verification</h2>
+          <h2>Instructions</h2>
 
           <TabbedSelector
-            tabs={["Shopify", "Others"]}
-            onChange={() => setActiveTabShopify(!activeTabShopify)}
+            tabs={["Step 1. Verify", "Step 2. Integrate Reelife"]}
+            onChange={() => setIsFirstStep(!isFirstStep)}
           />
 
-          <p>
-            To verify domain ownership, please add the following script to the
-            {!activeTabShopify ? (
-              <>
-                <b> theme.liquid</b> file.
-              </>
-            ) : (
-              <>
-                <b> {`<head >`}</b> tag as far up as possible.
-              </>
-            )}{" "}
-            Don’t add more than one script to your store.
-          </p>
-
-          {activeTabShopify && (
-            <Script onClick={() => setIsCopied(true)}>
-              <Code>{VERIFICATION_SCRIPT_SHOPIFY}</Code>
-              {!isCopied ? <Copy /> : <CopyDone />}
-            </Script>
+          {!isFirstStep && (
+            <>
+              <p>
+                To verify domain ownership, please add the following script to
+                the <b> theme.liquid</b> file. Don’t add more than one script to
+                your store.
+              </p>
+              <Script onClick={() => setIsCopied(true)}>
+                <Code>{VERIFICATION_SCRIPT_SHOPIFY}</Code>
+                {!isCopied ? <Copy /> : <CopyDone />}
+              </Script>
+              <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
+                Verify
+              </PrimaryButton>
+            </>
           )}
 
-          {!activeTabShopify && (
-            <Script onClick={() => setIsCopied(true)}>
-              <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
-              {!isCopied ? <Copy /> : <CopyDone />}
-            </Script>
+          {isFirstStep && (
+            <>
+              <p>
+                Now that you have verified your domain ownership, please
+                download the Reelife liquid file and add it to your store.
+              </p>
+              <Script onClick={handleLiquidFileDownload}>
+                <b>Paxify-Reelife.liquid</b>
+              </Script>
+              <p>
+                Once downloaded, this will act like any other liquid file. You
+                can add it to your store codebase and start using Reelife by
+                Paxify. In case you need help, please contact us at{" "}
+                <a href="mailto:support@paxify.io">
+                  <b>support@paxify.io</b>
+                </a>
+              </p>
+            </>
           )}
-          <p>Once completed, visit the store and then click on Verify</p>
-          <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
-            Verify
-          </PrimaryButton>
+
           {isVerified !== null && !isVerified && (
             <Error>
               <>
