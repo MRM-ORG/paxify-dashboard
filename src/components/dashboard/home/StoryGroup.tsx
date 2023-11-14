@@ -30,7 +30,7 @@ const StoryGroup = () => {
 
     return (
         <div>
-            <div className='mt-10 relative bg-white rounded-lg py-4 md:px-5'>
+            <div className='mt-10 relative bg-white rounded-lg py-8 md:px-5'>
                 <div className='flex md:flex-row flex-col justify-center md:justify-between items-center flex-wrap'>
                     <h1 className='font-bold text-lg'>Story Groups</h1>
                     <div className='space-x-2'>

@@ -1,14 +1,24 @@
 import React from 'react'
-import { Select, Button, DatePicker } from 'antd';
+import { Select, Button, DatePicker, Card } from 'antd';
 import { FileAddOutlined } from '@ant-design/icons';
 import InteractionCard from './InteractionCard';
 const { Option } = Select;
 
 const InteractionPage = () => {
     return (
-        <>
-            <div className='grid grid-cols-1 lg:grid-cols-2 place-items-center space-y-4 lg:space-y-0 lg:place-items-start'>
-                <div className='space-x-2 lg:space-y-0 space-y-4 '>
+        <Card style={{padding: '0px'}}>
+            <div className='mt-5 p-2 flex justify-between'>
+                <div className='flex flex-row'>
+                    <div style={{fontWeight: '700', fontSize: '14px'}}>Analytics</div>
+                    <div className='ml-2'>Interaction</div>
+                </div>
+                <div>
+                <Button className='bg-white mr-5' icon={<FileAddOutlined />}>Create report</Button>
+                <DatePicker.RangePicker className=' lg:w-auto w-full' />
+                </div>
+            </div>
+            <div className='grid grid-cols-1 lg:grid-cols-7 mt-5 mr-5 ml-5 place-items-center space-y-4 lg:space-y-0 lg:place-items-start'>
+                <div className='space-x-2 lg:space-y-0 space-y-4 col-span-4'>
 
                     <Select defaultValue={"1"} placeholder="Story Group Status">
                         <Option value="1">Story Group Status</Option>
@@ -34,12 +44,7 @@ const InteractionPage = () => {
                     </Select>
                 </div>
 
-                <div className='lg:ml-auto md:block flex justify-center items-center flex-col space-y-2 space-x-3'>
-                    <Button className='bg-white' icon={<FileAddOutlined />}>Create report</Button>
-                    <DatePicker.RangePicker className=' lg:w-auto w-full' />
-                </div>
-            </div>
-            <div className='mt-5 flex justify-center lg:justify-end'>
+                <div className='lg:ml-auto col-span-3 md:block flex justify-center items-center flex-col space-y-2 space-x-3'>
                 <Select defaultValue={"option1"} placeholder="Select an option">
                     <Option value="option1">
                         <div className='flex items-center  space-x-2'>
@@ -54,9 +59,11 @@ const InteractionPage = () => {
                         </div>
                     </Option>
                 </Select>
+                </div>
             </div>
+            
             <InteractionCard/>
-        </>
+        </Card>
     )
 }
 

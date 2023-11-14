@@ -17,9 +17,9 @@ export default function AnalyticsPage() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     fetchUserStores(user.uid)
       .then((stores) => {
-        if(Array.isArray(stores)) {
-        setStores(stores);
-      }
+        if (Array.isArray(stores)) {
+          setStores(stores);
+        }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
 
   return (
     !isLoading && (
-        <ViewAnalytics {...viewAnalyticsProps} />
+      <ViewAnalytics {...viewAnalyticsProps} />
       // <ProtectedAuthWrapper>
       // </ProtectedAuthWrapper>
     )

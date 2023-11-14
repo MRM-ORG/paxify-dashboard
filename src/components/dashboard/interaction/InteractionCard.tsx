@@ -1,22 +1,41 @@
-import React from 'react'
+import { fetchUserStores } from '@/apiCalls/auth';
+import { BACKEND_URL } from '@/constants';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 
 const InteractionCard = () => {
+    const [stories, setStories] = useState<any[]>([]);
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        fetchUserStores(user?.uid)
+          .then((stores) => {
+            if(Array.isArray(stores)) {
+            console.log({stores})
+            Promise.all(stores?.map((store) => {
+              const apiUrl = `${BACKEND_URL}/firebase/analytics/${user?.uid}/${store?.id}`;
+              return axios.get(apiUrl);
+            }))
+            .then((response) => {
+                const newStories = response?.map((res) => res?.data?.data?.stories).flat();
+                const filteredStories = newStories.filter((story) => story);
+                setStories(filteredStories);
+            })
+          }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      },[])
     return (
         <div className='flex relative justify-center sm:justify-between items-center flex-wrap mt-20'>
 
            {
-            Array.from({ length: 8 }).map((_, index) => (
-                <div key={index} className='w-[296px] flex flex-col mt-20 justify-between items-center h-[526px] relative' style={{ background: "url(https://s3-alpha-sig.figma.com/img/f4a4/afb0/2f21db6a7211ded80e5820be2b825032?Expires=1694995200&Signature=asjCg1VxbTBja7gF6GJwc1EdF06Qm4sHqaj537Gx47aaE~z6vP0ZJyWdPstAdr16eO37LWLf2zUYi7IKFWkhG8lDLi3sgenXJH8UOzzjdwbImnhAKWA5sN3SbCBimtWvje6SA~fYX5d1P7txacQnjGl4AefaHMRc63NaqSWMKCtCc9B6ZWyBxwnywpyBBA4AmeLmvMjGSSf48GmIKCs2Mj8hVpQbI5wIdYo1faSpHvEGbBu8JWDgdGiGe1KUELHlD5NaypwnhGx7S9tq11--LC6Ly5QOTGLeted7Hfjuu88uliALE9oZcDr3Uvk1-TJ9hGmCySsNIGZ8wMpHEZntLg__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4), lightgray 0px 0px / 100% 100% no-repeat", backgroundSize: "cover" }}>
-
-
-                <div className="flex mt-1 self-start ml-2 w-[40px] rounded-[8px] bg-[#fff] border border-[#e9e9ed] p-[8px] justify-center items-center">
-                    <div className='w-[16px] h-[16px] rounded-[11px] bg-[#01ea85]'></div>
-                </div>
-
-                {/* Card Body */}
-
-                <div className='w-[278px]   p-4 mb-2 h-[360px] rounded-[15px] bg-[#fff]' style={{ boxShadow: "4px 4px 20px 0px rgba(36, 36, 80, 0.10)" }}>
-
+            Array.from(stories).map((_, index) => (
+                <div key={index}>
+                <div className='w-[220px] p-0 mb-6 h-[448px] bg-[#fff]' style={{ boxShadow: "4px 4px 20px 0px rgba(36, 36, 80, 0.10)" }}>
+                    <img src={_?.player[0]?.content?.source} alt='img' className='h-[230px]'/>
+                    <div className='p-2'>
                     <div className='flex justify-between items-center'>
                         <h1 className='font-bold'>Poll</h1>
                         <div className='space-x-4 flex items-centers'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
@@ -29,45 +48,45 @@ const InteractionCard = () => {
                             </svg></div>
                     </div>
 
-                    <div className='flex mt-3 items-center space-x-3'>
-                    <div style={{ background: "url(https://cdn.britannica.com/36/123536-050-95CB0C6E/Variety-fruits-vegetables.jpg), lightgray 0px 0px / 100% 100% no-repeat", backgroundSize:"cover" }} className='h-[30px] w-[40px]  border border-red-300  rounded-full'></div>
+                    <div className='flex mt-2 items-center space-x-3'>
+                    <div style={{ background: "url(https://cdn.britannica.com/36/123536-050-95CB0C6E/Variety-fruits-vegetables.jpg), lightgray 0px 0px / 100% 100% no-repeat", backgroundSize:"cover" }} className='h-[25px] w-[40px]  border border-red-300  rounded-full'></div>
                     <p style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} className='font-medium'>Sweet Chili-Peanut Sauce Chicken Thighs </p>
                     </div>
-                    <div className='border-b mt-4'></div>
-                    <h1 className='text-center mt-3 text-xs font-medium'>Would you try this?</h1>
-                    <div className='flex justify-center space-x-2 mt-2'>
-                       <div className='flex flex-col items-center space-y-2'>
-                           <p>1</p>
-                            <div style={{height:"90px",width:"32px",borderRadius:"8px 8px 0px 0px",background:"#7a4bff"}}>
-
-                            </div>
-                           <p>👍</p>
-                       </div>
-                       <div className='flex flex-col items-center justify-end space-y-2'>
-                           <p>0</p>
-                            <div style={{height:"0px",width:"0px",borderRadius:"8px 8px 0px 0px",background:"#7a4bff"}}>
-
-                            </div>
-                           <p>👎</p>
-                       </div>
-                    </div>
-                    <div className='flex justify-between mt-4'>
+                    <div className='flex justify-between mt-2'>
                         <div className='flex flex-col justify-center items-center'>
-                            <h1 className='font-extrabold'>1</h1>
-                            <p className='font-medium'>Impression</p>
+                            <h1 className='font-medium'>1</h1>
+                            <p className='font-normal' style={{fontSize: '10px'}}>Impression</p>
                         </div>
                         <div className='flex flex-col justify-center items-center'>
-                            <h1 className='font-extrabold'>1</h1>
-                            <p className='font-medium'>responses</p>
+                            <h1 className='font-medium'>1</h1>
+                            <p className='font-normal' style={{fontSize: '10px'}}>responses</p>
                         </div>
                         <div style={{padding:"6px 12px 6px 12px"}} className='flex flex-col bg-[#e6fcfd] rounded-[12px] justify-center items-center'>
-                            <h1 className='font-extrabold'>100%</h1>
-                            <p className='font-medium'>response</p>
+                            <h1 className='font-medium'>100%</h1>
+                            <p className='font-normal' style={{fontSize: '10px'}}>response</p>
                         </div>
                     </div>
-                </div>
+                    <div className='border-b mt-2'></div>
+                    <h1 className='text-start mt-2 text-xs font-bold'>Would you try this?</h1>
+                    <div className='flex flex-col justify-center mt-1'>
+                       <div className='flex flex-row items-center space-y-2'>
+                           <p>👍</p>
+                            <div style={{height:"3px",width:"90%",background:"#7a4bff"}}>
 
-            
+                            </div>
+                           <p>1</p>
+                       </div>
+                       <div className='flex flex-row items-center'>
+                           <p>👎</p>
+                            <div style={{height:"3px",width:"100%",background:"#9D9D9D"}}>
+
+                            </div>
+                           <p>0</p>
+                       </div>
+                    </div>
+                    </div>
+                </div>
+                
             </div>
             ))
            }

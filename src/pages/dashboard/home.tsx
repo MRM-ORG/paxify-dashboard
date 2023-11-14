@@ -11,6 +11,7 @@ import Stories from '@/components/dashboard/home/Stories'
 import axios from 'axios'
 import { BACKEND_URL } from '@/constants'
 import { fetchUserStores } from '@/apiCalls/auth'
+import OverViewTop from '@/components/dashboard/home/OverViewTop'
 
  
 const Page: NextPageWithLayout = () => {
@@ -44,9 +45,10 @@ const Page: NextPageWithLayout = () => {
 
   return (
     <div className='md:py-4 md:px-10'>
-       <Instances stories={stories}/>
-       <Overview analytics={analytics}/>
-       <Performance analytics={analytics}/>
+       <OverViewTop analytics={analytics}/>
+       <Instances stories={stories} analytics={analytics}/>
+       {/* <Overview analytics={analytics}/>
+       <Performance analytics={analytics}/> */}
        <StoryGroup/>
        <Stories stories={stories} analytics={analytics}/>
     </div>

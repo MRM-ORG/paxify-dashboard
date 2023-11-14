@@ -136,14 +136,15 @@ const Performance:NextPage<Props> = ({ analytics }) => {
 ]
   
   return (
-    <Card className="mt-10 h-[650px] lg:h-[480px] " extra={Extra} style={{ marginTop: "60px" }} title={<h1 className="font-bold text-lg">Performance</h1>}>
+    <Card className="h-auto" extra={Extra} style={{ marginTop: "0px" }} title={<h1 className="font-bold text-lg">Performance</h1>}>
   <Tabs
     defaultActiveKey="reach"
-    tabPosition={screens.lg?"left":"top"}
+    tabPosition={screens.lg ? "bottom":"bottom"}
     items={PERFORMANCE_TABS_ITEMS?.map((item, i) => {
       return {
         label: (
-          <div className="lg:grid lg:grid-cols-2 lg:place-items-start lg:space-x-14 tab-label" >
+          <div className="flex flex-wrap">
+          <div className="lg:space-x-14 tab-label mt-20" >
             <h1>{item.text}</h1>
             {
                 item.link ? <Link className="text-primary flex items-center" href="#"><p>Get Started </p><ArrowRightOutlined className="ml-3"/></Link> : <div className="lg:space-x-3 lg:flex w-[100px] badge-content">
@@ -171,6 +172,7 @@ const Performance:NextPage<Props> = ({ analytics }) => {
                 </div>
               </div>
             }
+          </div>
           </div>
         ),
         key: item.text,

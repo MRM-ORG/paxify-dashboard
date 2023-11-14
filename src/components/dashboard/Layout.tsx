@@ -1,7 +1,8 @@
 import React , {useState} from 'react';
 import { items } from '@/constants'
 import {usePathname} from 'next/navigation'
-import { Layout, Menu,Button,Grid } from 'antd';
+import { Layout, Menu, Grid, Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 const { Header, Content, Footer, Sider } = Layout;
 
 const {useBreakpoint} = Grid
@@ -12,6 +13,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const screens = useBreakpoint();
     
     const [collapsed, setCollapsed] = useState(true);
+    console.log({pathname})
+    const pathParts = pathname.split('/').filter(part => part !== ''); // Split the path and remove empty parts
+    const lastPart = pathParts[pathParts.length - 1]; // Get the last part of the path
+    const capitalizedWord = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -20,10 +25,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <Menu defaultSelectedKeys={[pathname]} mode="inline" items={items} />
             </Sider>
             <Layout>
-                <Header style={{ padding: 0, background: "none",borderBottom:"1px solid #e8e8e8" }}>
-            
-                    <div className='h-full  flex justify-center items-center'>
-                        <img src='/logo/Reellife-dashboard.png' alt="Logo" className="w-8 h-9 mr-2 text-center" />
+                <Header style={{ padding: 0, background: "white",borderBottom:"1px solid #e8e8e8" }}>
+                    <div className='flex justify-between'>
+                        <div className='pl-10'>
+                            <span style={{fontWeight: 'bold', fontSize: '27px'}}>{capitalizedWord}</span>
+                        </div>
+                        <div className='flex flex-row pr-10'>
+                            <div className='mt-4 mr-2'>
+                            <img src='/logo/Notifications.png' className='h-[36px] w-[36px]'/>
+                            </div>
+                            <div>
+                                <Avatar shape="square" icon={<UserOutlined className='mt-2'/>} className='h-[45px] w-[45px]'/>
+                            </div>
+                            <div className='flex flex-col ml-2'>
+                                <span style={{fontWeight: '600'}}>Mushfiq</span>
+                                <span >Admin</span>
+                            </div>
+                        </div>
                     </div>
 
                 </Header>

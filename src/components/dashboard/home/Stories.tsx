@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
-import { LeftOutlined, RightOutlined } from '@ant-design/icons'
+import { CaretUpOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { Button, Select, Statistic } from "antd";
 import { NextPage } from 'next';
+import Image from 'next/image';
 
 type Props = {
     stories: any
@@ -81,12 +82,11 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
             >
                 {
                     Array.from(stories).map((_: any, index) => (
-                        <div key={index} style={{ flex: '0 0 auto' }} className='mt-10 mx-5'>
-                            <h1 className='text-lg'>Impression <span className='font-bold text-lg'>{countTitleMatches(impressions, _.player[0]?.layout?.title)}</span></h1>
+                        <div key={index} style={{ flex: '0 0 auto' }} className='mt-10 mx-2'>
                             {_?.player[0]?.layout?.timer &&
-                            <Countdown value={Date.now() + calculateTotalMillisecondsFromTime(_?.player[0]?.layout?.timer)}/>
+                            <Countdown className='ml-2' value={Date.now() + calculateTotalMillisecondsFromTime(_?.player[0]?.layout?.timer)}/>
                             }
-                            <div className='w-[296px] mt-3 flex flex-col justify-end items-center h-[526px] rounded-md relative' style={{ background: `url(${_.player[0]?.content?.source}), lightgray 0px 0px / 100% 100% no-repeat`, backgroundSize: "cover" }}>
+                            {/* <div className='w-[296px] mt-3 flex flex-col justify-end items-center h-[526px] rounded-md relative' style={{ background: `url(${_.player[0]?.content?.source}), lightgray 0px 0px / 100% 100% no-repeat`, backgroundSize: "cover" }}>
                                 <div className='w-[250px] p-4 mb-2  rounded-[15px] bg-[#fff]' style={{ boxShadow: "4px 4px 20px 0px rgba(36, 36, 80, 0.10)" }}>
                                     <div className='flex gap-4'>
                                         <div className='border p-2 flex justify-center'>
@@ -100,7 +100,45 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
                                     </div>
                                 </div>
                             </div>
-                            <p className='text-center mt-1 text-lg w-[296px]'>{_.player[0]?.layout?.title}</p>
+                            <p className='text-center mt-1 text-lg w-[296px]'>{_.player[0]?.layout?.title}</p> */}
+                            <div style={{ flex: '0 0 auto' }} key={index} className='pb-[19px] mt-5 mx-2 w-[210px] h-[465px] border'>
+                        <div className="flex flex-col items-center space-y-2 cursor-pointer ease-in transition">
+                            <div className='relative'>
+                            <img
+                              src={_.player[0]?.content?.source}
+                              alt={"img"}
+                              className="w-full h-[338px] object-cover"
+                            />
+                            <div className="absolute top-3 right-3">
+        <Image
+          src="/logo/storyIcon.png"
+          alt="edit"
+          width={25}
+          height={25}
+          style={{ borderRadius: "2px" }}
+          className="h-6 w-6 cursor-pointer"
+        />
+      </div>
+                            </div>
+                            <div className='flex flex-row justify-between ml-[5px] mr-[5px]'>
+                            <div className='border p-2 flex justify-center'>
+                                <div className='w-[52px] h-[52px]' style={{ background: `url(${_?.container?.background?.src}), lightgray 0px 0px / 100% 100% no-repeat`, backgroundSize: "cover" }}></div>
+                                </div>
+                                <div className='flex-1 w-[105px] ml-5'>
+                                  <h1>{_.player[0]?.layout?.title}</h1>
+                                            <button className='px-2 mt-2 py-1 text-white rounded-[16px]' style={{backgroundColor: _?.player[0]?.layout?.cta?.backgroundColor, fontSize: '12px'}}>{_?.player[0]?.layout?.cta?.text}</button>
+                                        </div>
+                            </div>
+                        </div>
+                        <div className='flex mt-3 justify-between items-center ml-3 mr-3'>
+                            <h1 className='font-medium'>Impression</h1>
+                            {/* <p className='font-bold'>18</p> */}
+                            <div style={{backgroundColor: 'rgba(1, 234, 133, 0.10)',padding: '5px 8px 4.5px 8px', borderRadius: '100px'}}>
+                              <CaretUpOutlined size={2} style={{ color: "#01EA85" }} /> {countTitleMatches(impressions, _.player[0]?.layout?.title)}
+                            </div>
+                        </div>
+
+                    </div>
                         </div>
                     ))
                 }
