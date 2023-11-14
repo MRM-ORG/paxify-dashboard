@@ -186,7 +186,7 @@ export const getLiquidFileContents = (uid: string, storeId: string) =>
 
 {% schema %}
 {
-  "name": "Stories",
+  "name": "Reelife",
   "tag": "section",
   "class": "section",
   "settings": [
@@ -195,6 +195,11 @@ export const getLiquidFileContents = (uid: string, storeId: string) =>
       "id": "id",
       "label": "Container Id",
       "default": "reelife-stories"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reelife"
     }
   ]
 }
