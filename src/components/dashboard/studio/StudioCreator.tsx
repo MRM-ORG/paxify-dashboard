@@ -252,13 +252,13 @@ const StudioCreator = () => {
   };
 
   return (
-    <>
-      <div className="w-screen h-screen bp4-dark " style={{ width: "80%" }}>
-        <PolotnoContainer style={{ width: "85vw", height: "100vh" }}>
-          <SidePanelWrap>
+    <div style={{height: '900px'}}>
+      <div className="w-screen bp4-dark " style={{ width: "80%", height: '800px' }}>
+        <PolotnoContainer style={{ width: "85vw", height: "100vh", display: 'flex', flexDirection: 'column' }}>
+          <SidePanelWrap style={{ order: 2,height: '16%', width: 'auto', maxHeight: '300vh'}}>
             <SidePanel store={store} />
           </SidePanelWrap>
-          <WorkspaceWrap>
+          <WorkspaceWrap className="go3456988929" style={{order: 1, flex: 1}}>
             {/* <Toolbar store={store} downloadButtonEnabled /> */}
             <Workspace
               bleedColor="red"
@@ -274,7 +274,7 @@ const StudioCreator = () => {
           width: "100px",
           height: "30px",
           borderRadius: "5px",
-          marginTop: "10px",
+          marginTop: "auto",
           background: "#4F46E4",
           color: "white",
         }}
@@ -358,7 +358,7 @@ const StudioCreator = () => {
         </div>
         ))}
       </Modal>
-    </>
+    </div>
   );
 };
 

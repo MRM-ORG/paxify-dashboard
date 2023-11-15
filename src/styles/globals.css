@@ -55,10 +55,10 @@ body > div:first-child {
   border-radius: 16px 16px 0 0;
 }
  /* polotno editor main container */
-.go810943435 {
+/* .go810943435 {
   display: flex;
   flex-direction: column-reverse;
-}
+} */
 
 /* polotno editor canvas or workspace */
 .go3456988929 {
@@ -81,14 +81,15 @@ body > div:first-child {
   display: flex;
   justify-content: center;
   width: 100%;
-  height: 70% !important;
+  /* height: 70% !important; */
+  height: 300px;
   padding: 0px !important;
   position: relative;
 }
 
-.go2939300030 {
+.go2939300030 .polotno-side-tabs-inner {
   display: flex;
-  flex-direction: row;
+  flex-direction: row !important;
   width: 600px;
 }
 
@@ -126,12 +127,35 @@ body > div:first-child {
   color: white !important;
   border: none !important;
   outline: none !important;
+  order: 2;
+}
+
+.bp4-navbar .polotno-panel-container {
+  background-color: #161630 !important;
+  border: none !important;
+  outline: none !important;
+  display: flex;
+  height: 200px !important;
+  width: 100% !important;
+  flex: 1;
+  order: 1;
+  flex-direction: column;
+}
+
+.bp4-navbar .polotno-side-tabs-inner {
+  display: flex;
+  flex-direction: row;
 }
 
 .bp4-navbar {
   background-color: #161630 !important;
   border: none !important;
   outline: none !important;
+  display: flex;
+  /* height: 300px; */
+  flex: 1;
+  order: 1;
+  flex-direction: column;
 }
 
 .setting-placeholder::placeholder {
