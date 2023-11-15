@@ -40,6 +40,7 @@ const StudioCreator = () => {
   const onTimeChange = (time: Dayjs, timeString: string) => {
     setTime(timeString);
   };
+  store.setSize(600, 600, true);
   const [players, setPlayers] = useState([
     // Initialize with a single player
     {
@@ -253,6 +254,20 @@ const StudioCreator = () => {
 
   return (
     <div style={{height: '1000px'}}>
+      <button
+        style={{
+          width: "100px",
+          height: "30px",
+          borderRadius: "5px",
+          marginTop: "50px",
+          marginBottom: "30px",
+          background: "#4F46E4",
+          color: "white",
+        }}
+        onClick={saveImage}
+      >
+        Save
+      </button>
       <div className="w-screen bp4-dark " style={{ width: "80%", height: '800px' }}>
         <PolotnoContainer style={{ width: "85vw", height: "100vh", display: 'flex', flexDirection: 'column' }}>
           <SidePanelWrap style={{ order: 2,height: '16%', width: 'auto', maxHeight: '300vh'}}>
@@ -269,19 +284,6 @@ const StudioCreator = () => {
           </WorkspaceWrap>
         </PolotnoContainer>
       </div>
-      <button
-        style={{
-          width: "100px",
-          height: "30px",
-          borderRadius: "5px",
-          marginTop: "50px",
-          background: "#4F46E4",
-          color: "white",
-        }}
-        onClick={saveImage}
-      >
-        Save
-      </button>
       <Modal
         title="Your Story"
         style={{marginBottom: '20px'}}

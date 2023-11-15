@@ -3,8 +3,8 @@ import type { MenuProps } from 'antd';
 import Link from 'next/link'
 import AreaChart from './components/dashboard/home/AreaChart';
 
-export const BACKEND_URL = "https://subscriptions.paxify.io";
-// export const BACKEND_URL = "http://localhost:8000";
+// export const BACKEND_URL = "https://subscriptions.paxify.io";
+export const BACKEND_URL = "http://localhost:8000";
 
 
 
