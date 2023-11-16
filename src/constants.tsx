@@ -133,7 +133,7 @@ export const items: MenuItem[] = [
     "Interactions",
     "/dashboard/interactions",
     <Link href="interactions">
-      <svg
+      {/* <svg
         width="20"
         height="20"
         viewBox="0 0 20 20"
@@ -149,7 +149,8 @@ export const items: MenuItem[] = [
             <rect width="20" height="20" fill="white" />
           </clipPath>
         </defs>
-      </svg>
+      </svg> */}
+      <svg fill="#000000" height="22" width="22" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" className="icon"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M880 112H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32zM726 585.7c0 55.3-44.7 100.1-99.7 100.1H420.6v53.4c0 5.7-6.5 8.8-10.9 5.3l-109.1-85.7c-3.5-2.7-3.5-8 0-10.7l109.1-85.7c4.4-3.5 10.9-.3 10.9 5.3v53.4h205.7c19.6 0 35.5-16 35.5-35.6v-78.9c0-3.7 3-6.8 6.8-6.8h50.7c3.7 0 6.8 3 6.8 6.8v79.1zm-2.6-209.9l-109.1 85.7c-4.4 3.5-10.9.3-10.9-5.3v-53.4H397.7c-19.6 0-35.5 16-35.5 35.6v78.9c0 3.7-3 6.8-6.8 6.8h-50.7c-3.7 0-6.8-3-6.8-6.8v-78.9c0-55.3 44.7-100.1 99.7-100.1h205.7v-53.4c0-5.7 6.5-8.8 10.9-5.3l109.1 85.7c3.6 2.5 3.6 7.8.1 10.5z"></path> </g></svg>
     </Link>
   ),
   getItem(
@@ -212,7 +213,7 @@ export const items: MenuItem[] = [
     "Exit Dashboard",
     "/",
     <Link href="/">
-      <svg
+      {/* <svg
         width="20"
         height="20"
         viewBox="0 0 20 20"
@@ -238,7 +239,8 @@ export const items: MenuItem[] = [
             <rect width="20" height="20" fill="white" />
           </clipPath>
         </defs>
-      </svg>
+      </svg> */}
+      <svg height="20" width="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>exit-to-app-solid</title> <g id="Layer_2" data-name="Layer 2"> <g id="invisible_box" data-name="invisible box"> <rect width="48" height="48" fill="none"></rect> </g> <g id="icons_Q2" data-name="icons Q2"> <path d="M42,4H6A2,2,0,0,0,4,6V22H25.2l-5.6-5.6a2,2,0,0,1,.2-3.1,2.3,2.3,0,0,1,2.7.3l8.9,9a1.9,1.9,0,0,1,0,2.8l-8.9,8.9a2,2,0,0,1-2.7.3,1.9,1.9,0,0,1-.2-3L25.2,26H4V42a2,2,0,0,0,2,2H42a2,2,0,0,0,2-2V6A2,2,0,0,0,42,4Z"></path> </g> </g> </g></svg>
     </Link>
   ),
 ];

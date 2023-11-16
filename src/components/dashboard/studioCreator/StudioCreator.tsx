@@ -252,13 +252,13 @@ const StudioCreator = () => {
     <div style={{ height: "auto" }}>
       <div
         className="w-screen bp4-dark "
-        style={{ width: "80%", height: "auto" }}>
+        style={{ width: "100%", height: "auto" }}>
         <PolotnoContainer
           style={{
-            width: "92vw",
+            width: "100%",
             height: "100vh",
-            marginLeft: '10px',
-            marginTop: '20px',
+            // marginLeft: '10px',
+            // marginTop: '20px',
             // display: "flex",
             // flexDirection: "column",
           }}>
@@ -275,10 +275,11 @@ const StudioCreator = () => {
           // className="go3456988929" 
           // style={{ order: 1, flex: 1 }}
           >
-            <Toolbar store={store} downloadButtonEnabled />
+            <Toolbar store={store} downloadButtonEnabled/>
             <Workspace
               bleedColor="red"
-              backgroundColor="#040408"
+              // backgroundColor="#040408"
+              backgroundColor="#F3E8FF"
               store={store}
             />
             <ZoomButtons store={store} />
@@ -290,10 +291,10 @@ const StudioCreator = () => {
           width: "100px",
           height: "30px",
           borderRadius: "5px",
-          marginTop: "30px",
+          marginTop: "20px",
           marginLeft: "10px",
-          marginBottom: "30px",
-          background: "#4F46E4",
+          // marginBottom: "20px",
+          background: "#BF83FF",
           color: "white",
         }}
         onClick={saveImage}>

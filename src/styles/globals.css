@@ -123,8 +123,10 @@ body > div:first-child {
 
 .bp4-dark .polotno-side-tabs-container,
 .bp4-dark .polotno-side-tabs-container {
-  background-color: #0e0e20 !important;
-  color: white !important;
+  /* background-color: #0e0e20 !important; */
+  background-color: #F3E8FF !important;
+  /* color: white !important; */
+  color: #0a0a0a !important;
   border: none !important;
   outline: none !important;
   /* order: 2; */
@@ -133,7 +135,9 @@ body > div:first-child {
 }
 
 .bp4-navbar .polotno-panel-container {
-  background-color: #161630 !important;
+  /* background-color: #161630 !important; */
+  background-color: #F3E8FF !important;
+  color: #0a0a0a !important;
   border: none !important;
   outline: none !important;
   /* display: flex;
@@ -150,7 +154,9 @@ body > div:first-child {
 }
 
 .bp4-navbar {
-  background-color: #161630 !important;
+  /* background-color: #161630 !important; */
+  background-color: #F3E8FF !important;
+  color: #0a0a0a !important;
   border: none !important;
   outline: none !important;
   display: flex;
@@ -158,6 +164,10 @@ body > div:first-child {
   /* flex: 1;
   order: 1;
   flex-direction: column; */
+}
+
+.bp4-dark .bp4-button.bp4-minimal {
+  color: #0a0a0a !important;
 }
 
 .bp4-dark .go1123280453 {
