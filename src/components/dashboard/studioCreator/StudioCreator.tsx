@@ -249,41 +249,33 @@ const StudioCreator = () => {
   };
 
   return (
-    <div style={{ height: "1000px" }}>
-      <button
-        style={{
-          width: "100px",
-          height: "30px",
-          borderRadius: "5px",
-          marginTop: "50px",
-          marginBottom: "30px",
-          background: "#4F46E4",
-          color: "white",
-        }}
-        onClick={saveImage}>
-        Save
-      </button>
+    <div style={{ height: "auto" }}>
       <div
         className="w-screen bp4-dark "
-        style={{ width: "80%", height: "800px" }}>
+        style={{ width: "80%", height: "auto" }}>
         <PolotnoContainer
           style={{
-            width: "85vw",
+            width: "92vw",
             height: "100vh",
-            display: "flex",
-            flexDirection: "column",
+            marginLeft: '10px',
+            marginTop: '20px',
+            // display: "flex",
+            // flexDirection: "column",
           }}>
           <SidePanelWrap
             style={{
-              order: 2,
-              height: "16%",
+              // order: 2,
+              // height: "16%",
               width: "auto",
-              maxHeight: "300vh",
+              // maxHeight: "300vh",
             }}>
             <SidePanel store={store} />
           </SidePanelWrap>
-          <WorkspaceWrap className="go3456988929" style={{ order: 1, flex: 1 }}>
-            {/* <Toolbar store={store} downloadButtonEnabled /> */}
+          <WorkspaceWrap 
+          // className="go3456988929" 
+          // style={{ order: 1, flex: 1 }}
+          >
+            <Toolbar store={store} downloadButtonEnabled />
             <Workspace
               bleedColor="red"
               backgroundColor="#040408"
@@ -293,6 +285,20 @@ const StudioCreator = () => {
           </WorkspaceWrap>
         </PolotnoContainer>
       </div>
+      <button
+        style={{
+          width: "100px",
+          height: "30px",
+          borderRadius: "5px",
+          marginTop: "30px",
+          marginLeft: "10px",
+          marginBottom: "30px",
+          background: "#4F46E4",
+          color: "white",
+        }}
+        onClick={saveImage}>
+        Save
+      </button>
       <Modal
         title="Your Story"
         style={{ marginBottom: "20px" }}

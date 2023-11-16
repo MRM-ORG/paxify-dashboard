@@ -62,35 +62,35 @@ body > div:first-child {
 
 /* polotno editor canvas or workspace */
 .go3456988929 {
-  display: flex;
+  /* display: flex;
     height: 100%;
-    width: 100%;
+    width: 100%; */
     /* flex: 1; */
-    flex-direction: column;
-    position: relative;
+    /* flex-direction: column;
+    position: relative; */
 }
 
 /* sidebar editor classes */
 .go1236784588 {
-  height: 16%;
+  /* height: 16%;
   width: auto;
-  max-height: 100vh;
+  max-height: 100vh; */
 }
 
 .go1621360228 {
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  width: 100%;
+  width: 100%; */
   /* height: 70% !important; */
-  height: 300px;
+  /* height: 300px;
   padding: 0px !important;
-  position: relative;
+  position: relative; */
 }
 
 .go2939300030 .polotno-side-tabs-inner {
-  display: flex;
+  /* display: flex;
   flex-direction: row !important;
-  width: 600px;
+  width: 600px; */
 }
 
 /* For screens larger than extra small (xs) */
@@ -127,26 +127,26 @@ body > div:first-child {
   color: white !important;
   border: none !important;
   outline: none !important;
-  order: 2;
-  padding-bottom: 70px;
-  overflow: hidden;
+  /* order: 2; */
+  /* padding-bottom: 70px; */
+  /* overflow: hidden; */
 }
 
 .bp4-navbar .polotno-panel-container {
   background-color: #161630 !important;
   border: none !important;
   outline: none !important;
-  display: flex;
-  height: 300px !important;
+  /* display: flex;
+  height: 500px !important;
   width: 100% !important;
   flex: 1;
   order: 1;
-  flex-direction: column;
+  flex-direction: column; */
 }
 
 .bp4-navbar .polotno-side-tabs-inner {
-  display: flex;
-  flex-direction: row;
+  /* display: flex;
+  flex-direction: row; */
 }
 
 .bp4-navbar {
@@ -155,14 +155,14 @@ body > div:first-child {
   outline: none !important;
   display: flex;
   /* height: 300px; */
-  flex: 1;
+  /* flex: 1;
   order: 1;
-  flex-direction: column;
+  flex-direction: column; */
 }
 
 .bp4-dark .go1123280453 {
-  right: -13px;
-  top: 0;
+  /* right: -13px;
+  top: 0; */
 }
 
 .setting-placeholder::placeholder {

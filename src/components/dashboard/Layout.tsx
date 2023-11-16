@@ -33,12 +33,20 @@ const { useBreakpoint } = Grid;
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const screens = useBreakpoint();
-  const [hasSubscription, setHasSubscription] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
-  const pathParts = pathname.split("/").filter((part) => part !== ""); // Split the path and remove empty parts
-  const lastPart = pathParts[pathParts.length - 1]; // Get the last part of the path
-  const capitalizedWord = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
+
+  const pathParts = pathname.split("/").filter((part) => part !== "");
+  const lastPart = pathParts[pathParts.length - 1];
+
+  const replacedLastPart = lastPart.replace(/_/g, ' ');
+
+  const capitalizedWords = replacedLastPart.split(' ').map(word => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+
+  const finalResult = capitalizedWords.join(' ');
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -87,7 +95,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               <div className="flex justify-between">
                 <div className="pl-10">
                   <span style={{ fontWeight: "bold", fontSize: "27px" }}>
-                    {capitalizedWord}
+                    {finalResult}
                   </span>
                 </div>
                 <div className="flex flex-row pr-10">
