@@ -1,13 +1,25 @@
-import { fetchUserStores, registerStore } from "@/apiCalls/auth";
+import {
+  fetchUserStores,
+  getStoreVerificationStatus,
+  registerStore,
+} from "@/apiCalls/auth";
 import PrimaryButton from "@/components/atoms/buttons/PrimaryButton";
 import { Column, Row } from "@/styles/common";
-import { transformDomain } from "@/utils/helpers";
+import { getLiquidFileContents, transformDomain } from "@/utils/helpers";
 import { THEME } from "@/utils/theme";
 import { Form, Formik } from "formik";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import FormikLabelledTextInput from "../../inputs/formik/FormikLabelledTextInput";
+import TabbedSelector from "../layoutSelector/TabbedSelector";
+import LoadingPage from "../loading/LoadingPage";
+import ModalComponent from "../../../atoms/Modal";
+import Tooltip from "../../../atoms/icons/tooltip";
+import Copy from "../../../atoms/icons/copy";
+import CopyDone from "../../../atoms/icons/copyDone";
+import Switch from "../../../atoms/Switch";
+import Delete from "../../../atoms/icons/delete";
 
 interface IStoreSelectorProps {
   user: {
@@ -24,7 +36,7 @@ const Container = styled(Column)`
 
 const NewStore = styled(Row)`
   gap: 25px;
-  max-width: 500px;
+  max-width: 700px;
   flex-wrap: nowrap;
   align-items: flex-end;
 
@@ -38,27 +50,161 @@ const RegisteredDomains = styled.div`
   font-weight: 600;
 `;
 
+const Store = styled(Row)`
+  padding: 12px 24px;
+  border-radius: 8px;
+  width: 100%;
+  justify-content: space-between;
+  background-color: ${THEME.background0};
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const VerificationBadge = styled.div<{ isVerified: boolean }>`
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 18px;
+  background-color: ${(props) => (props.isVerified ? "green" : "orange")};
+`;
+
+const Instructions = styled(Column)`
+  gap: 16px;
+  padding: 20px;
+`;
+
+const Script = styled(Row)`
+  padding: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+const Error = styled.div`
+  color: red;
+  font-size: 12px;
+`;
+
+const Success = styled.div`
+  color: green;
+`;
+
+const Code = styled.code`
+  max-width: 90%;
+`;
+
 const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
+  // return null;
+
   const [stores, setStores] = useState<any>([]);
-  const [activeUser, setActiveUser] = useState<string | null>(null);
+  const [activeStore, setActiveStore] = useState<any>();
+  const [activeUser, setActiveUser] = useState<any>();
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVerified, setIsVerified] = useState(null);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isFirstStep, setIsFirstStep] = useState(true);
+
+  let VERIFICATION_SCRIPT_SHOPIFY: any = null;
+  let VERIFICATION_SCRIPT_MANUAL: any = null;
+
+  try {
+    const signInUser = JSON.parse(localStorage.getItem("user") as string);
+    const { uid } = signInUser;
+
+    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js" }} defer="defer"></script>`;
+    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js"></script>`;
+  } catch (error) {
+    console.error(error);
+    alert("An error occured, please try again later.");
+  }
 
   useEffect(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user") as string);
       const { uid } = user;
+      setIsLoading(true);
       setActiveUser(uid);
 
       fetchUserStores(uid).then((stores) => {
-        if(Array.isArray(stores)){
-        setStores(stores);
+        if (Array.isArray(stores)) {
+          setStores(stores);
         }
       });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  console.log({stores})
+  const checkIfStoreVerified = () => {
+    setIsLoading(true);
+
+    const user = JSON.parse(localStorage.getItem("user") as string);
+    const { uid } = user;
+
+    getStoreVerificationStatus(uid, activeStore.id)
+      .then((res) => {
+        setIsVerified(res.message);
+        setIsLoading(false);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    setIsVerified(null);
+
+    if (!showInstructions) {
+      const user = JSON.parse(localStorage.getItem("user") as string);
+      const { uid } = user;
+
+      fetchUserStores(uid).then((stores) => {
+        setStores(stores);
+      });
+    }
+  }, [showInstructions]);
+
+  useEffect(() => {
+    isCopied && navigator.clipboard.writeText(VERIFICATION_SCRIPT_SHOPIFY);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 1500);
+  }, [isCopied]);
+
+  const handleLiquidFileDownload = () => {
+    const user = JSON.parse(localStorage.getItem("user") as string);
+    const { uid } = user;
+    const storeId = activeStore.id;
+    const fileContent = getLiquidFileContents(uid, storeId);
+
+    // Create a Blob containing the file content
+    const blob = new Blob([fileContent], { type: "text/plain" });
+
+    // Create a URL for the Blob
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create an anchor element to trigger the download
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = "paxify-reelife.liquid"; // Set the desired file name
+
+    // Trigger a click event on the anchor element to start the download
+    a.click();
+
+    // Clean up by revoking the Blob URL
+    URL.revokeObjectURL(blobUrl);
+  };
 
   return (
     <>
@@ -74,9 +220,16 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           remove stores, if that is covered under the subscription.
         </p>
         <Formik
-          initialValues={{ store: "" }}
+          initialValues={{ name: "", store: "" }}
           onSubmit={(values: any) => {
             const store = values.store.trim();
+            const name = values.name.trim();
+
+            if (stores && stores.length > 0) {
+              alert("You can only add one store at the moment.");
+              return;
+            }
+
             if (!store) return;
 
             const loggedInUser = JSON.parse(
@@ -84,13 +237,14 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             );
             const { uid } = loggedInUser;
 
-            registerStore(uid, store)
-              .then(() => {
+            registerStore(uid, { name, store })
+              .then((res) => {
                 setStores([
                   ...user?.stores,
                   {
-                    label: store,
-                    value: transformDomain(store),
+                    name,
+                    domain: store,
+                    id: res.store.id,
                   },
                 ]);
               })
@@ -105,7 +259,13 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             <NewStore>
               <FormikLabelledTextInput
                 type="text"
-                label="Add a Store"
+                label="Label"
+                name="name"
+                placeholder="What do you call this store?"
+              />
+              <FormikLabelledTextInput
+                type="text"
+                label="Domain Name"
                 name="store"
                 placeholder="Enter store domain"
               />
@@ -121,20 +281,109 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
           </Form>
         </Formik>
 
-        <RegisteredDomains>My Existing Stores</RegisteredDomains>
-        {/* {stores?.map((store: any) => (
-          <Row key={store.label} gap="90px">
-            <p>{store.label}</p>
-            <p>{store.accessToken}</p>
-          </Row>
-        ))} */}
-        {stores?.map((store: any) => (
-          <Row key={store?.id} gap="90px">
-            <p>{store?.name}</p>
-            <p>{store?.domain}</p>
-          </Row>
+        {JSON.stringify(stores) !== "{}" && (
+          <RegisteredDomains>Registered Stores</RegisteredDomains>
+        )}
+
+        {Object.values(stores).map((store: any) => (
+          <Store key={store.label}>
+            <p>{store.name}</p>
+            <p>{store.domain}</p>
+            <Row gap="5px">
+              <VerificationBadge isVerified={store.verified}>
+                {store.verified ? "Verified" : "Pending Verification"}
+              </VerificationBadge>
+              {window?.innerWidth > 768 && (
+                <Tooltip
+                  onClick={() => {
+                    setActiveStore(store);
+                    setIsFirstStep(true);
+                    setShowInstructions(true);
+                  }}
+                />
+              )}
+            </Row>
+            <Switch id={store.id} toggled={store.verified} onClick={() => {}}>
+              Status
+            </Switch>
+            <Delete onClick={() => {}} />
+          </Store>
         ))}
       </Container>
+      <ModalComponent
+        isVisible={showInstructions}
+        onClose={() => setShowInstructions(false)}>
+        <Instructions>
+          <h2>Instructions</h2>
+
+          <TabbedSelector
+            tabs={["Step 1. Verify", "Step 2. Integrate Reelife"]}
+            onChange={() => setIsFirstStep(!isFirstStep)}
+          />
+
+          {!isFirstStep && (
+            <>
+              <p>
+                To verify domain ownership, please add the following script to
+                the <b> theme.liquid</b> file. Don’t add more than one script to
+                your store.
+              </p>
+              <Script onClick={() => setIsCopied(true)}>
+                <Code>{VERIFICATION_SCRIPT_SHOPIFY}</Code>
+                {!isCopied ? <Copy /> : <CopyDone />}
+              </Script>
+              <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
+                Verify
+              </PrimaryButton>
+            </>
+          )}
+
+          {isFirstStep && (
+            <>
+              <p>
+                Now that you have verified your domain ownership, please
+                download the Reelife liquid file and add it to your store.
+              </p>
+              <Script onClick={handleLiquidFileDownload}>
+                <b>Paxify-Reelife.liquid</b>
+              </Script>
+              <p>
+                Once downloaded, this will act like any other liquid file. You
+                can add it to your store codebase and start using Reelife by
+                Paxify. In case you need help, please contact us at{" "}
+                <a href="mailto:support@paxify.io">
+                  <b>support@paxify.io</b>
+                </a>
+              </p>
+            </>
+          )}
+
+          {isVerified !== null && !isVerified && (
+            <Error>
+              <>
+                <strong>
+                  {activeStore.name} ({activeStore.domain})
+                </strong>{" "}
+                is not verified yet. Please ensure you have added the script to
+                your store by following the instructions above.
+              </>
+            </Error>
+          )}
+          {isVerified && (
+            <Success>
+              <>
+                Congratulations! 🎉{" "}
+                <strong>
+                  {activeStore.name} ({activeStore.domain})
+                </strong>{" "}
+                is successfully verified. You can now start using Reelife by
+                Paxify in your store🚀.
+              </>
+            </Success>
+          )}
+        </Instructions>
+      </ModalComponent>
+      <LoadingPage isLoading={isLoading} />
     </>
   );
 };

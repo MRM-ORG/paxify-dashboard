@@ -3,10 +3,13 @@ import { webAuth } from "@/firebase/firebase";
 import { Column, Row } from "@/styles/common";
 import { navigateNewPage } from "@/utils/navigate";
 import { isMobileDevice } from "@/utils/responsive";
-import { HOME_PAGE, USER_LOGIN } from "@/utils/routes";
+import { USER_LOGIN } from "@/utils/routes";
 import { GenericText, H2 } from "@/utils/text";
 import { THEME } from "@/utils/theme";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { Form, Formik } from "formik";
 import Head from "next/head";
 import Image from "next/image";
@@ -89,13 +92,25 @@ const SignUp: React.FC = () => {
     createUserWithEmailAndPassword(webAuth, values.email, values.password)
       .then((userCredential: any) => {
         const user = userCredential.user;
-        console.info("Signed in:", user);
-
         const uid = user.uid;
-        registerUser(uid).then(() => {
-          localStorage.setItem("user", JSON.stringify(user));
-          navigateNewPage(HOME_PAGE());
-        });
+        const payload = {
+          name: values.name.trim(),
+          email: values.email.trim(),
+        };
+
+        registerUser(uid, payload)
+          .then(() => {
+            sendEmailVerification(user).then(() => {
+              localStorage.setItem("user", JSON.stringify(user));
+              alert(
+                "We have sent you a verification email. Please verify your email to continue."
+              );
+              navigateNewPage(USER_LOGIN());
+            });
+          })
+          .catch((error: any) => {
+            console.error(error);
+          });
       })
       .catch((error: any) => {
         console.error(error);
@@ -136,9 +151,21 @@ const SignUp: React.FC = () => {
             <H2 color={THEME.primary}>Sign Up</H2>
             <Formik
               onSubmit={onSignUp}
-              initialValues={{ email: "", password: "", confirmPassword: "" }}
+              initialValues={{
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+              }}
               validationSchema={SignUpValidationSchema}>
               <Form>
+                <FormikLabelledTextInput
+                  type="text"
+                  label={SignUpForm.formField.name.label}
+                  name={SignUpForm.formField.name.name}
+                  placeholder={SignUpForm.formField.name.placeholder}
+                />
+                <Spacer height={16} />
                 <FormikLabelledTextInput
                   type="text"
                   label={SignUpForm.formField.email.label}

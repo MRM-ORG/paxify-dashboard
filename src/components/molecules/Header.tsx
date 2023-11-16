@@ -105,22 +105,27 @@ const MobileNavMenu = styled.div`
 const SidebarOptions = [
   {
     id: 0,
-    title: "My Stores",
+    title: "Add Stores",
     icon: <Stores />,
   },
-  {
-    id: 1,
-    title: "Analytics",
-    icon: <Analytics />,
-  },
+  // {
+  //   id: 1,
+  //   title: "Analytics",
+  //   icon: <Analytics />,
+  // },
   {
     id: 2,
     title: "Profile",
     hide: true,
   },
   {
+    id: 4,
+    title: "Dashboard",
+    icon: <Analytics />,
+  },
+  {
     id: 3,
-    title: "Resource Usage",
+    title: "Subscriptions",
     icon: <Card />,
   },
 ];
@@ -156,7 +161,7 @@ const Header: React.FC<IHeaderProps> = (props) => {
 
         <BottomBar>
           <LogoContainer>
-            <Image
+            <img
               src="/logo/reelife.png"
               alt="Paxify Logo"
               width={125}

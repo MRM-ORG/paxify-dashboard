@@ -11,7 +11,12 @@ type Props = {
 const Story = ({ img, text }: { img: string; text: string }) => {
   return (
     <div className="relative">
-      <img src={img} alt="Your Image" className="w-full h-auto rounded-lg" style={{ borderRadius: "16px 16px 0 0" }}/>
+      <img
+        src={img}
+        alt="Your Image"
+        className="w-full h-auto rounded-lg"
+        style={{ borderRadius: "16px 16px 0 0" }}
+      />
 
       <div className="absolute top-3 right-3">
         <Image
@@ -28,7 +33,6 @@ const Story = ({ img, text }: { img: string; text: string }) => {
 };
 
 const Stories: NextPage<Props> = ({ stories }) => {
-  console.log({ stories });
   return (
     <div className="flex relative justify-center sm:justify-between items-center flex-wrap mt-8">
       {Array.from(stories).map((_: any, index) => (
@@ -49,8 +53,7 @@ const Stories: NextPage<Props> = ({ stories }) => {
             marginBottom: "40px",
             borderRadius: "16px 16px 0 0",
           }}
-          cover={<Story text={_?.id} img={_.player[0]?.content?.source} />}
-        >
+          cover={<Story text={_?.id} img={_.player[0]?.content?.source} />}>
           <div className="mt-1 mb-1" style={{ fontWeight: "500" }}>
             {_?.player[0]?.layout?.title}
           </div>

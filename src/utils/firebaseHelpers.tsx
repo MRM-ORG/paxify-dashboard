@@ -84,7 +84,7 @@ export const transformComponentInteractions = (
 
       // Modify the condition to count events based on traffic filter
       if (
-        interaction === "reels_init" &&
+        interaction === "reels_opened" &&
         ((filters.traffic === "desktop" && (!device || device === "desktop")) ||
           (filters.traffic === "mobile" && device === "mobile") ||
           filters.traffic === "all")

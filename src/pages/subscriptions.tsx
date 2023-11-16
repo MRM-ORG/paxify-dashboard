@@ -3,8 +3,8 @@ import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
 
 export default function SubscriptionsPage() {
   return (
-    // <ProtectedAuthWrapper>
-    // </ProtectedAuthWrapper>
+    <ProtectedAuthWrapper>
       <Subscription />
+    </ProtectedAuthWrapper>
   );
 }

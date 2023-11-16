@@ -1,7 +1,6 @@
 import React from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import styled from "styled-components";
-// @ts-ignore
 import Modal from "react-modal";
 
 interface ILoadingPageProps {
@@ -42,6 +41,7 @@ const LoadingPage: React.FC<ILoadingPageProps> = (props) => {
       ariaHideApp={false}
       style={customStyles}
       onRequestClose={() => {}}>
+      {/* @ts-ignore */}
       <InnerContainer>
         <LoadingSpinner width={48} height={48} />
       </InnerContainer>

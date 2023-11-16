@@ -2,6 +2,7 @@ import React from "react";
 import { Table, Badge, Button } from "antd";
 import Link from "next/link";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { NextPage } from "next";
 
 interface TableRow {
@@ -60,7 +61,7 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
   const storyAnalytics = analytics?.filter(
     (obj: { name: string }) => obj.name === "reels_story_viewed"
   );
-  console.log({ analytics });
+
   const analyticsCount: { [storyTitle: string]: number } = {};
   storyAnalytics?.forEach((analytic: any) => {
     const storyTitle = analytic?.story?.player[0]?.layout?.title;
@@ -72,10 +73,9 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
   const ctaAnalytics = analytics?.filter(
     (obj: { name: string }) => obj.name === "cta_clicked"
   );
-  console.log({ ctaAnalytics });
+
   const ctaCount: { [storyTitle: string]: number } = {};
   ctaAnalytics?.forEach((analytic: any) => {
-    console.log({ analytic });
     const storyTitle = analytic?.story?.layout?.title;
     if (storyTitle) {
       ctaCount[storyTitle] = (ctaCount[storyTitle] || 0) + 1;
@@ -111,8 +111,6 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
     }
   });
 
-  console.log(stories);
-
   const columns: any = [
     {
       title: "Story",
@@ -122,8 +120,7 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
       render: (_text: any, story: any) => (
         <Link
           href="interaction"
-          className="flex items-center space-x-3 cursor-pointer w-fit"
-        >
+          className="flex items-center space-x-3 cursor-pointer w-fit">
           <div className="flex items-center">
             <div className="relative w-16 h-16 overflow-hidden rounded-full">
               <div className="absolute inset-0 border-2 border-[#bdbdca] rounded-full"></div>

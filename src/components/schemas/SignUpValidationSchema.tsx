@@ -3,6 +3,12 @@ import * as Yup from "yup";
 export const SignUpForm = {
   formId: "SignUpForm",
   formField: {
+    name: {
+      name: "name",
+      label: "Name",
+      placeholder: "Enter Name",
+      requiredErrorMsg: "Name is required",
+    },
     email: {
       name: "email",
       label: "Email",
@@ -25,10 +31,11 @@ export const SignUpForm = {
 };
 
 const {
-  formField: { email, password, confirmPassword },
+  formField: { name, email, password, confirmPassword },
 } = SignUpForm;
 
 export const SignUpValidationSchema = Yup.object({
+  name: Yup.string().required(name.requiredErrorMsg),
   email: Yup.string().required(email.requiredErrorMsg),
   password: Yup.string().required(password.requiredErrorMsg),
   confirmPassword: Yup.string().required(confirmPassword.requiredErrorMsg),

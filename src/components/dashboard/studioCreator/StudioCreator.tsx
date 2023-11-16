@@ -132,30 +132,29 @@ const StudioCreator = () => {
       });
   }, []);
 
-  console.log({ stores });
-
-  console.log({players})
-
   const showModal = () => {
     setOpen(true);
   };
 
   const handleOk = async () => {
     setConfirmLoading(true);
-    
+
     // Create a promise array to upload all content.sources in parallel
     const uploadPromises = players.map(async (player, index) => {
-      if (player.content.source && player.content.source.startsWith("data:image")) {
+      if (
+        player.content.source &&
+        player.content.source.startsWith("data:image")
+      ) {
         // Handle only data URLs
         const base64Data = player.content.source.split(",")[1];
         const storage = getStorage(firebase);
         const storageRef = ref(storage, `images/${Date.now()}_${index}.png`);
-  
+
         // Upload the base64 data to Firebase Storage
         const uploadTask = uploadString(storageRef, base64Data, "base64", {
           contentType: "image/png",
         });
-  
+
         // Get the download URL once the upload is complete
         try {
           await uploadTask;
@@ -167,38 +166,38 @@ const StudioCreator = () => {
         }
       }
     });
-  
+
     // Wait for all uploads to complete before proceeding
     try {
       await Promise.all(uploadPromises);
-  
+
       // Now, you can construct the story object with updated player content.source values
       const story = {
         story: {
           id: "story-1",
           status: true,
           container: {
-                border: {
-                color: "#e1306c",
-                width: 3,
-              },
-              background: {
-                src: "https://picsum.photos/150/250",
-              },
-              author: {
-                src: "https://picsum.photos/210/210",
-              },
-              isViewed: false,
-              },
+            border: {
+              color: "#e1306c",
+              width: 3,
+            },
+            background: {
+              src: "https://picsum.photos/150/250",
+            },
+            author: {
+              src: "https://picsum.photos/210/210",
+            },
+            isViewed: false,
+          },
           player: players,
         },
         user: { uid: user, storeId: storeId },
       };
-  
+
       // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
-        router.push('/dashboard/home')
+        router.push("/dashboard/home");
         setOpen(false);
       });
     } catch (error) {
@@ -206,9 +205,8 @@ const StudioCreator = () => {
       console.error("Error:", error);
     }
   };
-  
+
   const handleCancel = () => {
-    console.log("Clicked cancel button");
     setOpen(false);
   };
 
@@ -222,8 +220,6 @@ const StudioCreator = () => {
         setImage(res);
         showModal();
       });
-    console.log({ img });
-    console.log(" src ", store.toJSON());
     // store.saveAsImage({ fileName: 'polotno.png' });
   };
 
@@ -253,7 +249,7 @@ const StudioCreator = () => {
   };
 
   return (
-    <div style={{height: '1000px'}}>
+    <div style={{ height: "1000px" }}>
       <button
         style={{
           width: "100px",
@@ -264,16 +260,29 @@ const StudioCreator = () => {
           background: "#4F46E4",
           color: "white",
         }}
-        onClick={saveImage}
-      >
+        onClick={saveImage}>
         Save
       </button>
-      <div className="w-screen bp4-dark " style={{ width: "80%", height: '800px' }}>
-        <PolotnoContainer style={{ width: "85vw", height: "100vh", display: 'flex', flexDirection: 'column' }}>
-          <SidePanelWrap style={{ order: 2,height: '16%', width: 'auto', maxHeight: '300vh'}}>
+      <div
+        className="w-screen bp4-dark "
+        style={{ width: "80%", height: "800px" }}>
+        <PolotnoContainer
+          style={{
+            width: "85vw",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+          }}>
+          <SidePanelWrap
+            style={{
+              order: 2,
+              height: "16%",
+              width: "auto",
+              maxHeight: "300vh",
+            }}>
             <SidePanel store={store} />
           </SidePanelWrap>
-          <WorkspaceWrap className="go3456988929" style={{order: 1, flex: 1}}>
+          <WorkspaceWrap className="go3456988929" style={{ order: 1, flex: 1 }}>
             {/* <Toolbar store={store} downloadButtonEnabled /> */}
             <Workspace
               bleedColor="red"
@@ -286,78 +295,76 @@ const StudioCreator = () => {
       </div>
       <Modal
         title="Your Story"
-        style={{marginBottom: '20px'}}
+        style={{ marginBottom: "20px" }}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
         footer={
           // isAddingMore ? ( // Customize modal footer based on whether "Add More" or "Submit" is clicked
-            <div>
-              <Button key="add-more" onClick={showAddMoreModal}>
-                Add More
-              </Button>
-              <Button key="submit" type="primary" onClick={handleOk}>
-                {!confirmLoading ? 'Submit' : 'Please Wait..'}
-              </Button>
-            </div>
+          <div>
+            <Button key="add-more" onClick={showAddMoreModal}>
+              Add More
+            </Button>
+            <Button key="submit" type="primary" onClick={handleOk}>
+              {!confirmLoading ? "Submit" : "Please Wait.."}
+            </Button>
+          </div>
           // ) : (
           //   <Button key="ok" type="primary" onClick={handleOk}>
           //     Submit
           //   </Button>
           // )
-        }
-      >
+        }>
         {/* <input placeholder='Write something' style={{border: 'none'}} value={title} onChange={(e) => setTitle(e.target.value)}/> */}
         <Select
           style={{ width: "100%", marginBottom: "16px" }}
           placeholder="Select Store"
           value={storeId}
-          onChange={(value) => setStoreId(value)}
-        >
+          onChange={(value) => setStoreId(value)}>
           {stores?.map((option) => (
             <Option key={option?.id} value={option?.id}>
               {option?.name}
             </Option>
           ))}
         </Select>
-        <TimePicker 
+        <TimePicker
           onChange={onTimeChange as any}
-          defaultValue={dayjs('00:00:00', 'HH:mm:ss')} 
-          size="large" 
-          style={{marginBottom: '20px'}}
+          defaultValue={dayjs("00:00:00", "HH:mm:ss")}
+          size="large"
+          style={{ marginBottom: "20px" }}
         />
-        {players?.map((player: any, index: number) =>(
-        <div key={index}>
-        <Input.TextArea
-          placeholder="Write something"
-          style={{ marginBottom: "16px" }}
-          value={player?.layout?.title}
-          onChange={(e) => handleTitleChange(index, e.target.value)}
-        />
-        <h3>
-          <b>CTA</b>
-        </h3>
-        <Input
-          placeholder="CTA Text"
-          style={{ width: "100%", marginBottom: "16px" }}
-          value={player?.layout?.cta?.text}
-          onChange={(e) => handleCtaTitleChange(index, e.target.value)}
-        />
-        <Input
-          placeholder="CTA Link"
-          style={{ width: "100%", marginBottom: "16px" }}
-          value={player?.layout?.cta?.link}
-          onChange={(e) => handleCtaLinkChange(index, e.target.value)}
-        />
-        <h3 style={{ marginBottom: "16px" }}>
-          <b>CTA BackgroundColor</b>
-        </h3>
-        <CirclePicker
-          color={player?.layout?.cta?.backgroundColor}
-          onChangeComplete={(color) => handleCtaColorChange(color, index)}
-        />
-        </div>
+        {players?.map((player: any, index: number) => (
+          <div key={index}>
+            <Input.TextArea
+              placeholder="Write something"
+              style={{ marginBottom: "16px" }}
+              value={player?.layout?.title}
+              onChange={(e) => handleTitleChange(index, e.target.value)}
+            />
+            <h3>
+              <b>CTA</b>
+            </h3>
+            <Input
+              placeholder="CTA Text"
+              style={{ width: "100%", marginBottom: "16px" }}
+              value={player?.layout?.cta?.text}
+              onChange={(e) => handleCtaTitleChange(index, e.target.value)}
+            />
+            <Input
+              placeholder="CTA Link"
+              style={{ width: "100%", marginBottom: "16px" }}
+              value={player?.layout?.cta?.link}
+              onChange={(e) => handleCtaLinkChange(index, e.target.value)}
+            />
+            <h3 style={{ marginBottom: "16px" }}>
+              <b>CTA BackgroundColor</b>
+            </h3>
+            <CirclePicker
+              color={player?.layout?.cta?.backgroundColor}
+              onChangeComplete={(color) => handleCtaColorChange(color, index)}
+            />
+          </div>
         ))}
       </Modal>
     </div>

@@ -4,12 +4,14 @@ import {
   DASHBOARD_STORES,
   DASHBOARD_SUBSCRIPTIONS,
   HOME_PAGE,
+  MAIN_DASHBOARD,
   USER_LOGIN,
 } from "@/utils/routes";
 import { THEME } from "@/utils/theme";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
+import { isUserVerified } from "@/utils/auth";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -19,7 +21,7 @@ const RightPane = styled.div`
   overflow: auto;
   height: 100vh;
   display: flex;
-  background-color: ${THEME.background0};
+  // background-color: ${THEME.background0};
 `;
 
 const Grid = styled.div`
@@ -58,17 +60,21 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   const mapTabToRoute = (tab: any) => {
     if (tab === 0) {
       return DASHBOARD_STORES;
-    } else if (tab === 1) {
-      return DASHBOARD_ANALYTICS;
-    } else {
+    } else if (tab === 3) {
       return DASHBOARD_SUBSCRIPTIONS;
+    } else {
+      return MAIN_DASHBOARD;
     }
   };
 
   useEffect(() => {
     // Check firebase auth status here
     const user = localStorage.getItem("user");
+
     if (!user) {
+      navigateNewPage(USER_LOGIN());
+    } else if (!isUserVerified()) {
+      alert("Please verify your email, before proceeding.");
       navigateNewPage(USER_LOGIN());
     } else {
       setIsLoading(false);

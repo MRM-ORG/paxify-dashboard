@@ -9,233 +9,163 @@ import { OFFICIAL_WEBSITE_PRICING } from "@/utils/routes";
 import { H2, H3 } from "@/utils/text";
 import UsageBar from "@/components/atoms/UsageBar";
 import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
+import { createPaymentSession } from "@/apiCalls/stripe";
+import { getUser } from "@/utils/auth";
+import { getUserSubscriptionStatus } from "@/apiCalls/auth";
+import Spacer from "@/components/atoms/Spacer";
+import React from "react";
+import Toggle from "../../inputs/Toggle";
 
 interface IProfileProps {}
 
-const SUBSCRIPTIONS = [
+interface ICardProps {
+  plan: ISubscriptionPlan;
+  interval: {
+    label: string;
+    value: string;
+  };
+  activeSubscription: ISubscription;
+}
+
+interface ISubscriptionPlan {
+  id: number;
+  type: string;
+  name: string;
+  highlight: boolean;
+  prices: {
+    monthly: {
+      lookupKey: string;
+      unitPrice: number;
+      interval: {
+        label: string;
+        value: string;
+      };
+    };
+    yearly: {
+      lookupKey: string;
+      unitPrice: number;
+      interval: {
+        label: string;
+        value: string;
+      };
+    };
+  } | null;
+  features: {
+    id: number;
+    label: string;
+  }[];
+}
+
+interface ISubscription {
+  billingCycle: string;
+  isActive: false;
+  plan: string;
+  recurring: false;
+}
+
+const INTERVALS = {
+  monthly: {
+    label: "Month",
+    value: "monthly",
+  },
+  yearly: {
+    label: "Year",
+    value: "yearly",
+  },
+};
+
+const PLANS: ISubscriptionPlan[] = [
   {
     id: 1,
+    type: "free",
     name: "Basic",
-    price: 0,
-    isEnterprise: false,
-    cta: {
-      label: "Sign Up!",
-      href: OFFICIAL_WEBSITE_PRICING(),
+    highlight: false,
+    prices: null,
+    features: [
+      {
+        id: 1,
+        label: "Upto 3 Stories",
+      },
+      {
+        id: 2,
+        label: "Basic Analytics",
+      },
+      {
+        id: 3,
+        label: "50K Page Views per month",
+      },
+    ],
+  },
+  {
+    id: 2,
+    type: "paid",
+    name: "Starter",
+    highlight: true,
+    prices: {
+      monthly: {
+        lookupKey: "basic_plan_monthly",
+        unitPrice: 19.99,
+        interval: INTERVALS.monthly,
+      },
+      yearly: {
+        unitPrice: 199.99,
+        interval: INTERVALS.yearly,
+        lookupKey: "basic_plan_yearly",
+      },
     },
     features: [
       {
         id: 1,
-        label: (
-          <span>
-            Upto <strong>5</strong> Stories
-          </span>
-        ),
+        label: "Upto 20 Stories",
       },
       {
         id: 2,
-        label: (
-          <span>
-            <strong>1</strong> Component
-          </span>
-        ),
+        label: "150K Page Views per month",
       },
       {
         id: 3,
-        label: (
-          <span>
-            Ability to customize <strong>1</strong> Store or Business
-          </span>
-        ),
-      },
-      {
-        id: 4,
-        label: (
-          <span>
-            Limited <strong>tracking</strong>
-          </span>
-        ),
-      },
-      {
-        id: 5,
-        label: (
-          <span>
-            Limited <strong>customization</strong>
-          </span>
-        ),
-      },
-      {
-        id: 6,
-        label: (
-          <span>
-            <strong>50K</strong> page views
-          </span>
-        ),
-      },
-      {
-        id: 7,
-        label: (
-          <span>
-            Support via <strong>email</strong>
-          </span>
-        ),
-      },
-      {
-        id: 8,
-        label: <span>Paxify Logo</span>,
+        label: "Priority Mail Support",
       },
     ],
   },
-  // {
-  //   id: 2,
-  //   name: "Premium",
-  //   price: 25,
-  //   cta: {
-  //     label: "Sign Up!",
-  //     href: "#",
-  //   },
-  //   promo: "Most Popular",
-  //   features: [
-  //     {
-  //       id: 1,
-  //       label: (
-  //         <span>
-  //           <strong>Unlimited</strong> Stories
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 2,
-  //       label: (
-  //         <span>
-  //           Deeper <strong>insights</strong> & <strong>analytics</strong>
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 3,
-  //       label: (
-  //         <span>
-  //           Ability to customize <strong>1</strong> Store or Business
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 4,
-  //       label: (
-  //         <span>
-  //           <strong>Customization</strong> to match your brand
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 5,
-  //       label: (
-  //         <span>
-  //           Add Stories on <strong>multiple</strong> pages of your website
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 6,
-  //       label: (
-  //         <span>
-  //           <strong>1M</strong> page views
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 7,
-  //       label: (
-  //         <span>
-  //           Priority support via <strong>chat</strong> and{" "}
-  //           <strong>email</strong>
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 8,
-  //       label: (
-  //         <span>
-  //           <strong>No </strong>Paxify Logo
-  //         </span>
-  //       ),
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 3,
-  //   name: "Enterprise",
-  //   isEnterprise: true,
-  //   price: "Custom",
-  //   cta: {
-  //     label: "Contact Us!",
-  //     href: "#",
-  //   },
-  //   features: [
-  //     {
-  //       id: 1,
-  //       label: (
-  //         <span>
-  //           <strong>Everything</strong> in Pro Plan
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 2,
-  //       label: (
-  //         <span>
-  //           Customize <strong>all</strong> Stores or Businesses under your brand
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 3,
-  //       label: (
-  //         <span>
-  //           Richer <strong>insights</strong> for <strong>all</strong> of your
-  //           stories
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 4,
-  //       label: (
-  //         <span>
-  //           <strong>Personalized</strong> help with installation process
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 5,
-  //       label: (
-  //         <span>
-  //           <strong>Custom</strong> page views
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: 6,
-  //       label: (
-  //         <span>
-  //           Dedicated <strong>Slack&reg; </strong> support
-  //         </span>
-  //       ),
-  //     },
-  //   ],
-  // },
+  {
+    id: 3,
+    type: "paid",
+    name: "Professional",
+    highlight: false,
+    prices: {
+      monthly: {
+        lookupKey: "pro_plan_monthly",
+        unitPrice: 34.99,
+        interval: INTERVALS.monthly,
+      },
+      yearly: {
+        unitPrice: 349.99,
+        interval: INTERVALS.yearly,
+        lookupKey: "pro_plan_yearly",
+      },
+    },
+    features: [
+      {
+        id: 1,
+        label: "Unlimited Stories",
+      },
+      {
+        id: 2,
+        label: "300K Page Views per month",
+      },
+      {
+        id: 3,
+        label: "Dedicated Slack Support",
+      },
+    ],
+  },
 ];
-
-const Container = styled.div`
-  width: 100%;
-  gap: 10px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-`;
 
 const Heading = styled.h1``;
 
 const ModifiedColumn = styled(Column)`
+  width: 100%;
   flex-wrap: nowrap;
 `;
 
@@ -244,15 +174,18 @@ const Card = styled.form`
   width: 350px;
   position: relative;
   padding: 20px 20px;
+  min-height: 500px;
   border-radius: 12px;
-  // flex-direction: column;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background-color: #fff;
-  transition: box-shadow 0.5s ease-in-out;
+  background-color: ${THEME.white2};
+  transition: all 0.5s ease-in-out;
+  cursor: pointer;
+  padding: 3rem 1.5rem;
 
   &:hover {
-    box-shadow: 0 0 10px 0 ${THEME.primary};
+    box-shadow: 0 0 10px 0 ${THEME.body1};
   }
 `;
 
@@ -278,13 +211,28 @@ const Subscribe = styled.button<{ disable?: boolean }>`
   }
 `;
 
-const Button = styled.div`
+const Button = styled.div<{ isDisabled?: boolean }>`
   padding: 15px 20px;
+  border-radius: 12px;
+  background-color: ${(props) =>
+    props.isDisabled ? THEME.background2 : THEME.positive};
+  transition: all 0.5s ease-in-out;
+  text-align: center;
+  width: 100%;
+  cursor: ${(props) => (props.isDisabled ? "not-allowed" : "pointer")};
+
+  &:hover {
+    background-color: ${(props) =>
+      props.isDisabled ? THEME.background2 : THEME.positive400};
+    color: ${THEME.white};
+    transform: scale(1.05);
+  }
 `;
 
 const Divider = styled.hr`
-  height: 75%;
-  margin: 10px 0;
+  width: 100%;
+  border: 0.1px solid;
+  opacity: 0.2;
 `;
 
 const Price = styled.div`
@@ -308,50 +256,136 @@ const Resource = styled.div`
   min-width: 100px;
 `;
 
+const TextTemplate = styled("p")`
+  margin: 0;
+  font-weight: 500;
+  color: ${THEME.primary2};
+`;
+
+const MediumText = styled(TextTemplate)`
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  opacity: 0.8;
+`;
+
+const BigText = styled(TextTemplate)<{ as?: "h4" | "h3" }>`
+  font-size: ${({ as }) => (as === "h3" ? "2.25rem" : "3.75rem")};
+  line-height: ${({ as }) => (as === "h4" ? "2.5rem" : "1rem")};
+`;
+
+const SmallText = styled(TextTemplate)`
+  font-size: 1rem;
+  line-height: 1.655;
+  opacity: 0.7;
+`;
+
+const ToggleContainer = styled.div`
+  max-width: 1100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+const SubscriptionPlan = ({
+  plan,
+  interval,
+  activeSubscription,
+}: ICardProps) => {
+  const handleSubscribe = () => {
+    const user = getUser();
+    if (!user) {
+      return;
+    }
+
+    if (!plan.prices) {
+      return;
+    }
+
+    createPaymentSession({
+      lookupKey: (plan.prices as any)[interval.value].lookupKey,
+      userId: user?.uid,
+      intendedPlan: plan.name,
+    }).then((res) => {
+      window.location.href = res.url;
+    });
+  };
+
+  const isFreePlanDisabled = activeSubscription.plan === plan.name;
+  const isPaidPlanDisabled =
+    activeSubscription.plan === plan.name &&
+    activeSubscription.billingCycle === interval.label;
+
+  return (
+    <Card>
+      <MediumText>{plan.name}</MediumText>
+      {plan.prices ? (
+        <Row alignItem="baseline">
+          <BigText as="h3">$</BigText>
+          <BigText>{(plan.prices as any)[interval.value].unitPrice}</BigText>
+        </Row>
+      ) : (
+        <BigText>Free</BigText>
+      )}
+
+      {plan.prices ? (
+        <SmallText>
+          Per {(plan?.prices as any)?.[interval.value].interval.label}
+        </SmallText>
+      ) : (
+        <SmallText>No Credit Card</SmallText>
+      )}
+
+      <Divider />
+
+      {plan.features.map((feature) => (
+        <React.Fragment key={feature.id}>
+          <SmallText>{feature.label}</SmallText>
+        </React.Fragment>
+      ))}
+
+      {plan.prices ? (
+        <Button
+          isDisabled={isPaidPlanDisabled}
+          onClick={!isPaidPlanDisabled ? handleSubscribe : () => {}}>
+          Subscribe
+        </Button>
+      ) : (
+        <Button isDisabled={isFreePlanDisabled} onClick={() => {}}>
+          Subscribe
+        </Button>
+      )}
+    </Card>
+  );
+};
+
 const Subscription: React.FC<IProfileProps> = () => {
   const { publicRuntimeConfig } = getConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [resources, setResources] = useState<any>(null);
+  const [userSubscription, setUserSubscription] = useState<ISubscription>({
+    billingCycle: "",
+    isActive: false,
+    plan: "",
+    recurring: false,
+  });
+
+  const [showMonthlyPlans, setShowMonthlyPlans] = useState<boolean>(true);
 
   const currentPlan = "Basic";
+  const user = getUser();
 
   useEffect(() => {
-    fetchDomainResourcesForMonth("localhost:5173").then((res) => {
-      setResources(res);
-    });
+    if (user) {
+      getUserSubscriptionStatus(user?.uid)
+        .then((res) => {
+          setUserSubscription(res.plan);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   }, []);
-
-  const handleFormSubmit = async (event: any) => {
-    event.preventDefault();
-
-    if (selectedPlan === "Premium") {
-      setIsLoading(true);
-      const response = await fetch(
-        `${publicRuntimeConfig.STRIPE_BACKEND_URL}/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            lookup_key: "reels_pro",
-          }),
-        }
-      ).then((res) => {
-        setIsLoading(false);
-        return res.json();
-      });
-      const { url } = response;
-
-      window.location.href = url;
-    }
-
-    if (selectedPlan === "Enterprise") {
-      // Open mail client with subject line "Enterprise Plan"
-      window.location.href = `mailto:paxifydev@gmail.com?subject=Enterprise Plan&body=Hi, Paxify, I'm interested in the Enterprise Plan for Reels Life.`;
-    }
-  };
 
   return (
     <>
@@ -361,76 +395,25 @@ const Subscription: React.FC<IProfileProps> = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <ModifiedColumn style={{ padding: "24px", maxWidth: "100%" }} gap="20px">
-        <Heading>Billing & Resource Monitoring</Heading>
-
-        {resources && (
-          <ResourceContainer>
-            <Row gap="15px">
-              <Resource>Stores</Resource>
-              <UsageBar consumed={resources["stores"]} available={1} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>Components</Resource>
-              <UsageBar consumed={resources["components"]} available={3} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>Page Views</Resource>
-              <UsageBar consumed={resources["pageViews"]} available={50000} />
-            </Row>
-
-            <Row gap="15px">
-              <Resource>API Calls</Resource>
-              <UsageBar consumed={resources["apiCalls"]} available={200000} />
-            </Row>
-          </ResourceContainer>
-        )}
-
-        <strong>
-          <i>*Metrics reset at the start of every month</i>
-        </strong>
-
-        <H2>Current Plan</H2>
-        <Row gap="20px">
-          <Container>
-            {SUBSCRIPTIONS.map((subscription) => (
-              <Card onSubmit={handleFormSubmit} key={subscription.id}>
-                <Column>
-                  <Row>
-                    <div>{subscription?.name}</div>
-                  </Row>
-                  <Row>
-                    {!subscription?.isEnterprise && <div> $</div>}
-                    <Price>{subscription?.price}</Price>
-                    {!subscription?.isEnterprise && <div>/mo</div>}
-                  </Row>
-                </Column>
-                <Divider />
-                {/* <Column gap="2px">
-                  {subscription?.features.map((feature: any) => (
-                    <Row key={feature.id}>{feature?.label}</Row>
-                  ))}
-                </Column> */}
-                <input type="hidden" name="lookup_key" value="pro_plan" />
-                <Subscribe
-                  onClick={() => {
-                    // setSelectedPlan(subscription.name);
-                    window.location.href = subscription?.cta?.href;
-                  }}
-                  // disable={currentPlan === subscription.name}
-                  id="checkout-and-portal-button"
-                  type="submit">
-                  <Button>
-                    {currentPlan === subscription.name
-                      ? "Learn More"
-                      : subscription?.cta?.label}
-                  </Button>
-                </Subscribe>
-              </Card>
-            ))}
-          </Container>
+        <Heading>Manage Subscription</Heading>
+        <ToggleContainer>
+          <Toggle
+            selected={showMonthlyPlans}
+            toggleSelected={() => setShowMonthlyPlans(!showMonthlyPlans)}
+          />
+        </ToggleContainer>
+        <Row gap="30px">
+          {PLANS.map((plan) => (
+            <SubscriptionPlan
+              key={plan.id}
+              plan={plan}
+              interval={showMonthlyPlans ? INTERVALS.monthly : INTERVALS.yearly}
+              activeSubscription={userSubscription}
+            />
+          ))}
         </Row>
+
+        {userSubscription?.isActive && <div>You have subscribed</div>}
         <LoadingPage isLoading={isLoading} />
       </ModifiedColumn>
       {/* <LoadingPage isLoading={!resources} /> */}

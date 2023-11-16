@@ -139,13 +139,13 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       return;
     }
 
-    const rawPageViews = storeEvents.tracking.filter(
-      (event: any) => event.name === "reels_init"
+    const rawPageViews = storeEvents.analytics.filter(
+      (event: any) => event.name === "reels_opened"
     );
 
     const rawInteractions = storeEvents.tracking.filter(
       (event: any) =>
-        event.name === "reels_interacted" || event.name === "reels_init"
+        event.name === "reels_interacted" || event.name === "reels_opened"
     );
 
     const rawStoryViews = storeEvents.tracking.filter(
@@ -154,10 +154,12 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
     );
 
     const pageViews = transformPageViews(rawPageViews, filters);
+
     const interactions = transformComponentInteractions(
       rawInteractions,
       filters
     );
+
     const storyViews = transformStoryViews(rawStoryViews, filters);
     const averageStoryViews = transformAverageStoryViews(
       rawStoryViews,

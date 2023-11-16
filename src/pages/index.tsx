@@ -13,8 +13,8 @@ export default function HomePage() {
   };
 
   return (
-    // <ProtectedAuthWrapper>
-    // </ProtectedAuthWrapper>
+    <ProtectedAuthWrapper>
       <StoreSelector {...commonProps} />
+    </ProtectedAuthWrapper>
   );
 }

@@ -85,9 +85,11 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user") as string;
+    const user = localStorage.getItem("user");
     try {
+      // @ts-ignore
       const userObj = JSON.parse(user);
+
       if (userObj.emailVerified) {
         navigateNewPage(HOME_PAGE());
       }
