@@ -1,20 +1,15 @@
-import { Column, Row } from "@/styles/common";
-import styled from "styled-components";
-import getConfig from "next/config";
-import { THEME } from "@/utils/theme";
-import { useEffect, useState } from "react";
-import LoadingPage from "../loading/LoadingPage";
-import Head from "next/head";
-import { OFFICIAL_WEBSITE_PRICING } from "@/utils/routes";
-import { H2, H3 } from "@/utils/text";
-import UsageBar from "@/components/atoms/UsageBar";
-import { fetchDomainResourcesForMonth } from "@/apiCalls/resources";
-import { createPaymentSession } from "@/apiCalls/stripe";
-import { getUser } from "@/utils/auth";
 import { getUserSubscriptionStatus } from "@/apiCalls/auth";
-import Spacer from "@/components/atoms/Spacer";
-import React from "react";
+import { createPaymentSession } from "@/apiCalls/stripe";
+import { Column, Row } from "@/styles/common";
+import { getUser } from "@/utils/auth";
+import { THEME } from "@/utils/theme";
+import getConfig from "next/config";
+import Head from "next/head";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import Toggle from "../../inputs/Toggle";
+import LoadingPage from "../loading/LoadingPage";
+import { getCustomerSubscriptions } from "@/apiCalls/tracking";
 
 interface IProfileProps {}
 
@@ -24,7 +19,7 @@ interface ICardProps {
     label: string;
     value: string;
   };
-  activeSubscription: ISubscription;
+  activeSubscription: any;
 }
 
 interface ISubscriptionPlan {
@@ -56,13 +51,6 @@ interface ISubscriptionPlan {
   }[];
 }
 
-interface ISubscription {
-  billingCycle: string;
-  isActive: false;
-  plan: string;
-  recurring: false;
-}
-
 const INTERVALS = {
   monthly: {
     label: "Month",
@@ -72,6 +60,11 @@ const INTERVALS = {
     label: "Year",
     value: "yearly",
   },
+};
+
+const SUBSCRIPTION_INTERVALS = {
+  month: "Monthly",
+  year: "Yearly",
 };
 
 const PLANS: ISubscriptionPlan[] = [
@@ -142,7 +135,7 @@ const PLANS: ISubscriptionPlan[] = [
       yearly: {
         unitPrice: 349.99,
         interval: INTERVALS.yearly,
-        lookupKey: "pro_plan_yearly",
+        lookupKey: "pro_plan_yearly_1",
       },
     },
     features: [
@@ -162,7 +155,12 @@ const PLANS: ISubscriptionPlan[] = [
   },
 ];
 
-const Heading = styled.h1``;
+const Heading = styled.h1`
+  font-size: 1.25rem;
+  font-family: "Inter", sans-serif;
+  margin: 20px 0;
+  padding-left: 10px;
+`;
 
 const ModifiedColumn = styled(Column)`
   width: 100%;
@@ -186,28 +184,6 @@ const Card = styled.form`
 
   &:hover {
     box-shadow: 0 0 10px 0 ${THEME.body1};
-  }
-`;
-
-const Subscribe = styled.button<{ disable?: boolean }>`
-  bottom: 20px;
-  // position: absolute;
-  max-height: 50px;
-  display: flex;
-  align-items: center;
-  border-radius: 12px;
-  border: ${({ disable }) => (disable ? "none" : "1px solid")};
-  cursor: ${({ disable }) => (disable ? "not-allowed" : "pointer")};
-  background: ${({ disable }) => (disable ? THEME.background2 : THEME.white)};
-  font-size: 16px;
-  transition: all 0.5s ease-in-out;
-
-  &:hover {
-    scale: ${({ disable }) => (disable ? "1" : "1.1")};
-    color: ${({ disable }) => !disable && THEME.white};
-    font-weight: ${({ disable }) => (disable ? "400" : "600")};
-    background: ${({ disable }) =>
-      disable ? THEME.background2 : THEME.primary};
   }
 `;
 
@@ -284,6 +260,45 @@ const ToggleContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
+`;
+
+const Grid = styled.div`
+  display: grid;
+  padding: 20px 20px;
+  grid-template-columns: 3fr 3fr 2fr 2fr 2fr;
+`;
+
+const TableHeader = styled(Grid)`
+  text-align: center;
+`;
+
+const SubscriptionCard = styled(Grid)`
+  border-radius: 12px;
+  align-items: center;
+  text-align: center;
+  background-color: ${THEME.white2};
+  transition: all 0.5s ease-in-out;
+  margin-bottom: 10px;
+
+  &:hover {
+    box-shadow: 0 0 10px 0 ${THEME.body1};
+  }
+`;
+
+const CancelButton = styled.div`
+  padding: 15px 20px;
+  border-radius: 12px;
+  background-color: ${THEME.background2};
+  transition: all 0.5s ease-in-out;
+  text-align: center;
+  width: 100%;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${THEME.danger};
+    color: ${THEME.white};
+    transform: scale(1.05);
+  }
 `;
 
 const SubscriptionPlan = ({
@@ -363,14 +378,9 @@ const Subscription: React.FC<IProfileProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [resources, setResources] = useState<any>(null);
-  const [userSubscription, setUserSubscription] = useState<ISubscription>({
-    billingCycle: "",
-    isActive: false,
-    plan: "",
-    recurring: false,
-  });
-
+  const [userSubscription, setUserSubscription] = useState<any>(null);
   const [showMonthlyPlans, setShowMonthlyPlans] = useState<boolean>(true);
+  const [activeSubscriptions, setActiveSubscriptions] = useState<any>([]);
 
   const currentPlan = "Basic";
   const user = getUser();
@@ -387,6 +397,20 @@ const Subscription: React.FC<IProfileProps> = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (!userSubscription) {
+      return;
+    }
+
+    getCustomerSubscriptions(userSubscription.stripeId).then((res) => {
+      setActiveSubscriptions(res.data);
+    });
+  }, [userSubscription]);
+
+  const handleSubscriptionCancel = (subscriptionId: string) => {
+    alert("Are you sure you want to cancel this subscription?");
+  };
+
   return (
     <>
       <Head>
@@ -395,25 +419,67 @@ const Subscription: React.FC<IProfileProps> = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <ModifiedColumn style={{ padding: "24px", maxWidth: "100%" }} gap="20px">
-        <Heading>Manage Subscription</Heading>
         <ToggleContainer>
           <Toggle
             selected={showMonthlyPlans}
             toggleSelected={() => setShowMonthlyPlans(!showMonthlyPlans)}
           />
         </ToggleContainer>
-        <Row gap="30px">
-          {PLANS.map((plan) => (
-            <SubscriptionPlan
-              key={plan.id}
-              plan={plan}
-              interval={showMonthlyPlans ? INTERVALS.monthly : INTERVALS.yearly}
-              activeSubscription={userSubscription}
-            />
-          ))}
-        </Row>
+        {userSubscription && (
+          <Row gap="30px">
+            {PLANS.map((plan) => (
+              <SubscriptionPlan
+                key={plan.id}
+                plan={plan}
+                interval={
+                  showMonthlyPlans ? INTERVALS.monthly : INTERVALS.yearly
+                }
+                activeSubscription={userSubscription}
+              />
+            ))}
+          </Row>
+        )}
+        <Heading>Your Subscription</Heading>
+        {userSubscription?.isActive && (
+          <div>
+            <TableHeader>
+              <div>Start Date</div>
+              <div>Renewal Date</div>
+              <div>Amount</div>
+              <div>Interval</div>
+            </TableHeader>
+            {activeSubscriptions?.map((subscription: any) => {
+              const startDate = new Date(
+                subscription.current_period_start * 1000
+              );
+              const endDate = new Date(subscription.current_period_end * 1000);
 
-        {userSubscription?.isActive && <div>You have subscribed</div>}
+              return (
+                <SubscriptionCard key={subscription.id}>
+                  <div>
+                    {startDate.getDate()}/{startDate.getMonth() + 1}/
+                    {startDate.getFullYear()}
+                  </div>
+                  <div>
+                    {endDate.getDate()}/{endDate.getMonth() + 1}/
+                    {endDate.getFullYear()}
+                  </div>
+                  <div>
+                    ${Number(subscription.plan.amount / 100).toFixed(2)}
+                  </div>
+                  <div>
+                    {/* @ts-ignore */}
+                    {SUBSCRIPTION_INTERVALS[subscription.plan.interval]}
+                  </div>
+                  <CancelButton
+                    onClick={() => handleSubscriptionCancel(subscription.id)}>
+                    Cancel
+                  </CancelButton>
+                </SubscriptionCard>
+              );
+            })}
+          </div>
+        )}
         <LoadingPage isLoading={isLoading} />
       </ModifiedColumn>
       {/* <LoadingPage isLoading={!resources} /> */}
