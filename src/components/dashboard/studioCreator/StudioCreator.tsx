@@ -5,7 +5,6 @@ import { Toolbar } from "polotno/toolbar/toolbar";
 import { ZoomButtons } from "polotno/toolbar/zoom-buttons";
 import { SidePanel } from "polotno/side-panel";
 import { Workspace } from "polotno/canvas/workspace";
-// import { ref } from 'firebase/database';
 import {
   getDownloadURL,
   getStorage,
@@ -37,10 +36,46 @@ const StudioCreator = () => {
   const [user, setUser] = useState("");
   const [name, setName] = useState("");
   const [time, setTime] = useState("");
+  const [audioFile, setAudioFile] = useState(null);
+
   const onTimeChange = (time: Dayjs, timeString: string) => {
     setTime(timeString);
   };
-  store.setSize(600, 600, true);
+
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result.split(',')[1]); // Extracting base64 data from the result
+        } else {
+          reject(new Error('Failed to read file as base64.'));
+        }
+      };
+  
+      reader.onerror = (error) => {
+        reject(error);
+      };
+  
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleAudioChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      const file = e.target.files?.[0] || null;
+      const updatedPlayers = [...players];
+  
+      if (file) {
+        const fileString = await readFileAsBase64(file);
+        updatedPlayers[index].enhancements.audio.src = fileString;
+        // updatedPlayers[index].enhancements.audio.source = file;
+      }
+  
+      setPlayers(updatedPlayers);
+    };
+  store.setSize(330, 600, true);
+  console.log('store width', store.width)
   const [players, setPlayers] = useState([
     // Initialize with a single player
     {
@@ -54,7 +89,8 @@ const StudioCreator = () => {
       },
       enhancements: {
         audio: {
-          src: "https://cdn.shopify.com/s/files/1/0762/0499/8931/files/mixkit-game-show-suspense-waiting-667.wav?v=1689275490",
+          src: "",
+          // src: "https://cdn.shopify.com/s/files/1/0762/0499/8931/files/mixkit-game-show-suspense-waiting-667.wav?v=1689275490",
         },
       },
       layout: {
@@ -89,7 +125,8 @@ const StudioCreator = () => {
         },
         enhancements: {
           audio: {
-            src: "https://cdn.shopify.com/s/files/1/0762/0499/8931/files/mixkit-game-show-suspense-waiting-667.wav?v=1689275490",
+            src: "",
+            // src: "https://cdn.shopify.com/s/files/1/0762/0499/8931/files/mixkit-game-show-suspense-waiting-667.wav?v=1689275490",
           },
         },
         layout: {
@@ -165,13 +202,26 @@ const StudioCreator = () => {
           console.error("Error uploading image:", error);
         }
       }
+      if (player.enhancements.audio.src) {
+        const audioFile = player.enhancements.audio.src;
+        const storage = getStorage(firebase);
+        const audioStorageRef = ref(storage, `audio/${Date.now()}_${index}.mp3`);
+
+        try {
+          await uploadString(audioStorageRef, audioFile, "base64", {
+            contentType: "audio/mp3",
+          });
+
+          const downloadURL = await getDownloadURL(audioStorageRef);
+          player.enhancements.audio.src = downloadURL;
+        } catch (error) {
+          console.error("Error uploading audio:", error);
+        }
+      }
     });
 
-    // Wait for all uploads to complete before proceeding
     try {
       await Promise.all(uploadPromises);
-
-      // Now, you can construct the story object with updated player content.source values
       const story = {
         story: {
           id: "story-1",
@@ -252,34 +302,25 @@ const StudioCreator = () => {
     <div style={{ height: "auto" }}>
       <div
         className="w-screen bp4-dark "
-        style={{ width: "100%", height: "auto" }}>
+        style={{ width: "100%", height: "auto", position: "relative" }}>
         <PolotnoContainer
           style={{
             width: "100%",
             height: "100vh",
-            // marginLeft: '10px',
-            // marginTop: '20px',
-            // display: "flex",
-            // flexDirection: "column",
           }}>
           <SidePanelWrap
             style={{
-              // order: 2,
-              // height: "16%",
               width: "auto",
-              // maxHeight: "300vh",
             }}>
             <SidePanel store={store} />
           </SidePanelWrap>
           <WorkspaceWrap 
-          // className="go3456988929" 
-          // style={{ order: 1, flex: 1 }}
+            style={{borderBottom: '1px solid grey'}}
           >
             <Toolbar store={store} downloadButtonEnabled/>
             <Workspace
-              bleedColor="red"
-              // backgroundColor="#040408"
-              backgroundColor="#F3E8FF"
+              bleedColor="white"
+              backgroundColor="#F5F5F5"
               store={store}
             />
             <ZoomButtons store={store} />
@@ -287,16 +328,7 @@ const StudioCreator = () => {
         </PolotnoContainer>
       </div>
       <button
-        style={{
-          width: "100px",
-          height: "30px",
-          borderRadius: "5px",
-          marginTop: "20px",
-          marginLeft: "10px",
-          // marginBottom: "20px",
-          background: "#BF83FF",
-          color: "white",
-        }}
+        className="saveButton"
         onClick={saveImage}>
         Save
       </button>
@@ -308,7 +340,6 @@ const StudioCreator = () => {
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
         footer={
-          // isAddingMore ? ( // Customize modal footer based on whether "Add More" or "Submit" is clicked
           <div>
             <Button key="add-more" onClick={showAddMoreModal}>
               Add More
@@ -317,13 +348,7 @@ const StudioCreator = () => {
               {!confirmLoading ? "Submit" : "Please Wait.."}
             </Button>
           </div>
-          // ) : (
-          //   <Button key="ok" type="primary" onClick={handleOk}>
-          //     Submit
-          //   </Button>
-          // )
         }>
-        {/* <input placeholder='Write something' style={{border: 'none'}} value={title} onChange={(e) => setTitle(e.target.value)}/> */}
         <Select
           style={{ width: "100%", marginBottom: "16px" }}
           placeholder="Select Store"
@@ -363,6 +388,15 @@ const StudioCreator = () => {
               style={{ width: "100%", marginBottom: "16px" }}
               value={player?.layout?.cta?.link}
               onChange={(e) => handleCtaLinkChange(index, e.target.value)}
+            />
+            <h3>
+              <b>Audio</b>
+            </h3>
+            <Input
+              type="file"
+              accept="audio/*"
+              onChange={(newValue) => handleAudioChange(newValue, index)}
+              style={{ width: "100%", marginBottom: "16px" }}
             />
             <h3 style={{ marginBottom: "16px" }}>
               <b>CTA BackgroundColor</b>

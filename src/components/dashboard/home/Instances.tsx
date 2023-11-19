@@ -51,20 +51,20 @@ const Instances:NextPage<Props> = ({ stories, analytics }) => {
           </div>
           <div className="flex space-x-4 overflow-y-hidden overflow-x-auto py-2 px-2">
             <Story
-              text={stories[6]?.player[0]?.layout?.title}
-              img={stories[6]?.player[0]?.content?.source}
+              text={stories[0]?.player[0]?.layout?.title}
+              img={stories[0]?.player[0]?.content?.source}
             />
             <Story
-              text={stories[7]?.player[0]?.layout?.title}
-              img={stories[7]?.player[0]?.content?.source}
+              text={stories[1]?.player[0]?.layout?.title}
+              img={stories[1]?.player[0]?.content?.source}
             />
             <Story
-              text={stories[8]?.player[0]?.layout?.title}
-              img={stories[8]?.player[0]?.content?.source}
+              text={stories[2]?.player[0]?.layout?.title}
+              img={stories[2]?.player[0]?.content?.source}
             />
             <Story
-              text={stories[9]?.player[0]?.layout?.title}
-              img={stories[9]?.player[0]?.content?.source}
+              text={stories[3]?.player[0]?.layout?.title}
+              img={stories[3]?.player[0]?.content?.source}
             />
           </div>
         </div>
@@ -81,20 +81,20 @@ const Instances:NextPage<Props> = ({ stories, analytics }) => {
           </div>
           <div className="flex space-x-4 overflow-y-hidden overflow-x-auto py-2 px-2">
             <Story
+              text={stories[4]?.player[0]?.layout?.title}
+              img={stories[4]?.player[0]?.content?.source}
+            />
+            <Story
+              text={stories[5]?.player[0]?.layout?.title}
+              img={stories[5]?.player[0]?.content?.source}
+            />
+            <Story
               text={stories[6]?.player[0]?.layout?.title}
               img={stories[6]?.player[0]?.content?.source}
             />
             <Story
               text={stories[7]?.player[0]?.layout?.title}
               img={stories[7]?.player[0]?.content?.source}
-            />
-            <Story
-              text={stories[8]?.player[0]?.layout?.title}
-              img={stories[8]?.player[0]?.content?.source}
-            />
-            <Story
-              text={stories[9]?.player[0]?.layout?.title}
-              img={stories[9]?.player[0]?.content?.source}
             />
           </div>
         </div>

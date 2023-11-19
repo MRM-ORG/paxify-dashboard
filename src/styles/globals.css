@@ -93,6 +93,17 @@ body > div:first-child {
   width: 600px; */
 }
 
+.saveButton {
+  position: absolute;
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  left: 200px;
+  bottom: -55px;
+  background: #BF83FF;
+  color: white;
+}
+
 /* For screens larger than extra small (xs) */
 @media (min-width: 576px) {
   .tab-label {
@@ -115,6 +126,16 @@ body > div:first-child {
   .badge-content {
     margin-top: 8px; /* Adjust as needed for spacing */
   }
+  .saveButton {
+    position: absolute;
+    width: 100px;
+    height: 30px;
+    border-radius: 5px;
+    left: 170px;
+    bottom: 45px;
+    background: #BF83FF;
+    color: white;
+  }
 }
 
 .custom-scroll-container {
@@ -124,7 +145,7 @@ body > div:first-child {
 .bp4-dark .polotno-side-tabs-container,
 .bp4-dark .polotno-side-tabs-container {
   /* background-color: #0e0e20 !important; */
-  background-color: #F3E8FF !important;
+  background-color: #F5F5F5 !important;
   /* color: white !important; */
   color: #0a0a0a !important;
   border: none !important;
@@ -136,7 +157,7 @@ body > div:first-child {
 
 .bp4-navbar .polotno-panel-container {
   /* background-color: #161630 !important; */
-  background-color: #F3E8FF !important;
+  background-color: #F5F5F5 !important;
   color: #0a0a0a !important;
   border: none !important;
   outline: none !important;
@@ -155,7 +176,7 @@ body > div:first-child {
 
 .bp4-navbar {
   /* background-color: #161630 !important; */
-  background-color: #F3E8FF !important;
+  background-color: #F5F5F5 !important;
   color: #0a0a0a !important;
   border: none !important;
   outline: none !important;
