@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { items } from "@/constants";
 import { usePathname } from "next/navigation";
 import { Layout, Menu, Button, Grid, Avatar } from "antd";
-import { getUserSubscriptionStatus } from "@/apiCalls/auth";
+import { fetchUserStores, getUserSubscriptionStatus } from "@/apiCalls/auth";
 import { navigateNewPage } from "@/utils/navigate";
 import { UserOutlined } from "@ant-design/icons";
-import { DASHBOARD_SUBSCRIPTIONS } from "@/utils/routes";
+import { DASHBOARD_STORES, DASHBOARD_SUBSCRIPTIONS } from "@/utils/routes";
 import ModalComponent from "../atoms/Modal";
 import styled from "styled-components";
 import LoadingPage from "../molecules/subviews/loading/LoadingPage";
@@ -40,23 +40,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const pathParts = pathname.split("/").filter((part) => part !== "");
   const lastPart = pathParts[pathParts.length - 1];
 
-  const replacedLastPart = lastPart.replace(/_/g, ' ');
+  const replacedLastPart = lastPart.replace(/_/g, " ");
 
-  const capitalizedWords = replacedLastPart.split(' ').map(word => {
+  const capitalizedWords = replacedLastPart.split(" ").map((word) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
   });
 
-  const finalResult = capitalizedWords.join(' ');
+  const finalResult = capitalizedWords.join(" ");
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    getUserSubscriptionStatus(user?.uid)
+    fetchUserStores(user?.uid)
       .then((res) => {
-        if (!res.plan.isActive) {
-          setHasSubscription(false);
-        } else {
-          setHasSubscription(true);
-        }
+        console.log("STORES:", res);
+        setHasSubscription(JSON.stringify(res) !== "{}");
       })
       .finally(() => {
         setIsLoading(false);
@@ -126,15 +123,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       )}
       <ModalComponent isVisible={!hasSubscription} onClose={() => {}}>
         <Container>
-          <h1>Invalid Subscription</h1>
+          <h1>No Store Found</h1>
           <p>
-            You don&apos;t have an active subscription. Please renew your
-            subscription to continue using the app.
+            You don&apos;t have any store. Please create a store to continue
+            using Reellife.
           </p>
           <Button
             type="primary"
-            onClick={() => navigateNewPage(DASHBOARD_SUBSCRIPTIONS())}>
-            Renew Subscription
+            onClick={() => navigateNewPage(DASHBOARD_STORES())}>
+            Create Store
           </Button>
         </Container>
       </ModalComponent>

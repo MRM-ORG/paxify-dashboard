@@ -21,8 +21,11 @@ export async function getStoreEvents(
     });
 }
 
-export async function getCustomerSubscriptions(cid: string): Promise<any> {
-  const API = `${BACKEND_URL}/stripe/subscriptions/${cid}`;
+export async function getCustomerSubscriptions(
+  uid: string,
+  cid: string
+): Promise<any> {
+  const API = `${BACKEND_URL}/stripe/subscriptions/${uid}/${cid}`;
 
   return axios
     .get(API)

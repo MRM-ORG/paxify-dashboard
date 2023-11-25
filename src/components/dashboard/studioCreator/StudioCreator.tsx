@@ -45,37 +45,41 @@ const StudioCreator = () => {
   const readFileAsBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-  
+
       reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          resolve(reader.result.split(',')[1]); // Extracting base64 data from the result
+        if (typeof reader.result === "string") {
+          resolve(reader.result.split(",")[1]); // Extracting base64 data from the result
         } else {
-          reject(new Error('Failed to read file as base64.'));
+          reject(new Error("Failed to read file as base64."));
         }
       };
-  
+
       reader.onerror = (error) => {
         reject(error);
       };
-  
+
       reader.readAsDataURL(file);
     });
   };
 
-  const handleAudioChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-      const file = e.target.files?.[0] || null;
-      const updatedPlayers = [...players];
-  
-      if (file) {
-        const fileString = await readFileAsBase64(file);
-        updatedPlayers[index].enhancements.audio.src = fileString;
-        // updatedPlayers[index].enhancements.audio.source = file;
-      }
-  
-      setPlayers(updatedPlayers);
-    };
-  store.setSize(330, 600, true);
-  console.log('store width', store.width)
+  const handleAudioChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const file = e.target.files?.[0] || null;
+    const updatedPlayers = [...players];
+
+    if (file) {
+      const fileString = await readFileAsBase64(file);
+      updatedPlayers[index].enhancements.audio.src = fileString;
+      // updatedPlayers[index].enhancements.audio.source = file;
+    }
+
+    setPlayers(updatedPlayers);
+  };
+  store.setSize(1080, 1920, true);
+  store.setScale(0.4);
+  console.log("store width", store.width);
   const [players, setPlayers] = useState([
     // Initialize with a single player
     {
@@ -205,7 +209,10 @@ const StudioCreator = () => {
       if (player.enhancements.audio.src) {
         const audioFile = player.enhancements.audio.src;
         const storage = getStorage(firebase);
-        const audioStorageRef = ref(storage, `audio/${Date.now()}_${index}.mp3`);
+        const audioStorageRef = ref(
+          storage,
+          `audio/${Date.now()}_${index}.mp3`
+        );
 
         try {
           await uploadString(audioStorageRef, audioFile, "base64", {
@@ -314,10 +321,8 @@ const StudioCreator = () => {
             }}>
             <SidePanel store={store} />
           </SidePanelWrap>
-          <WorkspaceWrap 
-            style={{borderBottom: '1px solid grey'}}
-          >
-            <Toolbar store={store} downloadButtonEnabled/>
+          <WorkspaceWrap style={{ borderBottom: "1px solid grey" }}>
+            <Toolbar store={store} downloadButtonEnabled />
             <Workspace
               bleedColor="white"
               backgroundColor="#F5F5F5"
@@ -327,9 +332,7 @@ const StudioCreator = () => {
           </WorkspaceWrap>
         </PolotnoContainer>
       </div>
-      <button
-        className="saveButton"
-        onClick={saveImage}>
+      <button className="saveButton" onClick={saveImage}>
         Save
       </button>
       <Modal

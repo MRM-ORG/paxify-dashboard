@@ -6,14 +6,9 @@ import styled, { css } from "styled-components";
 interface IPrimaryButtonProps {
   onClick: (e?: any) => void;
   backgroundColor?: string;
+  isDisabled?: boolean;
   width?: string;
-  height?: string;
-  disabled?: boolean;
-  multiChildren?: boolean;
-  borderRadius?: string;
   background?: string;
-  borderColor?: string;
-  color?: string;
   type?: "submit" | "button";
   action?: string;
   children: React.ReactNode;
@@ -22,10 +17,7 @@ interface IPrimaryButtonProps {
 interface IButtonProps {
   background?: string;
   backgroundColor?: string;
-  borderColor?: string;
-  color?: string;
   isDisabled?: boolean;
-  borderRadius?: string;
 }
 interface IContainerProps {
   width?: string;
@@ -38,20 +30,16 @@ const Container = styled("div")<IContainerProps>`
 
 const Button = styled("button")<IButtonProps>`
   min-height: 49px;
-  border-radius: ${(props) =>
-    props.borderRadius ? props.borderRadius : "8px"};
-  color: ${(props) => (props.color ? props.color : THEME.primary)};
+  border-radius: 9px;
+  color: white;
+  background-color: ${THEME.danger};
   background: ${(props) => props.background};
-  background-color: ${(props) =>
-    props.backgroundColor ? props.backgroundColor : THEME.body1};
+  cursor: pointer;
   transition: 200ms;
-  padding: 8px 14px;
-  border: ${(props) =>
-    props.borderColor ? `1px solid ${props.borderColor}` : "none"};
+  padding: 10px 15px;
+  border: 0px;
   outline: none;
   width: 100%;
-
-  cursor: ${(prop) => (!prop.isDisabled ? "pointer" : "auto")};
   &:hover {
     opacity: 0.7;
     opacity: ${(prop) => (prop.isDisabled ? 0.3 : 0.7)};
@@ -60,6 +48,7 @@ const Button = styled("button")<IButtonProps>`
   ${mq.medium(css`
     font-size: 17px;
   `)};
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.2);
 `;
 
 const FontLabel = styled("div")`
@@ -67,32 +56,20 @@ const FontLabel = styled("div")`
   fontweight: 400;
 `;
 
-const Children = styled(FontLabel)`
-  gap: 5px;
-  display: flex;
-`;
-
-const SecondaryButton: React.FC<IPrimaryButtonProps> = (props) => {
+const DangerButton: React.FC<IPrimaryButtonProps> = (props) => {
   return (
     <Container width={props.width}>
       <Button
-        isDisabled={props.disabled}
-        borderRadius={props.borderRadius}
+        isDisabled={props.isDisabled}
         background={props.background}
         backgroundColor={props.backgroundColor}
-        color={props.color}
-        borderColor={props.borderColor}
-        onClick={!props.disabled ? props.onClick : () => {}}
+        onClick={!props.isDisabled ? props.onClick : () => {}}
         data-action={props.action}
         type={props.type}>
-        {props.multiChildren ? (
-          <Children>{props.children}</Children>
-        ) : (
-          <FontLabel>{props.children}</FontLabel>
-        )}
+        <FontLabel>{props.children}</FontLabel>
       </Button>
     </Container>
   );
 };
 
-export default SecondaryButton;
+export default DangerButton;
