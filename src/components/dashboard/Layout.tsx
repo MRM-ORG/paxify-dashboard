@@ -9,6 +9,7 @@ import { DASHBOARD_SUBSCRIPTIONS } from "@/utils/routes";
 import ModalComponent from "../atoms/Modal";
 import styled from "styled-components";
 import LoadingPage from "../molecules/subviews/loading/LoadingPage";
+import { useRouter } from "next/router";
 
 const Container = styled.div`
   padding: 20px;
@@ -31,6 +32,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const { useBreakpoint } = Grid;
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  const router = useRouter();
   const pathname = usePathname();
   const screens = useBreakpoint();
   const [hasSubscription, setHasSubscription] = useState(true);
@@ -105,11 +107,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       className="h-[36px] w-[36px]"
                     />
                   </div>
-                  <div>
+                  <div className="cursor-pointer" onClick={() => router.push("/dashboard/settings")}>
                     <Avatar
                       shape="square"
                       icon={<UserOutlined className="mt-2" />}
-                      className="h-[45px] w-[45px]"
+                      className="h-[35px] w-[37px]"
                     />
                   </div>
                   <div className="flex flex-col ml-2">

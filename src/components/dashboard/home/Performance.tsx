@@ -48,9 +48,13 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     count,
   }));
 
+  console.log({newArray})
+
   const viewAnalytics = analytics.filter(
     (obj: { name: string }) => obj.name === "reels_story_viewed"
   );
+
+  console.log({viewAnalytics})
 
   const viewDateCounts: Record<string, number> = {};
 
@@ -72,6 +76,8 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     date: new Date(date),
     count,
   }));
+
+  console.log({viewsArray})
 
   const dummyData = [
     {
@@ -163,7 +169,7 @@ const Performance: NextPage<Props> = ({ analytics }) => {
           return {
             label: (
               <div className="flex flex-wrap">
-                <div className="lg:space-x-14 tab-label mt-20">
+                <div className="lg:space-x-14 tab-label mt-5">
                   <h1>{item.text}</h1>
                   {item.link ? (
                     <Link className="text-primary flex items-center" href="#">

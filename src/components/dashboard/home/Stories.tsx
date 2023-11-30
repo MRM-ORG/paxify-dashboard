@@ -18,10 +18,11 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
   const impressions = analytics.filter(
     (obj: { name: string }) => obj.name === "reels_init"
   );
+  console.log({impressions})
   const scrollContainerRef = useRef<any>(null);
   const scrollToLeft = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 100;
+      const scrollAmount = 250;
       const currentScroll = scrollContainerRef.current.scrollLeft;
       scrollContainerRef.current.scrollTo({
         left: currentScroll - scrollAmount,
@@ -32,7 +33,7 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
 
   const scrollToRight = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 100;
+      const scrollAmount = 250;
       const currentScroll = scrollContainerRef.current.scrollLeft;
       scrollContainerRef.current.scrollTo({
         left: currentScroll + scrollAmount,
@@ -50,6 +51,7 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
           return totalMatches + 1;
         }
       }
+      console.log({totalMatches})
       return totalMatches;
     }, 0);
   }
