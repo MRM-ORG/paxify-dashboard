@@ -8,7 +8,7 @@ const StoryGroup = () => {
     const scrollContainerRef = useRef<any>(null);
     const scrollToLeft = () => {
         if (scrollContainerRef.current) {
-          const scrollAmount = 100;
+          const scrollAmount = 200;
           const currentScroll = scrollContainerRef.current.scrollLeft;
           scrollContainerRef.current.scrollTo({
             left: currentScroll - scrollAmount,
@@ -19,7 +19,7 @@ const StoryGroup = () => {
 
       const scrollToRight = () => {
         if (scrollContainerRef.current) {
-          const scrollAmount = 100;
+          const scrollAmount = 200;
           const currentScroll = scrollContainerRef.current.scrollLeft;
           scrollContainerRef.current.scrollTo({
             left: currentScroll + scrollAmount,
