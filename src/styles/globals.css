@@ -54,6 +54,12 @@ body > div:first-child {
 :where(.css-dev-only-do-not-override-1xjqmv2).ant-card .ant-card-cover img {
   border-radius: 16px 16px 0 0;
 }
+
+:where(.css-dev-only-do-not-override-1xjqmv2).ant-tabs-bottom >.ant-tabs-nav {
+  order: 1;
+  margin-top: 75px;
+  margin-bottom: 0;
+}
  /* polotno editor main container */
 /* .go810943435 {
   display: flex;

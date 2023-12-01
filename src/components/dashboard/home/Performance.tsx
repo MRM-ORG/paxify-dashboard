@@ -48,9 +48,13 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     count,
   }));
 
+  console.log({newArray})
+
   const viewAnalytics = analytics.filter(
     (obj: { name: string }) => obj.name === "reels_story_viewed"
   );
+
+  console.log({viewAnalytics})
 
   const viewDateCounts: Record<string, number> = {};
 
@@ -72,6 +76,8 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     date: new Date(date),
     count,
   }));
+
+  console.log({viewsArray})
 
   const dummyData = [
     {
@@ -162,9 +168,9 @@ const Performance: NextPage<Props> = ({ analytics }) => {
         items={PERFORMANCE_TABS_ITEMS?.map((item, i) => {
           return {
             label: (
-              <div className="flex flex-wrap">
-                <div className="lg:space-x-14 tab-label mt-20">
-                  <h1>{item.text}</h1>
+              <div className="flex flex-wrap" style={{marginTop: '50px'}}>
+                <div className="lg:space-x-14 tab-label mt-5">
+                  <span>{item.text}</span>
                   {item.link ? (
                     <Link className="text-primary flex items-center" href="#">
                       <p>Get Started </p>
