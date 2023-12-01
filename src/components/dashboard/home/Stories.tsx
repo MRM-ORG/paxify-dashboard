@@ -42,19 +42,30 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
     }
   };
 
-  function countTitleMatches(impressions: any[], titleToMatch: any) {
+  // function countTitleMatches(impressions: any[], titleToMatch: any) {
+  //   return impressions.reduce((totalMatches, impression) => {
+  //     const story = impression.story;
+  //     if (story && story.player && story.player[0] && story.player[0].layout) {
+  //       const storyTitle = story.player[0].layout.title;
+  //       if (storyTitle === titleToMatch) {
+  //         return totalMatches + 1;
+  //       }
+  //     }
+  //     console.log({totalMatches})
+  //     return totalMatches;
+  //   }, 0);
+  // }
+  function countTitleMatches(impressions: any[], titleToMatch: any): number {
     return impressions.reduce((totalMatches, impression) => {
-      const story = impression.story;
-      if (story && story.player && story.player[0] && story.player[0].layout) {
-        const storyTitle = story.player[0].layout.title;
+        const storyTitle = impression?.story?.player?.[0]?.layout?.title;
+
         if (storyTitle === titleToMatch) {
-          return totalMatches + 1;
+            return totalMatches + 1;
         }
-      }
-      console.log({totalMatches})
-      return totalMatches;
+        console.log({totalMatches})
+        return totalMatches;
     }, 0);
-  }
+}
 
   function calculateTotalMillisecondsFromTime(time: any) {
     // Split the time into hours, minutes, and seconds

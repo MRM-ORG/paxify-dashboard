@@ -168,9 +168,9 @@ const Performance: NextPage<Props> = ({ analytics }) => {
         items={PERFORMANCE_TABS_ITEMS?.map((item, i) => {
           return {
             label: (
-              <div className="flex flex-wrap">
+              <div className="flex flex-wrap" style={{marginTop: '50px'}}>
                 <div className="lg:space-x-14 tab-label mt-5">
-                  <h1>{item.text}</h1>
+                  <span>{item.text}</span>
                   {item.link ? (
                     <Link className="text-primary flex items-center" href="#">
                       <p>Get Started </p>
