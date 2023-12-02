@@ -1,17 +1,13 @@
-import { useState, type ReactElement, useEffect } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 
-import type { NextPageWithLayout } from "../_app";
+import { fetchUserStores } from "@/apiCalls/auth";
 import DashboardLayout from "@/components/dashboard/Layout";
 import Instances from "@/components/dashboard/home/Instances";
-import Overview from "@/components/dashboard/home/Overview";
-import Performance from "@/components/dashboard/home/Performance";
-import StoryGroup from "@/components/dashboard/home/StoryGroup";
-import Stories from "@/components/dashboard/home/Stories";
-import axios from "axios";
-import { BACKEND_URL } from "@/constants";
-import { fetchUserStores } from "@/apiCalls/auth";
 import OverViewTop from "@/components/dashboard/home/OverViewTop";
-import Reels from "@/components/molecules/reels";
+import Stories from "@/components/dashboard/home/Stories";
+import { BACKEND_URL } from "@/constants";
+import axios from "axios";
+import type { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
   const [stories, setStories] = useState<any[]>([]);

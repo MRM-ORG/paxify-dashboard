@@ -1,13 +1,7 @@
-import React, { useRef } from "react";
-import {
-  CaretUpOutlined,
-  LeftOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
-import { Button, Select, Statistic } from "antd";
+import Reels from "../../molecules/Reels";
+import { Statistic } from "antd";
 import { NextPage } from "next";
-import Image from "next/image";
-import Reels from "@/components/molecules/reels";
+import { useRef } from "react";
 
 type Props = {
   stories: any;
