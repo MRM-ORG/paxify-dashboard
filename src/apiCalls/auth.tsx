@@ -88,3 +88,37 @@ export async function getUserSubscriptionStatus(uid: string): Promise<any> {
       return Promise.reject(result);
     });
 }
+
+export async function getUserProfile(uid: string): Promise<any> {
+  const API = `${BACKEND_URL}/firebase/profile/${uid}`;
+
+  return axios
+    .get(API)
+    .then((response) => {
+      return response.data;
+    })
+    .then((responseJson) => {
+      return Promise.resolve(responseJson.data);
+    })
+    .catch((error) => {
+      const result = error.result;
+      return Promise.reject(result);
+    });
+}
+
+export async function updateUserProfile(profile: any): Promise<any> {
+  const API = `${BACKEND_URL}/firebase/profile`;
+
+  return axios
+    .post(API, profile)
+    .then((response) => {
+      return response.data;
+    })
+    .then((responseJson) => {
+      return Promise.resolve(responseJson.data);
+    })
+    .catch((error) => {
+      const result = error.result;
+      return Promise.reject(result);
+    });
+}

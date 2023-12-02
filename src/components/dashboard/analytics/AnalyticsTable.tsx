@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { NextPage } from "next";
+import styled from "styled-components";
 
 interface TableRow {
   key: string;
@@ -56,6 +57,13 @@ const data: TableRow[] = [
   },
   // Add more data rows as needed
 ];
+
+const StatusBadge = styled(Badge)`
+  & > span {
+    width: 12px !important;
+    height: 12px !important;
+  }
+`;
 
 const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
   const storyAnalytics = analytics?.filter(
@@ -150,19 +158,22 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
       key: "status",
       render: (_text: any, { status }: any) => {
         return (
-          <Badge status={status === true ? "success" : "error"} text={status} />
+          <StatusBadge
+            status={status === true ? "success" : "error"}
+            text={status}
+          />
         );
       },
     },
-    {
-      title: "Labels",
-      className: "text-[12px]",
-      dataIndex: "labels",
-      key: "labels",
-      render: (_text: any, { labels }: any) => {
-        return <Button type="default">See Labels</Button>;
-      },
-    },
+    // {
+    //   title: "Labels",
+    //   className: "text-[12px]",
+    //   dataIndex: "labels",
+    //   key: "labels",
+    //   render: (_text: any, { labels }: any) => {
+    //     return <Button type="default">See Labels</Button>;
+    //   },
+    // },
     {
       title: () => {
         return (
@@ -247,18 +258,18 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
       dataIndex: "complete",
       key: "complete",
     },
-    {
-      title: () => {
-        return (
-          <div className="flex space-x-2">
-            <p>Active Users</p>
-          </div>
-        );
-      },
-      className: "text-[12px]",
-      dataIndex: "activeUsers",
-      key: 0,
-    },
+    // {
+    //   title: () => {
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <p>Active Users</p>
+    //       </div>
+    //     );
+    //   },
+    //   className: "text-[12px]",
+    //   dataIndex: "activeUsers",
+    //   key: 0,
+    // },
   ];
   return (
     <div className="max-w-full overflow-x-auto">

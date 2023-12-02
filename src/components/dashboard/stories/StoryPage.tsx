@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Select, Badge, Button, Radio } from "antd";
 import {
   EyeOutlined,
@@ -12,27 +12,95 @@ import Stories from "./Stories";
 import { NextPage } from "next";
 const { Option } = Select;
 import { AiOutlineSearch } from "react-icons/ai";
+import { getUser } from "@/utils/auth";
+import { fetchUserStores } from "@/apiCalls/auth";
+import styled from "styled-components";
+
+const Flex = styled("div")`
+  gap: 15px;
+  display: flex;
+`;
 
 type Props = {
   stories: any;
 };
 
 const StoryPage: NextPage<Props> = ({ stories }) => {
+  const [searchString, setSearchString] = React.useState("");
+  const [stores, setStores] = React.useState<any>([]);
+  const [filteredStories, setFilteredStories] = React.useState<any[]>(stories);
+
+  const handleSearch = (e: any) => {
+    setSearchString(e.target.value);
+
+    if (e.target.value === "") {
+      setFilteredStories(stories);
+      return;
+    }
+
+    const filteredStories = stories.filter((story: any) => {
+      console.log("story", story);
+      return story?.player[0]?.layout?.title
+        ?.toLowerCase()
+        .includes(searchString.toLowerCase());
+    });
+
+    setFilteredStories(filteredStories);
+  };
+
+  useEffect(() => {
+    setFilteredStories(stories);
+  }, [stories]);
+
+  useEffect(() => {
+    try {
+      const user = getUser();
+      if (!user) return;
+      const { uid } = user;
+      fetchUserStores(uid).then((stores) => {
+        if (Array.isArray(stores)) {
+          setStores(stores);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
     <div className="w-full p-8 rounded-[10px] bg-white">
       <div className=" max-md:mt-12 max-md:p-3 flex flex-col justify-between gap-4  min-[1334px]:gap-2 min-[1334px]:flex-row">
         <div className="w-full min-[1334px]:w-[40%]">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search here..."
-              className="pl-10 story-placeholder w-full h-[45px] py-2 px-3 bg-[#F9FAFB]  rounded shadow-none focus:outline-none"
-            />
-            <AiOutlineSearch className="absolute top-4 left-4 z-1 text-[18px] cursor-pointer text-[#09797A]" />
-          </div>
+          <Flex>
+            {stores.length > 0 &&
+              stores.map((store: any) => (
+                <div key={store.id}>
+                  <input
+                    style={{
+                      width: "450px",
+                    }}
+                    disabled
+                    className="pl-10 h-[45px] py-2 px-3 bg-[#F9FAFB]  rounded shadow-none focus:outline-none"
+                    value={`Store: ${store.name} (${store.domain})`}></input>
+                </div>
+              ))}
+            <div className="relative">
+              <input
+                value={searchString}
+                onChange={handleSearch}
+                type="text"
+                placeholder="Filter stories..."
+                style={{
+                  width: "450px",
+                }}
+                className="pl-10 story-placeholder w-full h-[45px] py-2 px-3 bg-[#F9FAFB]  rounded shadow-none focus:outline-none"
+              />
+              <AiOutlineSearch className="absolute top-4 left-4 z-1 text-[18px] cursor-pointer text-[#09797A]" />
+            </div>
+          </Flex>
         </div>
 
-        <div className="w-full min-[1334px]:w-[60%] flex flex-row max-sm:flex-col justify-start  gap-2 sm:items-center">
+        {/* <div className="w-full min-[1334px]:w-[60%] flex flex-row max-sm:flex-col justify-start  gap-2 sm:items-center">
           <div className="flex gap-1">
             <div className="ml-6">
               <Select defaultValue={"option1"} placeholder="Select an option">
@@ -87,8 +155,7 @@ const StoryPage: NextPage<Props> = ({ stories }) => {
                     width="17"
                     height="16"
                     viewBox="0 0 17 16"
-                    fill="none"
-                  >
+                    fill="none">
                     <path
                       d="M8.08998 8.66668C8.45817 8.66668 8.75664 8.3682 8.75664 8.00001C8.75664 7.63182 8.45817 7.33334 8.08998 7.33334C7.72179 7.33334 7.42331 7.63182 7.42331 8.00001C7.42331 8.3682 7.72179 8.66668 8.08998 8.66668Z"
                       stroke="#7C7C96"
@@ -134,22 +201,18 @@ const StoryPage: NextPage<Props> = ({ stories }) => {
             </div>
 
             <div className="ml-[10px]">
-              <div className="w-[130px] h-[40px] flex justify-between" style={{border: '1px solid #D3D3DC', borderRadius: '6px'}}>
-                {/* <Radio.Button value="large"> */}
-                  <WindowsOutlined className="pl-[10px]"/>
-                {/* </Radio.Button>
-                <Radio.Button value="middle"> */}
-                  <PicCenterOutlined />
-                {/* </Radio.Button> */}
-                {/* <Radio.Button value="small"> */}
-                  <UnorderedListOutlined className="pr-[10px]"/>
-                {/* </Radio.Button> */}
+              <div
+                className="w-[130px] h-[40px] flex justify-between"
+                style={{ border: "1px solid #D3D3DC", borderRadius: "6px" }}>
+                <WindowsOutlined className="pl-[10px]" />
+                <PicCenterOutlined />
+                <UnorderedListOutlined className="pr-[10px]" />
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
-      <Stories stories={stories} />
+      <Stories stores={stores} stories={filteredStories} />
     </div>
   );
 };

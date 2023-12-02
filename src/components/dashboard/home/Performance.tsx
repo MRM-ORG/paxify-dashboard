@@ -13,8 +13,8 @@ import AreaChart from "./AreaChart";
 
 const Extra = (
   <div className="flex items-center space-x-3">
-    <Select defaultValue={"Apps and Websites"} />
-    <Button icon={<DownloadOutlined />}>Export</Button>
+    {/* <Select defaultValue={"Apps and Websites"} />*/}
+    {/* <Button icon={<DownloadOutlined />}>Export</Button> */}
   </div>
 );
 
@@ -44,17 +44,13 @@ const Performance: NextPage<Props> = ({ analytics }) => {
 
   // Create a new array of objects with date and count
   const newArray = Object.entries(reachDateCounts).map(([date, count]) => ({
-    date: new Date(date),
+    date,
     count,
   }));
-
-  console.log({newArray})
 
   const viewAnalytics = analytics.filter(
     (obj: { name: string }) => obj.name === "reels_story_viewed"
   );
-
-  console.log({viewAnalytics})
 
   const viewDateCounts: Record<string, number> = {};
 
@@ -73,11 +69,11 @@ const Performance: NextPage<Props> = ({ analytics }) => {
 
   // Create a new array of objects with date and count
   const viewsArray = Object.entries(viewDateCounts).map(([date, count]) => ({
-    date: new Date(date),
+    date,
     count,
   }));
 
-  console.log({viewsArray})
+  console.log({ viewsArray });
 
   const dummyData = [
     {
@@ -107,40 +103,40 @@ const Performance: NextPage<Props> = ({ analytics }) => {
       ) : null,
       link: false,
     },
-    {
-      text: "Impression",
-      number: analytics.filter(
-        (obj: { name: string }) => obj?.name === "reels_init"
-      )?.length,
-      label: "12.4%",
-      increase: true,
-      children: newArray ? (
-        <div className="h-[300px] w-full">
-          <AreaChart analytics={!newArray?.length ? dummyData : newArray} />
-        </div>
-      ) : null,
-      link: false,
-    },
-    {
-      text: "Click",
-      number: analytics?.filter(
-        (obj: { name: string }) => obj?.name === "reels_story_viewed"
-      )?.length,
-      label: `${(
-        analytics?.filter((obj: { name: string }) => obj?.name === "reels_init")
-          ?.length /
-        analytics?.filter(
-          (obj: { name: string }) => obj.name === "reels_story_viewed"
-        ).length
-      ).toFixed(2)}%`,
-      increase: false,
-      children: viewsArray ? (
-        <div className="h-[300px] w-full">
-          <AreaChart analytics={!viewsArray?.length ? dummyData : viewsArray} />
-        </div>
-      ) : null,
-      link: false,
-    },
+    // {
+    //   text: "Impression",
+    //   number: analytics.filter(
+    //     (obj: { name: string }) => obj?.name === "reels_init"
+    //   )?.length,
+    //   label: "12.4%",
+    //   increase: true,
+    //   children: newArray ? (
+    //     <div className="h-[300px] w-full">
+    //       <AreaChart analytics={!newArray?.length ? dummyData : newArray} />
+    //     </div>
+    //   ) : null,
+    //   link: false,
+    // },
+    // {
+    //   text: "Click",
+    //   number: analytics?.filter(
+    //     (obj: { name: string }) => obj?.name === "reels_story_viewed"
+    //   )?.length,
+    //   label: `${(
+    //     analytics?.filter((obj: { name: string }) => obj?.name === "reels_init")
+    //       ?.length /
+    //     analytics?.filter(
+    //       (obj: { name: string }) => obj.name === "reels_story_viewed"
+    //     ).length
+    //   ).toFixed(2)}%`,
+    //   increase: false,
+    //   children: viewsArray ? (
+    //     <div className="h-[300px] w-full">
+    //       <AreaChart analytics={!viewsArray?.length ? dummyData : viewsArray} />
+    //     </div>
+    //   ) : null,
+    //   link: false,
+    // },
     // {
     //     text:"Active Users",
     //     number:"1.5k",
@@ -149,11 +145,11 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     //     children:<h1>Active Users</h1>,
     //     link:false
     // },
-    {
-      text: "Event Tracker",
-      children: <h1>Event Tracker</h1>,
-      link: true,
-    },
+    // {
+    //   text: "Event Tracker",
+    //   children: <h1>Event Tracker</h1>,
+    //   link: true,
+    // },
   ];
 
   return (
@@ -168,7 +164,7 @@ const Performance: NextPage<Props> = ({ analytics }) => {
         items={PERFORMANCE_TABS_ITEMS?.map((item, i) => {
           return {
             label: (
-              <div className="flex flex-wrap" style={{marginTop: '50px'}}>
+              <div className="flex flex-wrap" style={{ marginTop: "50px" }}>
                 <div className="lg:space-x-14 tab-label mt-5">
                   <span>{item.text}</span>
                   {item.link ? (

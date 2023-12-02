@@ -10,6 +10,7 @@ import ModalComponent from "../atoms/Modal";
 import styled from "styled-components";
 import LoadingPage from "../molecules/subviews/loading/LoadingPage";
 import { useRouter } from "next/router";
+import { getUser } from "@/utils/auth";
 
 const Container = styled.div`
   padding: 20px;
@@ -35,7 +36,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const screens = useBreakpoint();
-  const [hasSubscription, setHasSubscription] = useState(true);
+  const [hasStores, setHasStores] = useState(true);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
 
@@ -50,12 +52,25 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const finalResult = capitalizedWords.join(" ");
 
+  const user = getUser();
+
   useEffect(() => {
+    setIsLoading(true);
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    fetchUserStores(user?.uid)
+    getUserSubscriptionStatus(user?.uid)
       .then((res) => {
-        console.log("STORES:", res);
-        setHasSubscription(JSON.stringify(res) !== "{}");
+        // console.log("STORES:", res);
+        console.log("SUBSCRIPTION:", res.plan.isActive);
+        setHasSubscription(res.plan.isActive);
+        if (res.plan.isActive) {
+          fetchUserStores(user?.uid)
+            .then((res) => {
+              setHasStores(JSON.stringify(res) !== "{}");
+            })
+            .finally(() => {
+              setIsLoading(false);
+            });
+        }
       })
       .finally(() => {
         setIsLoading(false);
@@ -68,7 +83,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      {hasSubscription && (
+      {hasStores && hasSubscription && (
         <Layout style={{ minHeight: "100vh" }}>
           <Sider
             breakpoint={screens.md ? undefined : "lg"}
@@ -98,13 +113,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   </span>
                 </div>
                 <div className="flex flex-row pr-10">
-                  <div className="mt-4 mr-2">
-                    <img
-                      src="/logo/Notifications.png"
-                      className="h-[36px] w-[36px]"
-                    />
-                  </div>
-                  <div className="cursor-pointer" onClick={() => router.push("/dashboard/settings")}>
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => router.push("/dashboard/settings")}>
                     <Avatar
                       shape="square"
                       icon={<UserOutlined className="mt-2" />}
@@ -112,7 +123,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     />
                   </div>
                   <div className="flex flex-col ml-2">
-                    <span style={{ fontWeight: "600" }}>Mushfiq</span>
+                    <span style={{ fontWeight: "600" }}>
+                      {user && user.email
+                        ? user.email.split("@")[0]
+                        : "Profile"}
+                    </span>
                     <span>Admin</span>
                   </div>
                 </div>
@@ -123,7 +138,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </Layout>
         </Layout>
       )}
-      <ModalComponent isVisible={!hasSubscription} onClose={() => {}}>
+      <ModalComponent isVisible={!hasStores} onClose={() => {}}>
         <Container>
           <h1>No Store Found</h1>
           <p>
@@ -134,6 +149,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             type="primary"
             onClick={() => navigateNewPage(DASHBOARD_STORES())}>
             Create Store
+          </Button>
+        </Container>
+      </ModalComponent>
+      <ModalComponent isVisible={!hasSubscription} onClose={() => {}}>
+        <Container>
+          <h1>No Subscription Found</h1>
+          <p>
+            Your subscription has expired. Please renew your subscription to
+            continue using Reellife.
+          </p>
+          <Button
+            type="primary"
+            onClick={() => navigateNewPage(DASHBOARD_SUBSCRIPTIONS())}>
+            Renew Subscription
           </Button>
         </Container>
       </ModalComponent>

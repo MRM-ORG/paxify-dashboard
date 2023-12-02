@@ -17,27 +17,26 @@ const AnalyticsHeader: NextPage<Props> = ({ stories, analytics }) => {
           <div className="flex flex-col justify-center gap-4 lg:justify-between lg:flex-row lg:gap-0">
             <div className="flex gap-1">
               <h1 className="text-[#242450] text-[18px] font-[900]">
-                Analytics
+                All Stories
               </h1>
-              <p className="text-[#7C7C96] text-[11px] font-[500] mt-[5px]">
+              {/* <p className="text-[#7C7C96] text-[11px] font-[500] mt-[5px]">
                 Interaction
-              </p>
+              </p> */}
             </div>
-            <div className="flex items-center justify-end gap-4 max-sm:flex-col ">
+            {/* <div className="flex items-center justify-end gap-4 max-sm:flex-col ">
               <Button
                 className="bg-white max-sm:w-full"
                 icon={<FileAddOutlined className="text-[#666685]" />}
-                style={{ color: "#666685" }}
-              >
+                style={{ color: "#666685" }}>
                 Create report
               </Button>
               <DatePicker.RangePicker className="w-full lg:w-auto" />
-            </div>
+            </div> */}
           </div>
 
           <div className="mt-3">
             <div className="flex gap-2 max-sm:flex-col">
-              <Select defaultValue={"status1"} placeholder="Select an option">
+              {/*<Select defaultValue={"status1"} placeholder="Select an option">
                 <Option value="status1">
                   Status
                   <Badge
@@ -69,7 +68,7 @@ const AnalyticsHeader: NextPage<Props> = ({ stories, analytics }) => {
                   />
                 </Option>
               </Select>
-              <Select defaultValue={"option1"} placeholder="Select an option">
+               <Select defaultValue={"option1"} placeholder="Select an option">
                 <Option value="option1">Labels</Option>
                 <Option value="option2">Labels</Option>
               </Select>
@@ -81,7 +80,7 @@ const AnalyticsHeader: NextPage<Props> = ({ stories, analytics }) => {
                 <Option value="option1">
                   <UngroupOutlined /> Column
                 </Option>
-              </Select>
+              </Select> */}
             </div>
           </div>
         </div>

@@ -12,17 +12,32 @@ interface DataPoint {
   date: Date;
   count: number;
 }
+
+const getDateTime = (date: string) => {
+  const parts = date.split("/");
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const year = parseInt(parts[2], 10);
+
+  const dateObj = new Date(year, month, day);
+  return Math.floor(dateObj.getTime() / 1000);
+};
+
 // Function to aggregate daily data into weekly data
-function aggregateDataWeekly(dailyData: DataPoint[]): DataPoint[] {
+function aggregateDataWeekly1(dailyData: DataPoint[]): DataPoint[] {
   const weeklyData: DataPoint[] = [];
   let currentWeek: DataPoint[] = [];
   let currentWeekStartDate: Date | null = null;
 
+  console.log("DAILY DATA:", dailyData);
+
   // Sort daily data by date
-  dailyData.sort((a, b) => a.date.getTime() - b.date.getTime());
+  dailyData.sort(
+    (a, b) => getDateTime(a.date.toString()) - getDateTime(b.date.toString())
+  );
 
   dailyData.forEach((dataPoint) => {
-    const dataDate = dataPoint.date;
+    const dataDate = getDateTime(dataPoint.date.toString());
 
     // Initialize the current week on the first data point
     if (!currentWeekStartDate) {
@@ -32,8 +47,8 @@ function aggregateDataWeekly(dailyData: DataPoint[]): DataPoint[] {
     // If the data point falls within the current week, add it to the current week's data
     if (
       currentWeekStartDate &&
-      dataDate.getTime() >= currentWeekStartDate.getTime() &&
-      dataDate.getTime() <
+      dataDate >= currentWeekStartDate.getTime() &&
+      dataDate <
         new Date(currentWeekStartDate).setDate(
           currentWeekStartDate.getDate() + 7
         )
@@ -60,11 +75,61 @@ function aggregateDataWeekly(dailyData: DataPoint[]): DataPoint[] {
     });
   }
 
+  console.log("WEELKY DATA:", weeklyData);
+
   return weeklyData;
 }
 
+function getWeekNumber(date: any) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  // @ts-ignore
+  const weekNumber = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  return weekNumber;
+}
+
+function getFirstDateOfWeek(date: any) {
+  const d = new Date(date);
+  d.setDate(d.getDate() - d.getDay());
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+}
+
+function getMonthYear(date: any) {
+  const d = new Date(date);
+  const month = d.toLocaleDateString("en-US", { month: "numeric" });
+  const year = d.toLocaleDateString("en-US", { year: "numeric" });
+  return `${year}-${month}`;
+}
+
+function aggregateDataWeekly(data: DataPoint[]) {
+  const groupedData: any = {};
+
+  data.forEach((item) => {
+    const dateParts = item.date.toString().split("/");
+    const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+    const weekNumber = getWeekNumber(date);
+
+    if (!groupedData[weekNumber]) {
+      groupedData[weekNumber] = {
+        date: getFirstDateOfWeek(date),
+        count: 0,
+      };
+    }
+
+    groupedData[weekNumber].count += item.count;
+  });
+
+  return Object.values(groupedData);
+}
+
 // Function to aggregate daily data into monthly data
-function aggregateDataMonthly(dailyData: DataPoint[]): DataPoint[] {
+function aggregateDataMonthly1(dailyData: DataPoint[]): DataPoint[] {
   const monthlyData: DataPoint[] = [];
   let currentMonth: DataPoint[] = [];
   let currentMonthStartDate: Date | null = null;
@@ -112,6 +177,27 @@ function aggregateDataMonthly(dailyData: DataPoint[]): DataPoint[] {
   }
 
   return monthlyData;
+}
+
+function aggregateDataMonthly(data: DataPoint[]) {
+  const groupedData: any = {};
+
+  data.forEach((item) => {
+    const dateParts = item.date.toString().split("/");
+    const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+    const monthYear = getMonthYear(date);
+
+    if (!groupedData[monthYear]) {
+      groupedData[monthYear] = {
+        date: `${monthYear}-01`, // Assuming the first day of the month
+        count: 0,
+      };
+    }
+
+    groupedData[monthYear].count += item.count;
+  });
+
+  return Object.values(groupedData);
 }
 
 type MyDatum = { date: Date; count: number };
@@ -179,6 +265,8 @@ const AreaChart: NextPage<Props> = ({ analytics }) => {
       stroke: "#efe2ed",
     };
   }, []);
+
+  console.log("DATA:", data);
 
   return (
     <>

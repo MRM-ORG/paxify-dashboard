@@ -19,6 +19,7 @@ import { BACKEND_URL } from "@/constants";
 import { fetchUserStores } from "@/apiCalls/auth";
 import { useRouter } from "next/router";
 import dayjs, { Dayjs } from "dayjs";
+import { v4 as uuidv4 } from "uuid";
 
 const { Option } = Select;
 
@@ -79,7 +80,7 @@ const StudioCreator = () => {
   };
   store.setSize(1080, 1920, true);
   store.setScale(0.4);
-  console.log("store width", store.width);
+  // console.log("store width", store.width);
   const [players, setPlayers] = useState([
     // Initialize with a single player
     {
@@ -231,8 +232,8 @@ const StudioCreator = () => {
       await Promise.all(uploadPromises);
       const story = {
         story: {
-          id: "story-1",
-          status: true,
+          id: uuidv4(),
+          status: false,
           container: {
             border: {
               color: "#e1306c",
@@ -254,7 +255,7 @@ const StudioCreator = () => {
       // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
-        router.push("/dashboard/home");
+        router.push("/dashboard/");
         setOpen(false);
       });
     } catch (error) {

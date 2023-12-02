@@ -11,6 +11,7 @@ import axios from "axios";
 import { BACKEND_URL } from "@/constants";
 import { fetchUserStores } from "@/apiCalls/auth";
 import OverViewTop from "@/components/dashboard/home/OverViewTop";
+import Reels from "@/components/molecules/reels";
 
 const Page: NextPageWithLayout = () => {
   const [stories, setStories] = useState<any[]>([]);
@@ -53,7 +54,7 @@ const Page: NextPageWithLayout = () => {
       <Instances stories={stories} analytics={analytics} />
       {/* <Overview analytics={analytics}/>
        <Performance analytics={analytics}/> */}
-      <StoryGroup />
+      {/* <StoryGroup /> */}
       <Stories stories={stories} analytics={analytics} />
     </div>
   );

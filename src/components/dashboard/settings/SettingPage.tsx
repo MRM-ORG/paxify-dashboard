@@ -1,7 +1,42 @@
-import React from "react";
+import { getUserProfile, updateUserProfile } from "@/apiCalls/auth";
+import { getUser } from "@/utils/auth";
+import React, { useEffect } from "react";
 import { BiSolidMessageDetail } from "react-icons/bi";
 
 const SettingPage = () => {
+  const [profile, setProfile] = React.useState<any>({
+    uid: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    city: "",
+    country: "",
+  });
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) return;
+
+    const fetchProfile = async () => {
+      const profile = await getUserProfile(user.uid);
+      setProfile(profile);
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleProfileChange = (e: any) => {
+    const { name, value } = e.target;
+    setProfile((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    console.log("profile", profile);
+    updateUserProfile(profile).then((res) => {
+      alert("Profile updated successfully");
+    });
+  };
+
   return (
     <div>
       <div className="bg-white rounded-[10px]  p-6 ">
@@ -9,7 +44,7 @@ const SettingPage = () => {
           Profile
         </h1>
 
-        <div className="flex flex-col items-start w-full gap-4 lg:gap-8 lg:flex-row lg:items-center">
+        <div className="flex flex-col items-start w-full gap-4 lg:gap-8 lg:flex-row">
           <div className="w-full lg:w-[50%] mt-4">
             <div>
               <label className="font-[500] text-[14px] text-setting-text-color">
@@ -17,8 +52,10 @@ const SettingPage = () => {
               </label>
               <br />
               <input
+                name="firstName"
+                value={profile.firstName}
                 type="text"
-                placeholder="Muzamil"
+                onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
               />
             </div>
@@ -30,7 +67,8 @@ const SettingPage = () => {
               <br />
               <input
                 type="text"
-                placeholder="Gilgit"
+                value={profile.city}
+                onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
               />
             </div>
@@ -41,8 +79,10 @@ const SettingPage = () => {
               </label>
               <br />
               <input
+                name="email"
                 type="email"
-                placeholder="muzamil@gmail.com"
+                value={profile.email}
+                onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
               />
             </div>
@@ -55,8 +95,10 @@ const SettingPage = () => {
               </label>
               <br />
               <input
+                name="lastName"
                 type="text"
-                placeholder="Mehdi"
+                value={profile.lastName}
+                onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
               />
             </div>
@@ -67,20 +109,10 @@ const SettingPage = () => {
               </label>
               <br />
               <input
+                name="country"
                 type="text"
-                placeholder="Pakistan"
-                className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="font-[500] text-[14px] text-setting-text-color">
-                Password
-              </label>
-              <br />
-              <input
-                type="password"
-                placeholder="******"
+                value={profile.country}
+                onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
               />
             </div>
@@ -89,12 +121,14 @@ const SettingPage = () => {
       </div>
 
       <div className="flex gap-4 mt-6 max-md:p-4">
-        <button className="py-[6px] px-[46px] bg-setting-btb-bg rounded-[6px] text-white text-[14px] font-[500]">
+        <button
+          onClick={handleSave}
+          className="py-[6px] px-[46px] bg-setting-btb-bg rounded-[6px] text-white text-[14px] font-[500]">
           Save
         </button>
-        <button className="py-[6px] px-[46px] bg-[#D3D3D9] rounded-[6px] text-[#212143] text-[14px] font-[500]">
+        {/* <button className="py-[6px] px-[46px] bg-[#D3D3D9] rounded-[6px] text-[#212143] text-[14px] font-[500]">
           Cancel
-        </button>
+        </button> */}
       </div>
 
       <div className="flex justify-end mt-8 ">

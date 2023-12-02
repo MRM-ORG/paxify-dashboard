@@ -196,7 +196,7 @@ const StudioCreator = () => {
       // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
-        router.push("/dashboard/home");
+        router.push("/dashboard/");
         setOpen(false);
       });
     } catch (error) {
@@ -206,7 +206,6 @@ const StudioCreator = () => {
   };
 
   const handleCancel = () => {
-    
     setOpen(false);
   };
 
@@ -220,8 +219,8 @@ const StudioCreator = () => {
         setImage(res);
         showModal();
       });
-    console.log({ img });
-    console.log(" src ", store.toJSON());
+    // console.log({ img });
+    // console.log(" src ", store.toJSON());
     // store.saveAsImage({ fileName: 'polotno.png' });
   };
 

@@ -436,7 +436,7 @@ const Subscription: React.FC<IProfileProps> = () => {
 
     getCustomerSubscriptions(user?.uid as string, userSubscription.stripeId)
       .then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         setActiveSubscriptions(res.data);
       })
       .finally(() => setHasCustomerSubscription(true));
@@ -452,7 +452,7 @@ const Subscription: React.FC<IProfileProps> = () => {
         // Refresh the subscriptions
         getCustomerSubscriptions(user?.uid as string, userSubscription.stripeId)
           .then((res) => {
-            console.log("res", res);
+            // console.log("res", res);
             setActiveSubscriptions(res.data);
           })
           .finally(() => setIsLoading(false));

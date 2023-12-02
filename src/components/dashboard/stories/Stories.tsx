@@ -1,70 +1,126 @@
+import { BACKEND_URL } from "@/constants";
+import { getUser } from "@/utils/auth";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Card, Switch } from "antd";
+import axios from "axios";
 import { NextPage } from "next";
 import Image from "next/image";
 import React from "react";
+import styled from "styled-components";
+
+const Toggle = styled(Switch)`
+  // Styles for the on state
+  &.ant-switch-checked:not(.ant-switch-loading) {
+    .ant-switch-inner {
+      background-color: #52c41a; // Change this color to your desired background color for the "on" state
+    }
+  }
+
+  // Styles for the off state
+  &.ant-switch:not(.ant-switch-checked):not(.ant-switch-loading) {
+    .ant-switch-inner {
+      background-color: #f5222d; // Change this color to your desired background color for the "off" state
+    }
+  }
+`;
+
+const Flex = styled("div")`
+  margin-top: 10px;
+  gap: 10px;
+  align-items: center;
+  display: flex !important;
+  justify-content: center;
+`;
+
 const { Meta } = Card;
 
 type Props = {
+  stores: any;
   stories: any;
 };
-const Story = ({ img, text }: { img: string; text: string }) => {
-  return (
-    <div className="relative">
-      <img
-        src={img}
-        alt="Your Image"
-        className="w-full h-auto rounded-lg"
-        style={{ borderRadius: "16px 16px 0 0" }}
-      />
 
-      <div className="absolute top-3 right-3">
-        <Image
-          src="/logo/edit.png"
-          alt="edit"
-          width={25}
-          height={25}
-          style={{ borderRadius: "2px" }}
-          className="h-6 w-6 cursor-pointer"
+const Story = ({
+  store,
+  story,
+  img,
+  text,
+}: {
+  store: any;
+  story: any;
+  img: string;
+  text: string;
+}) => {
+  const [isActive, setIsActive] = React.useState(story.status);
+
+  const handleStoryToggle = (storyId: string) => {
+    const user = getUser();
+    axios
+      .post(`${BACKEND_URL}/firebase/update-story-status`, {
+        uid: user?.uid,
+        storeId: store.id,
+        storyId,
+      })
+      .then(() => setIsActive(!isActive));
+  };
+
+  return (
+    <>
+      <div className="relative">
+        <img
+          src={img}
+          alt="Story"
+          className="w-full h-auto rounded-lg"
+          style={{
+            borderRadius: "16px 16px 0 0",
+            width: "250px",
+            height: "450px",
+          }}
         />
       </div>
-    </div>
+
+      <Flex>
+        <div className="mt-1 mb-1" style={{ fontWeight: "500" }}>
+          {story?.player[0]?.layout?.title}
+        </div>
+        <Meta
+          className=""
+          title={
+            <Toggle
+              onClick={() => handleStoryToggle(story?.id)}
+              checked={isActive}
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+              defaultChecked
+            />
+          }
+        />
+      </Flex>
+    </>
   );
 };
 
-const Stories: NextPage<Props> = ({ stories }) => {
+const Stories: NextPage<Props> = ({ stores, stories }) => {
   return (
-    <div className="flex relative justify-center sm:justify-between items-center flex-wrap mt-8">
+    <div className="flex gap-5 relative justify-center sm:justify-start items-center flex-wrap mt-8">
       {Array.from(stories).map((_: any, index) => (
         <Card
           key={index}
           hoverable
-          actions={[
-            <div key={"hi"} className="flex w-[190px] justify-end">
-              <div>
-                <InfoCircleOutlined />{" "}
-              </div>
-              <p className="ml-2 text-[#7C7C96]">Audiences</p>
-            </div>,
-          ]}
           style={{
-            width: "210px",
-            height: "310px",
+            width: "250px",
+            height: "500px",
             marginBottom: "40px",
-            borderRadius: "16px 16px 0 0",
+            borderRadius: "16px",
           }}
-          cover={<Story text={_?.id} img={_.player[0]?.content?.source} />}>
-          <div className="mt-1 mb-1" style={{ fontWeight: "500" }}>
-            {_?.player[0]?.layout?.title}
-          </div>
-          <Meta
-            className=""
-            title={<Switch className="" defaultChecked />}
-            description={
-              <div className="h-8 w-4 rounded-sm bg-black ml-[10px] mt-[5px]"></div>
-            }
-          />
-        </Card>
+          cover={
+            <Story
+              store={stores[0]}
+              story={_}
+              text={_?.id}
+              img={_.player[0]?.content?.source}
+            />
+          }
+        />
       ))}
     </div>
   );
