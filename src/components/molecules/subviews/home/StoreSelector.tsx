@@ -21,12 +21,7 @@ import CopyDone from "../../../atoms/icons/copyDone";
 import Switch from "../../../atoms/Switch";
 import Delete from "../../../atoms/icons/delete";
 
-interface IStoreSelectorProps {
-  user: {
-    stores: any[];
-    setStores: (stores: string[]) => void;
-  };
-}
+interface IStoreSelectorProps {}
 
 const Container = styled(Column)`
   gap: 10px;
@@ -102,9 +97,7 @@ const Code = styled.code`
   max-width: 90%;
 `;
 
-const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
-  // return null;
-
+const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   const [stores, setStores] = useState<any>([]);
   const [activeStore, setActiveStore] = useState<any>();
   const [activeUser, setActiveUser] = useState<any>();
@@ -128,25 +121,6 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
     alert("An error occured, please try again later.");
   }
 
-  useEffect(() => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user") as string);
-      const { uid } = user;
-      setIsLoading(true);
-      setActiveUser(uid);
-
-      fetchUserStores(uid).then((stores) => {
-        if (Array.isArray(stores)) {
-          setStores(stores);
-        }
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const checkIfStoreVerified = () => {
     setIsLoading(true);
 
@@ -162,15 +136,25 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
   };
 
   useEffect(() => {
-    setIsVerified(null);
+    // We don't need to make this call if modal is open or if store is already verified
+    if (showInstructions) return;
+    if (isVerified) return;
 
-    if (!showInstructions) {
+    try {
       const user = JSON.parse(localStorage.getItem("user") as string);
       const { uid } = user;
+      setIsLoading(true);
+      setActiveUser(uid);
 
       fetchUserStores(uid).then((stores) => {
-        setStores(stores);
+        if (Array.isArray(stores)) {
+          setStores(stores);
+        }
       });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }, [showInstructions]);
 
@@ -240,7 +224,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = ({ user }) => {
             registerStore(uid, { name, store })
               .then((res) => {
                 setStores([
-                  ...user?.stores,
+                  ...stores,
                   {
                     name,
                     domain: store,

@@ -89,8 +89,14 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
       ctaCount[storyTitle] = (ctaCount[storyTitle] || 0) + 1;
     }
   });
-  const impressions = analytics?.filter(
+
+  const reach = analytics?.filter(
     (obj: { name: string }) => obj.name === "reels_init"
+  );
+
+  const impressions = analytics?.filter(
+    (obj: { name: string }) =>
+      obj.name === "cta_clicked" || obj.name === "reels_interacted"
   );
 
   function countTitleMatches(impressions: any[], titleToMatch: any) {
@@ -111,7 +117,7 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
     if (storyTitle) {
       story.analyticsCount = analyticsCount[storyTitle] || 0;
       story.ctaCount = ctaCount[storyTitle] || 0;
-      story.reach = countTitleMatches(impressions, storyTitle);
+      story.reach = countTitleMatches(reach, storyTitle);
       story.impression = countTitleMatches(impressions, storyTitle);
       story.skip = 0;
       story.share = 0;
@@ -126,9 +132,9 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
       dataIndex: "player",
       key: "player",
       render: (_text: any, story: any) => (
-        <Link
-          href="interaction"
-          className="flex items-center space-x-3 cursor-pointer w-fit">
+        <div
+          // href="interaction"
+          className="flex items-center space-x-3 w-fit">
           <div className="flex items-center">
             <div className="relative w-16 h-16 overflow-hidden rounded-full">
               <div className="absolute inset-0 border-2 border-[#bdbdca] rounded-full"></div>
@@ -147,7 +153,7 @@ const AnalyticsTable: NextPage<Props> = ({ stories, analytics }) => {
           <p className="text-sm text-center max-w-[130px] break-words font-medium text-primary">
             {story?.player[0]?.layout?.title}
           </p>
-        </Link>
+        </div>
       ),
     },
     {

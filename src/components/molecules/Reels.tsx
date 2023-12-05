@@ -16,7 +16,7 @@ const Reels: React.FC = () => {
 
   return (
     <section id={TARGET_ID}>
-      <div>Loading Preview...</div>
+      <div>Loading...</div>
     </section>
   );
 };

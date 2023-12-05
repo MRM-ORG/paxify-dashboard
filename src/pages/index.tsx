@@ -3,18 +3,11 @@ import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
 import { useState } from "react";
 
 export default function HomePage() {
-  const [stores, setStores] = useState<any[]>([]);
-
-  const commonProps = {
-    user: {
-      stores,
-      setStores,
-    },
-  };
+  console.log("HOME PAGE");
 
   return (
     <ProtectedAuthWrapper>
-      <StoreSelector {...commonProps} />
+      <StoreSelector />
     </ProtectedAuthWrapper>
   );
 }

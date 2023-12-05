@@ -10,7 +10,6 @@ import axios from "axios";
 import type { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
-  const [stories, setStories] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any[]>([]);
 
   useEffect(() => {
@@ -20,21 +19,18 @@ const Page: NextPageWithLayout = () => {
         if (Array.isArray(stores)) {
           Promise.all(
             stores?.map((store) => {
-              const apiUrl = `${BACKEND_URL}/firebase/analytics/${user?.uid}/${store?.id}`;
+              const apiUrl = `${BACKEND_URL}/firebase/events/${user?.uid}/${store?.id}`;
               return axios.get(apiUrl);
             })
           ).then((response) => {
-            const newStories = response
-              ?.map((res) => res?.data?.data?.stories)
-              .flat();
-            const filteredStories = newStories.filter((story) => story);
-            setStories(filteredStories);
-            const newAnalytics = response
-              ?.map((res) => res?.data?.data?.analytics)
-              .flat();
-            const filteredAnalytics = newAnalytics?.filter(
-              (analytic) => analytic
+            const analytics = response[0]?.data?.data;
+            const filteredAnalytics = Object.keys(analytics).map(
+              (key: string) => {
+                // @ts-ignore
+                return analytics[key];
+              }
             );
+
             setAnalytics(filteredAnalytics);
           });
         }
@@ -47,11 +43,8 @@ const Page: NextPageWithLayout = () => {
   return (
     <div className="md:py-4 md:px-10">
       <OverViewTop analytics={analytics} />
-      <Instances stories={stories} analytics={analytics} />
-      {/* <Overview analytics={analytics}/>
-       <Performance analytics={analytics}/> */}
-      {/* <StoryGroup /> */}
-      <Stories stories={stories} analytics={analytics} />
+      <Instances analytics={analytics} />
+      <Stories analytics={analytics} />
     </div>
   );
 };

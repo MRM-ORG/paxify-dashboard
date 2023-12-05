@@ -19,6 +19,7 @@ const SettingPage = () => {
 
     const fetchProfile = async () => {
       const profile = await getUserProfile(user.uid);
+      console.log("profile", profile);
       setProfile(profile);
     };
 
@@ -31,7 +32,10 @@ const SettingPage = () => {
   };
 
   const handleSave = () => {
-    console.log("profile", profile);
+    const user = getUser();
+    if (!user) return;
+
+    profile.uid = user.uid;
     updateUserProfile(profile).then((res) => {
       alert("Profile updated successfully");
     });
@@ -48,12 +52,12 @@ const SettingPage = () => {
           <div className="w-full lg:w-[50%] mt-4">
             <div>
               <label className="font-[500] text-[14px] text-setting-text-color">
-                First name
+                First Name
               </label>
               <br />
               <input
                 name="firstName"
-                value={profile.firstName}
+                value={profile?.firstName}
                 type="text"
                 onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
@@ -67,6 +71,7 @@ const SettingPage = () => {
               <br />
               <input
                 type="text"
+                name="city"
                 value={profile.city}
                 onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"
@@ -81,6 +86,7 @@ const SettingPage = () => {
               <input
                 name="email"
                 type="email"
+                disabled
                 value={profile.email}
                 onChange={handleProfileChange}
                 className="setting-placeholder mt-2 border border-[#C2C2C2] p-2 pl-4 rounded-[8px] w-full h-[44px]"

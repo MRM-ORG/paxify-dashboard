@@ -82,7 +82,7 @@ const PLANS: ISubscriptionPlan[] = [
     features: [
       {
         id: 1,
-        label: "Upto 3 Stories",
+        label: "Upto 5 Stories",
       },
       {
         id: 2,
@@ -403,13 +403,11 @@ const Subscription: React.FC<IProfileProps> = () => {
         ))}
 
         {plan.prices ? (
-          <Button
-            isDisabled={isPaidPlanDisabled}
-            onClick={!isPaidPlanDisabled ? handleSubscribe : () => {}}>
+          <Button isDisabled={false} onClick={handleSubscribe}>
             Subscribe
           </Button>
         ) : (
-          <Button isDisabled={isFreePlanDisabled} onClick={() => {}}>
+          <Button isDisabled onClick={() => {}}>
             {isFreePlanDisabled ? "Your Plan" : "Subscribe"}
           </Button>
         )}
@@ -418,6 +416,7 @@ const Subscription: React.FC<IProfileProps> = () => {
   };
 
   useEffect(() => {
+    console.log("Calling useEffect");
     if (user) {
       getUserSubscriptionStatus(user?.uid)
         .then((res) => {

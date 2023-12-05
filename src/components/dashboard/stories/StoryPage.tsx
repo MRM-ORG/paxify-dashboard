@@ -1,20 +1,12 @@
-import React, { useEffect } from "react";
-import { Select, Badge, Button, Radio } from "antd";
-import {
-  EyeOutlined,
-  PicCenterOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  UnorderedListOutlined,
-  WindowsOutlined,
-} from "@ant-design/icons";
-import Stories from "./Stories";
-import { NextPage } from "next";
-const { Option } = Select;
-import { AiOutlineSearch } from "react-icons/ai";
-import { getUser } from "@/utils/auth";
 import { fetchUserStores } from "@/apiCalls/auth";
+import { getUser } from "@/utils/auth";
+import { Select } from "antd";
+import { NextPage } from "next";
+import React, { useEffect } from "react";
+import { AiOutlineSearch } from "react-icons/ai";
 import styled from "styled-components";
+import Stories from "./Stories";
+const { Option } = Select;
 
 const Flex = styled("div")`
   gap: 15px;

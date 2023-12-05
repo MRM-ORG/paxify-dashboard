@@ -196,7 +196,7 @@ const StudioCreator = () => {
       // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
-        router.push("/dashboard/");
+        router.push("/dashboard/stories");
         setOpen(false);
       });
     } catch (error) {
@@ -219,7 +219,6 @@ const StudioCreator = () => {
         setImage(res);
         showModal();
       });
-    // console.log({ img });
     // console.log(" src ", store.toJSON());
     // store.saveAsImage({ fileName: 'polotno.png' });
   };
@@ -328,16 +327,16 @@ const StudioCreator = () => {
             </Option>
           ))}
         </Select>
-        <TimePicker
+        {/* <TimePicker
           onChange={onTimeChange as any}
           defaultValue={dayjs("00:00:00", "HH:mm:ss")}
           size="large"
           style={{ marginBottom: "20px" }}
-        />
+        /> */}
         {players?.map((player: any, index: number) => (
           <div key={index}>
             <Input.TextArea
-              placeholder="Write something"
+              placeholder="Story Label"
               style={{ marginBottom: "16px" }}
               value={player?.layout?.title}
               onChange={(e) => handleTitleChange(index, e.target.value)}

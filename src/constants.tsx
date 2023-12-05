@@ -5,6 +5,7 @@ import Link from "next/link";
 const { publicRuntimeConfig } = getConfig();
 
 export const BACKEND_URL = publicRuntimeConfig.BACKEND_URL;
+export const REELS_VERSION = publicRuntimeConfig.REELS_VERSION || "latest";
 
 // Dashboard sidebar constants like Name ,icons etc
 type MenuItem = Required<MenuProps>["items"][number];
@@ -106,29 +107,29 @@ export const items: MenuItem[] = [
   //     </svg>
   //   </Link>
   // ),
-  getItem(
-    "Analytics",
-    "/dashboard/analytics",
-    <Link href="analytics">
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg">
-        <g clipPath="url(#clip0_0_719)">
-          <path d="M4.16651 2.50024H3.33317C2.4127 2.50024 1.6665 3.24644 1.6665 4.16691V15.0003C1.6665 15.9207 2.4127 16.6669 3.33317 16.6669H4.16651C5.08699 16.6669 5.83318 15.9207 5.83318 15.0003V4.16691C5.83318 3.24644 5.08699 2.50024 4.16651 2.50024Z" />
-          <path d="M10.4165 5.8335H9.58317C8.6627 5.8335 7.9165 6.57969 7.9165 7.50017V15.0002C7.9165 15.9207 8.6627 16.6669 9.58317 16.6669H10.4165C11.337 16.6669 12.0832 15.9207 12.0832 15.0002V7.50017C12.0832 6.57969 11.337 5.8335 10.4165 5.8335Z" />
-          <path d="M16.6665 4.16699H15.8332C14.9127 4.16699 14.1665 4.91319 14.1665 5.83366V15.0003C14.1665 15.9208 14.9127 16.667 15.8332 16.667H16.6665C17.587 16.667 18.3332 15.9208 18.3332 15.0003V5.83366C18.3332 4.91319 17.587 4.16699 16.6665 4.16699Z" />
-        </g>
-        <defs>
-          <clipPath id="clip0_0_719">
-            <rect width="20" height="20" fill="white" />
-          </clipPath>
-        </defs>
-      </svg>
-    </Link>
-  ),
+  // getItem(
+  //   "Analytics",
+  //   "/dashboard/analytics",
+  //   <Link href="analytics">
+  //     <svg
+  //       width="20"
+  //       height="20"
+  //       viewBox="0 0 20 20"
+  //       fill="none"
+  //       xmlns="http://www.w3.org/2000/svg">
+  //       <g clipPath="url(#clip0_0_719)">
+  //         <path d="M4.16651 2.50024H3.33317C2.4127 2.50024 1.6665 3.24644 1.6665 4.16691V15.0003C1.6665 15.9207 2.4127 16.6669 3.33317 16.6669H4.16651C5.08699 16.6669 5.83318 15.9207 5.83318 15.0003V4.16691C5.83318 3.24644 5.08699 2.50024 4.16651 2.50024Z" />
+  //         <path d="M10.4165 5.8335H9.58317C8.6627 5.8335 7.9165 6.57969 7.9165 7.50017V15.0002C7.9165 15.9207 8.6627 16.6669 9.58317 16.6669H10.4165C11.337 16.6669 12.0832 15.9207 12.0832 15.0002V7.50017C12.0832 6.57969 11.337 5.8335 10.4165 5.8335Z" />
+  //         <path d="M16.6665 4.16699H15.8332C14.9127 4.16699 14.1665 4.91319 14.1665 5.83366V15.0003C14.1665 15.9208 14.9127 16.667 15.8332 16.667H16.6665C17.587 16.667 18.3332 15.9208 18.3332 15.0003V5.83366C18.3332 4.91319 17.587 4.16699 16.6665 4.16699Z" />
+  //       </g>
+  //       <defs>
+  //         <clipPath id="clip0_0_719">
+  //           <rect width="20" height="20" fill="white" />
+  //         </clipPath>
+  //       </defs>
+  //     </svg>
+  //   </Link>
+  // ),
   // getItem(
   //   "Interactions",
   //   "/dashboard/interactions",

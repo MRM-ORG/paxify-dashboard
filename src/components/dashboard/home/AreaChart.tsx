@@ -29,8 +29,6 @@ function aggregateDataWeekly1(dailyData: DataPoint[]): DataPoint[] {
   let currentWeek: DataPoint[] = [];
   let currentWeekStartDate: Date | null = null;
 
-  console.log("DAILY DATA:", dailyData);
-
   // Sort daily data by date
   dailyData.sort(
     (a, b) => getDateTime(a.date.toString()) - getDateTime(b.date.toString())
@@ -204,9 +202,13 @@ type MyDatum = { date: Date; count: number };
 
 type Props = {
   analytics: any;
+  event: {
+    name: "Impressions" | "Reach" | "Engagement";
+    description: string;
+  };
 };
 
-const AreaChart: NextPage<Props> = ({ analytics }) => {
+const AreaChart: NextPage<Props> = ({ analytics, event }) => {
   const [checked, setChecked] = React.useState("daily");
 
   // Visualization data can come in practically any shape and size, so memoization of data into this shape is almost always necessary.
@@ -266,16 +268,12 @@ const AreaChart: NextPage<Props> = ({ analytics }) => {
     };
   }, []);
 
-  console.log("DATA:", data);
-
   return (
     <>
       <div className="flex justify-between lg:flex-row flex-col items-center">
         <div>
-          <h1 className="font-extrabold text-lg">Reach</h1>
-          <p className="font-medium text-sm">
-            Unique devices that caused an impression
-          </p>
+          <h1 className="font-extrabold text-lg">{event && event.name}</h1>
+          <p className="font-medium text-sm">{event && event.description}</p>
         </div>
         <div className="lg:mt-0 mt-7">
           <ConfigProvider

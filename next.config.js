@@ -13,6 +13,7 @@ const nextConfig = {
     STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     STRIPE_BACKEND_URL: process.env.NEXT_PUBLIC_STRIPE_BACKEND_URL,
     BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+    REELS_VERSION: process.env.NEXT_PUBLIC_REELS_VERSION,
   },
   compiler: {
     styledComponents: true,

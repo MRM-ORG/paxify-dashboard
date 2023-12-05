@@ -17,13 +17,12 @@ const Page: NextPageWithLayout = () => {
         if (Array.isArray(stores)) {
           Promise.all(
             stores?.map((store) => {
-              const apiUrl = `${BACKEND_URL}/firebase/analytics/${user?.uid}/${store?.id}`;
+              const apiUrl = `${BACKEND_URL}/firebase/allStories/${user?.uid}/${store?.id}`;
               return axios.get(apiUrl);
             })
           ).then((response) => {
-            const newStories = response
-              ?.map((res) => res?.data?.data?.stories)
-              .flat();
+            console.log("RES:", response);
+            const newStories = response?.map((res) => res?.data?.data).flat();
             const filteredStories = newStories.filter((story) => story);
             setStories(filteredStories);
           });

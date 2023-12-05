@@ -72,11 +72,46 @@ const StudioCreator = () => {
 
     if (file) {
       const fileString = await readFileAsBase64(file);
+
       updatedPlayers[index].enhancements.audio.src = fileString;
       // updatedPlayers[index].enhancements.audio.source = file;
     }
 
+    console.log("updatedPlayers", updatedPlayers);
+
     setPlayers(updatedPlayers);
+  };
+
+  const uploadAuthorImageToFirebase = async (event: any, index: number) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const storage = getStorage(firebase);
+      const storageRef = ref(storage, `images/${Date.now()}.png`);
+      const reader = new FileReader();
+      reader.onload = async (e: any) => {
+        // The result property contains the base64 string
+        const base64Image = e.target.result.split(",")[1];
+
+        try {
+          await uploadString(storageRef, base64Image, "base64", {
+            contentType: "image/png",
+          });
+          const downloadURL = await getDownloadURL(storageRef);
+          const updatedPlayers = [...players];
+          updatedPlayers[index].layout.author = downloadURL;
+
+          setPlayers(updatedPlayers);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
+
+        // Pass the base64 image to the onChange event handler
+      };
+
+      // Read the file as a data URL
+      reader.readAsDataURL(file);
+    }
   };
   store.setSize(1080, 1920, true);
   store.setScale(0.4);
@@ -255,7 +290,7 @@ const StudioCreator = () => {
       // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
-        router.push("/dashboard/");
+        router.push("/dashboard/stories");
         setOpen(false);
       });
     } catch (error) {
@@ -364,16 +399,16 @@ const StudioCreator = () => {
             </Option>
           ))}
         </Select>
-        <TimePicker
+        {/* <TimePicker
           onChange={onTimeChange as any}
           defaultValue={dayjs("00:00:00", "HH:mm:ss")}
           size="large"
           style={{ marginBottom: "20px" }}
-        />
+        /> */}
         {players?.map((player: any, index: number) => (
           <div key={index}>
             <Input.TextArea
-              placeholder="Write something"
+              placeholder="Story Heading..."
               style={{ marginBottom: "16px" }}
               value={player?.layout?.title}
               onChange={(e) => handleTitleChange(index, e.target.value)}
@@ -381,17 +416,28 @@ const StudioCreator = () => {
             <h3>
               <b>CTA</b>
             </h3>
+            <div className="flex gap-3">
+              <Input
+                placeholder="CTA Text"
+                style={{ width: "100%", marginBottom: "16px" }}
+                value={player?.layout?.cta?.text}
+                onChange={(e) => handleCtaTitleChange(index, e.target.value)}
+              />
+              <Input
+                placeholder="CTA Link"
+                style={{ width: "100%", marginBottom: "16px" }}
+                value={player?.layout?.cta?.link}
+                onChange={(e) => handleCtaLinkChange(index, e.target.value)}
+              />
+            </div>
+            <h3>
+              <b>Author Image</b>
+            </h3>
             <Input
-              placeholder="CTA Text"
+              type="file"
+              accept="image/*"
+              onChange={(event) => uploadAuthorImageToFirebase(event, index)}
               style={{ width: "100%", marginBottom: "16px" }}
-              value={player?.layout?.cta?.text}
-              onChange={(e) => handleCtaTitleChange(index, e.target.value)}
-            />
-            <Input
-              placeholder="CTA Link"
-              style={{ width: "100%", marginBottom: "16px" }}
-              value={player?.layout?.cta?.link}
-              onChange={(e) => handleCtaLinkChange(index, e.target.value)}
             />
             <h3>
               <b>Audio</b>

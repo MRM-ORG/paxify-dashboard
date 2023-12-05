@@ -1,4 +1,5 @@
 import { fetchUserStores } from "@/apiCalls/auth";
+import { REELS_VERSION } from "@/constants";
 import { getUser } from "@/utils/auth";
 
 interface CustomWindow extends Window {
@@ -13,10 +14,12 @@ export const loadReels = async (id: string) => {
 
   const stores = await fetchUserStores(user.uid);
 
+  console.log("Using Reels Version:", REELS_VERSION);
+
   const loadReelsScript = () => {
     const reelsScript = document.createElement("script");
     reelsScript.id = "reels-script";
-    reelsScript.src = `https://cdn.jsdelivr.net/gh/paxify-llc/builds@main/reelife/paxify-reelife.min.js`;
+    reelsScript.src = `https://cdn.jsdelivr.net/gh/paxify-llc/builds@${REELS_VERSION}/reelife/paxify-reelife.min.js`;
 
     document.body.appendChild(reelsScript);
 
@@ -39,7 +42,7 @@ export const loadReels = async (id: string) => {
     stylesheet.setAttribute("rel", "stylesheet");
     stylesheet.setAttribute(
       "href",
-      `https://cdn.jsdelivr.net/gh/paxify-llc/builds@main/reelife/paxify-reelife.min.css`
+      `https://cdn.jsdelivr.net/gh/paxify-llc/builds@${REELS_VERSION}/reelife/paxify-reelife.min.css`
     );
     document.head.appendChild(stylesheet);
   };

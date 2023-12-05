@@ -60,7 +60,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     getUserSubscriptionStatus(user?.uid)
       .then((res) => {
         // console.log("STORES:", res);
-        console.log("SUBSCRIPTION:", res.plan.isActive);
         setHasSubscription(res.plan.isActive);
         if (res.plan.isActive) {
           fetchUserStores(user?.uid)

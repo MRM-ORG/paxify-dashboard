@@ -4,16 +4,14 @@ import { NextPage } from "next";
 import { useRef } from "react";
 
 type Props = {
-  stories: any;
   analytics: any;
 };
 
 const { Countdown } = Statistic;
-const Stories: NextPage<Props> = ({ stories, analytics }) => {
+const Stories: NextPage<Props> = ({ analytics }) => {
   const impressions = analytics.filter(
     (obj: { name: string }) => obj.name === "reels_init"
   );
-  // console.log({ impressions });
   const scrollContainerRef = useRef<any>(null);
   const scrollToLeft = () => {
     if (scrollContainerRef.current) {
@@ -81,16 +79,6 @@ const Stories: NextPage<Props> = ({ stories, analytics }) => {
     <div className="mt-10 relative bg-white rounded-lg py-4 md:px-5">
       <div className="flex md:flex-row flex-col justify-center md:justify-between items-center flex-wrap">
         <h1 className="font-bold text-lg">Stories Preview</h1>
-        {/* <div className="space-x-2">
-          <Select
-            className="md:w-auto w-[140px]"
-            defaultValue={"Your stories"}
-          />
-          <Select
-            className="md:w-auto w-[140px]"
-            defaultValue={"Impressioin"}
-          />
-        </div> */}
       </div>
 
       <Reels />

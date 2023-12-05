@@ -28,11 +28,10 @@ const Story = ({ img, text }: { img: string; text: string }) => {
 };
 
 type Props = {
-  stories: any;
   analytics: any;
 };
 
-const Instances: NextPage<Props> = ({ stories, analytics }) => {
+const Instances: NextPage<Props> = ({ analytics }) => {
   return (
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-5 mt-10">
