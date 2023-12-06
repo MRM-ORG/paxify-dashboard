@@ -1,4 +1,5 @@
 import {
+  deleteStore,
   fetchUserStores,
   getStoreVerificationStatus,
   registerStore,
@@ -20,6 +21,7 @@ import Copy from "../../../atoms/icons/copy";
 import CopyDone from "../../../atoms/icons/copyDone";
 import Switch from "../../../atoms/Switch";
 import Delete from "../../../atoms/icons/delete";
+import SecondaryButton from "@/components/atoms/buttons/SecondaryButton";
 
 interface IStoreSelectorProps {}
 
@@ -97,6 +99,11 @@ const Code = styled.code`
   max-width: 90%;
 `;
 
+const Heading = styled.h1`
+  font-size: 24px;
+  font-weight: 600;
+`;
+
 const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   const [stores, setStores] = useState<any>([]);
   const [activeStore, setActiveStore] = useState<any>();
@@ -105,7 +112,8 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
-  const [isFirstStep, setIsFirstStep] = useState(true);
+  const [shopify, setIsShopify] = useState(true);
+  const [deleteStoreModal, setDeleteStoreModal] = useState(false);
 
   let VERIFICATION_SCRIPT_SHOPIFY: any = null;
   let VERIFICATION_SCRIPT_MANUAL: any = null;
@@ -114,8 +122,8 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
     const signInUser = JSON.parse(localStorage.getItem("user") as string);
     const { uid } = signInUser;
 
-    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js" }} defer="defer"></script>`;
-    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds/reelife/auth.js"></script>`;
+    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/auth.js" }} defer="defer"></script>`;
+    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/auth.js"></script>`;
   } catch (error) {
     console.error(error);
     alert("An error occured, please try again later.");
@@ -133,6 +141,17 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
         setIsLoading(false);
       })
       .finally(() => setIsLoading(false));
+  };
+
+  const handleStoreDeletion = () => {
+    const signInUser = JSON.parse(localStorage.getItem("user") as string);
+    const { uid } = signInUser;
+
+    if (!uid || !activeStore?.id) return;
+    deleteStore(uid, activeStore.id).then(() => {
+      setStores(stores.filter((store: any) => store.id !== activeStore.id));
+      setDeleteStoreModal(false);
+    });
   };
 
   useEffect(() => {
@@ -281,16 +300,21 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
                 <Tooltip
                   onClick={() => {
                     setActiveStore(store);
-                    setIsFirstStep(true);
+                    setIsShopify(true);
                     setShowInstructions(true);
                   }}
                 />
               )}
             </Row>
-            <Switch id={store.id} toggled={store.verified} onClick={() => {}}>
+            {/* <Switch id={store.id} toggled={store.verified} onClick={() => {}}>
               Status
-            </Switch>
-            <Delete onClick={() => {}} />
+            </Switch> */}
+            <Delete
+              onClick={() => {
+                setActiveStore(store);
+                setDeleteStoreModal(true);
+              }}
+            />
           </Store>
         ))}
       </Container>
@@ -301,29 +325,52 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
           <h2>Instructions</h2>
 
           <TabbedSelector
-            tabs={["Step 1. Verify", "Step 2. Integrate Reelife"]}
-            onChange={() => setIsFirstStep(!isFirstStep)}
+            tabs={["Shopify Store", "Other Store - Manual Installation"]}
+            onChange={() => setIsShopify(!shopify)}
           />
 
-          {!isFirstStep && (
+          {!shopify && (
             <>
               <p>
-                To verify domain ownership, please add the following script to
-                the <b> theme.liquid</b> file. Don’t add more than one script to
-                your store.
+                You can now seamlessly integrate Reelife in our Shopify Stores.
+                Just head over to Shopify App Store and download Reelife
+                Companion App.{" "}
+                <a target="_blank" href="https://apps.shopify.com/">
+                  Direct Link
+                </a>
               </p>
-              <Script onClick={() => setIsCopied(true)}>
-                <Code>{VERIFICATION_SCRIPT_SHOPIFY}</Code>
-                {!isCopied ? <Copy /> : <CopyDone />}
-              </Script>
+              <p>
+                Once you have installed the app, you can verify your domain
+                ownership by clicking on the button below.
+              </p>
               <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
                 Verify
               </PrimaryButton>
             </>
           )}
 
-          {isFirstStep && (
+          {shopify && (
             <>
+              <p>
+                At the moment, installing Reelife by Paxify in Non-Shopify
+                stores needs to be done manually.
+                <br /> The process needs to be done by someone who has access to
+                the store codebase.
+                <br /> You can contact us at our{" "}
+                <a href="mailto:support@paxify.io">
+                  <b>Offical Support</b>{" "}
+                </a>{" "}
+                for FREE consultation and assistance.
+              </p>
+              {/* <p>
+                To verify domain ownership, please add the following script to
+                the <b> head</b> tag. Don’t add more than one script to your
+                store.
+              </p>
+              <Script onClick={() => setIsCopied(true)}>
+                <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
+                {!isCopied ? <Copy /> : <CopyDone />}
+              </Script>
               <p>
                 Now that you have verified your domain ownership, please
                 download the Reelife liquid file and add it to your store.
@@ -339,6 +386,9 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
                   <b>support@paxify.io</b>
                 </a>
               </p>
+              <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
+                Verify
+              </PrimaryButton> */}
             </>
           )}
 
@@ -365,6 +415,32 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
               </>
             </Success>
           )}
+        </Instructions>
+      </ModalComponent>
+      <ModalComponent
+        isVisible={deleteStoreModal}
+        onClose={() => setDeleteStoreModal(false)}>
+        <Instructions>
+          <Heading>Are you sure?</Heading>
+          <p>
+            Do you really want to delete<b>({activeStore?.name})</b>? All your
+            associated stories, analytics and other data will be lost. This
+            action cannot be undone.
+          </p>
+          <Row gap="20px">
+            <PrimaryButton
+              background={THEME.danger}
+              width="200px"
+              onClick={handleStoreDeletion}>
+              Delete
+            </PrimaryButton>
+            <PrimaryButton
+              width="200px"
+              background={THEME.primary}
+              onClick={() => setDeleteStoreModal(false)}>
+              Cancel
+            </PrimaryButton>
+          </Row>
         </Instructions>
       </ModalComponent>
       <LoadingPage isLoading={isLoading} />

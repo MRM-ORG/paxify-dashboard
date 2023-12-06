@@ -122,3 +122,20 @@ export async function updateUserProfile(profile: any): Promise<any> {
       return Promise.reject(result);
     });
 }
+
+export async function deleteStore(uid: string, storeId: string): Promise<any> {
+  const API = `${BACKEND_URL}/firebase/delete-store/${uid}/${storeId}`;
+
+  return axios
+    .delete(API)
+    .then((response) => {
+      return response.data;
+    })
+    .then((responseJson) => {
+      return Promise.resolve(responseJson.data);
+    })
+    .catch((error) => {
+      const result = error.result;
+      return Promise.reject(result);
+    });
+}

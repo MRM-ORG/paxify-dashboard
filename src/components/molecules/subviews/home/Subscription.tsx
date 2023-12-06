@@ -563,8 +563,9 @@ const Subscription: React.FC<IProfileProps> = () => {
               </a>
             </p>
             <p>
-              Your subscription will be cancelled at the end of the current
-              billing cycle and you will be downgraded to the free plan.
+              Your subscription will be cancelled right away and you will be
+              downgraded to the free plan. You can contact us to process any
+              refunds (if applicable).
             </p>
           </Row>
           <Spacer height={20} />

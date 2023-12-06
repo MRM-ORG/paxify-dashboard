@@ -76,7 +76,7 @@ const Stories: NextPage<Props> = ({ analytics }) => {
   }
 
   return (
-    <div className="mt-10 relative bg-white rounded-lg py-4 md:px-5">
+    <div className="mt-10 relative min-h-[300px] bg-white rounded-lg py-4 md:px-5">
       <div className="flex md:flex-row flex-col justify-center md:justify-between items-center flex-wrap">
         <h1 className="font-bold text-lg">Stories Preview</h1>
       </div>

@@ -19,7 +19,7 @@ export const loadReels = async (id: string) => {
   const loadReelsScript = () => {
     const reelsScript = document.createElement("script");
     reelsScript.id = "reels-script";
-    reelsScript.src = `https://cdn.jsdelivr.net/gh/paxify-llc/builds@${REELS_VERSION}/reelife/paxify-reelife.min.js`;
+    reelsScript.src = `https://cdn.jsdelivr.net/gh/paxify-llc/builds@${REELS_VERSION}/reelife/paxify-reelife.js`;
 
     document.body.appendChild(reelsScript);
 
@@ -27,8 +27,9 @@ export const loadReels = async (id: string) => {
       if (typeof customizedWindow.ReelsInitializer === "function") {
         // @ts-ignore
         const reels = new ReelsInitializer({
-          elementId: id,
           uid: user.uid,
+          elementId: id,
+          isPreviewMode: true,
           storeId: stores[0].id,
         });
         reels.render();

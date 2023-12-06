@@ -36,7 +36,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const screens = useBreakpoint();
-  const [hasStores, setHasStores] = useState(true);
+  const [hasStores, setHasStores] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
@@ -57,23 +57,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setIsLoading(true);
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    getUserSubscriptionStatus(user?.uid)
-      .then((res) => {
-        // console.log("STORES:", res);
-        setHasSubscription(res.plan.isActive);
-        if (res.plan.isActive) {
-          fetchUserStores(user?.uid)
-            .then((res) => {
-              setHasStores(JSON.stringify(res) !== "{}");
-            })
-            .finally(() => {
-              setIsLoading(false);
-            });
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    getUserSubscriptionStatus(user?.uid).then((res) => {
+      // console.log("STORES:", res);
+      setHasSubscription(res.plan.isActive);
+      if (res.plan.isActive) {
+        fetchUserStores(user?.uid)
+          .then((stores) => {
+            if (Array.isArray(stores)) {
+              setHasStores(stores[0]?.verified);
+            }
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
+    });
   }, []);
 
   if (isLoading) {
@@ -137,17 +135,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </Layout>
         </Layout>
       )}
-      <ModalComponent isVisible={!hasStores} onClose={() => {}}>
+      <ModalComponent isVisible={!hasStores && !isLoading} onClose={() => {}}>
         <Container>
           <h1>No Store Found</h1>
           <p>
-            You don&apos;t have any store. Please create a store to continue
-            using Reellife.
+            Sorry we couldn&apos;t find any registered store. If you believe you
+            have created one, please double check to see if it is verified.
           </p>
           <Button
             type="primary"
             onClick={() => navigateNewPage(DASHBOARD_STORES())}>
-            Create Store
+            Back to Stores Page
           </Button>
         </Container>
       </ModalComponent>

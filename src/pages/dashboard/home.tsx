@@ -11,11 +11,15 @@ import type { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
   const [analytics, setAnalytics] = useState<any[]>([]);
+  const [hasStores, setHasStores] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     fetchUserStores(user?.uid)
       .then((stores) => {
+        if (Array.isArray(stores)) {
+          setHasStores(stores[0]?.verified);
+        }
         if (Array.isArray(stores)) {
           Promise.all(
             stores?.map((store) => {
@@ -24,6 +28,7 @@ const Page: NextPageWithLayout = () => {
             })
           ).then((response) => {
             const analytics = response[0]?.data?.data;
+            if (!analytics) return;
             const filteredAnalytics = Object.keys(analytics).map(
               (key: string) => {
                 // @ts-ignore
@@ -39,6 +44,10 @@ const Page: NextPageWithLayout = () => {
         console.error(err);
       });
   }, []);
+
+  if (!hasStores) {
+    return null;
+  }
 
   return (
     <div className="md:py-4 md:px-10">

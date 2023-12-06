@@ -86,7 +86,8 @@ const StudioCreator = () => {
     const file = event.target.files?.[0];
 
     if (file) {
-      const storage = getStorage(firebase);
+      const storage = getStorage();
+      console.log("STORAGE:", storage);
       const storageRef = ref(storage, `images/${Date.now()}.png`);
       const reader = new FileReader();
       reader.onload = async (e: any) => {
