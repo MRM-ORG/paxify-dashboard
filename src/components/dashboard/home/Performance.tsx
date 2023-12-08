@@ -22,6 +22,7 @@ const groupByDate = (analytics: any) => {
   const dateCounts: Record<string, number> = {};
 
   analytics?.forEach((obj: any) => {
+    if (!obj.payload) return;
     // Convert the timestamp to a date
     const date = new Date(obj.payload.time);
     const dateString = date.toLocaleDateString(); // Convert date to a string
