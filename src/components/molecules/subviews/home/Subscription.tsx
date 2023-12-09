@@ -40,7 +40,7 @@ interface ISubscriptionPlan {
         value: string;
       };
     };
-    yearly: {
+    quarterly: {
       lookupKey: string;
       unitPrice: number;
       interval: {
@@ -60,16 +60,16 @@ const INTERVALS = {
     label: "Month",
     value: "monthly",
   },
-  yearly: {
-    label: "Year",
-    value: "yearly",
+  quarterly: {
+    label: "Quarter",
+    value: "quarterly",
   },
 };
 
 const SUBSCRIPTION_INTERVALS = {
   none: "-",
   month: "Monthly",
-  year: "Yearly",
+  quarter: "Quarterly",
 };
 
 const PLANS: ISubscriptionPlan[] = [
@@ -93,6 +93,10 @@ const PLANS: ISubscriptionPlan[] = [
         label: "2K Page Views per month",
       },
       {
+        id: 5,
+        label: "Personalized Installation Support",
+      },
+      {
         id: 4,
         label: "Paxify Branding",
       },
@@ -105,14 +109,14 @@ const PLANS: ISubscriptionPlan[] = [
     highlight: true,
     prices: {
       monthly: {
-        lookupKey: "basic_plan_monthly",
+        lookupKey: "reelife-starter-standard-monthly",
         unitPrice: 14.99,
         interval: INTERVALS.monthly,
       },
-      yearly: {
-        unitPrice: 149.99,
-        interval: INTERVALS.yearly,
-        lookupKey: "basic_plan_yearly",
+      quarterly: {
+        unitPrice: 39.99,
+        interval: INTERVALS.quarterly,
+        lookupKey: "reelife-starter-standard-quarterly",
       },
     },
     features: [
@@ -129,6 +133,10 @@ const PLANS: ISubscriptionPlan[] = [
         label: "In-Depth Analytics",
       },
       {
+        id: 5,
+        label: "Personalized Installation Support",
+      },
+      {
         id: 4,
         label: "No Paxify Branding",
       },
@@ -141,14 +149,14 @@ const PLANS: ISubscriptionPlan[] = [
     highlight: false,
     prices: {
       monthly: {
-        lookupKey: "pro_plan_monthly",
+        lookupKey: "reelife-professional-standard-monthly",
         unitPrice: 24.99,
         interval: INTERVALS.monthly,
       },
-      yearly: {
-        unitPrice: 249.99,
-        interval: INTERVALS.yearly,
-        lookupKey: "pro_plan_yearly_1",
+      quarterly: {
+        unitPrice: 64.99,
+        interval: INTERVALS.quarterly,
+        lookupKey: "reelife-professional-standard-quarterly",
       },
     },
     features: [
@@ -435,7 +443,7 @@ const Subscription: React.FC<IProfileProps> = () => {
 
     getCustomerSubscriptions(user?.uid as string, userSubscription.stripeId)
       .then((res) => {
-        // console.log("res", res);
+        console.log("Subscriptions:", res.data);
         setActiveSubscriptions(res.data);
       })
       .finally(() => setHasCustomerSubscription(true));
@@ -485,7 +493,7 @@ const Subscription: React.FC<IProfileProps> = () => {
                   key={plan.id}
                   plan={plan}
                   interval={
-                    showMonthlyPlans ? INTERVALS.monthly : INTERVALS.yearly
+                    showMonthlyPlans ? INTERVALS.monthly : INTERVALS.quarterly
                   }
                   activeSubscription={userSubscription}
                 />
@@ -501,37 +509,29 @@ const Subscription: React.FC<IProfileProps> = () => {
               <div>Plan</div>
               <div>Start Date</div>
               <div>Renewal Date</div>
-              <div>Amount</div>
-              <div>Interval</div>
+              <div>Charge</div>
+              {/* <div>Interval</div> */}
             </TableHeader>
             {activeSubscriptions?.map((subscription: any) => {
               const startDate = new Date(
                 subscription.current_period_start * 1000
-              );
+              ).toDateString();
               const endDate =
                 subscription.current_period_end &&
-                new Date(subscription.current_period_end * 1000);
+                new Date(subscription.current_period_end * 1000).toDateString();
 
               return (
                 <SubscriptionCard key={subscription.id}>
                   <div>{subscription.plan.name}</div>
-                  <div>
-                    {startDate.getDate()}/{startDate.getMonth() + 1}/
-                    {startDate.getFullYear()}
-                  </div>
-                  {endDate && (
-                    <div>
-                      {endDate.getDate()}/{endDate.getMonth() + 1}/
-                      {endDate.getFullYear()}
-                    </div>
-                  )}
+                  <div>{startDate}</div>
+                  {endDate && <div>{endDate}</div>}
                   {!endDate && <div>-</div>}
                   <div>
                     ${Number(subscription.plan.amount / 100).toFixed(2)}
                   </div>
                   <div>
                     {/* @ts-ignore */}
-                    {SUBSCRIPTION_INTERVALS[subscription.plan.interval]}
+                    {/* {SUBSCRIPTION_INTERVALS[subscription.plan.interval]} */}
                   </div>
                   {endDate && (
                     <CancelButton
@@ -563,9 +563,9 @@ const Subscription: React.FC<IProfileProps> = () => {
               </a>
             </p>
             <p>
-              Your subscription will be cancelled right away and you will be
-              downgraded to the free plan. You can contact us to process any
-              refunds (if applicable).
+              <b>Note: </b>Your subscription will be cancelled right away and
+              you will be downgraded to the free plan. You can contact us to
+              process any refunds (if applicable).
             </p>
           </Row>
           <Spacer height={20} />

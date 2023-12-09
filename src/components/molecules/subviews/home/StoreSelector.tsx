@@ -423,9 +423,9 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
         <Instructions>
           <Heading>Are you sure?</Heading>
           <p>
-            Do you really want to delete<b>({activeStore?.name})</b>? All your
-            associated stories, analytics and other data will be lost. This
-            action cannot be undone.
+            Do you really want to delete the store <b>{activeStore?.name}</b>?
+            All your associated stories, analytics and other data will be lost.
+            This action cannot be undone.
           </p>
           <Row gap="20px">
             <PrimaryButton
