@@ -28,10 +28,10 @@ const Story = ({ img, text }: { img: string; text: string }) => {
 };
 
 type Props = {
-  analytics: any;
+  summarizedEvents: any;
 };
 
-const Instances: NextPage<Props> = ({ analytics }) => {
+const Instances: NextPage<Props> = ({ summarizedEvents }) => {
   return (
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-5 mt-10">
@@ -105,7 +105,7 @@ const Instances: NextPage<Props> = ({ analytics }) => {
           </div>
         </Card> */}
         <div className="col-span-12">
-          <Performance analytics={analytics} />
+          <Performance summarizedEvents={summarizedEvents} />
         </div>
       </div>
     </div>

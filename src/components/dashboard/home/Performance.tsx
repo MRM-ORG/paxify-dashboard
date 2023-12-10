@@ -15,56 +15,88 @@ const Extra = (
 );
 
 type Props = {
-  analytics: any;
+  summarizedEvents: any;
 };
 
-const groupByDate = (analytics: any) => {
-  const dateCounts: Record<string, number> = {};
+// const groupByDate = (analytics: any) => {
+//   const dateCounts: Record<string, number> = {};
 
-  analytics?.forEach((obj: any) => {
-    if (!obj.payload) return;
-    // Convert the timestamp to a date
-    const date = new Date(obj.payload.time);
-    const dateString = date.toLocaleDateString(); // Convert date to a string
+//   analytics?.forEach((obj: any) => {
+//     if (!obj.payload) return;
+//     // Convert the timestamp to a date
+//     const date = new Date(obj.payload.time);
+//     const dateString = date.toLocaleDateString(); // Convert date to a string
 
-    // Check if the date exists in the dateCounts object
-    if (dateCounts[dateString]) {
-      dateCounts[dateString]++;
-    } else {
-      dateCounts[dateString] = 1;
-    }
-  });
+//     // Check if the date exists in the dateCounts object
+//     if (dateCounts[dateString]) {
+//       dateCounts[dateString]++;
+//     } else {
+//       dateCounts[dateString] = 1;
+//     }
+//   });
 
-  // Create a new array of objects with date and count
-  return Object.entries(dateCounts).map(([date, count]) => ({
-    date,
-    count,
-  }));
+//   // Create a new array of objects with date and count
+//   return Object.entries(dateCounts).map(([date, count]) => ({
+//     date,
+//     count,
+//   }));
+// };
+
+const groupEventsByKeys = (analytics: any, key: string) => {
+  return Object.keys(analytics)
+    .map((year) => {
+      const months = analytics[year];
+      return Object.keys(months).map((month) => {
+        const days = months[month];
+        return Object.keys(days).map((day) => {
+          const dayEvents = days[day];
+          return {
+            date: `${day}/${Number(month) + 1}/${year}`,
+            count: dayEvents[key],
+          };
+        });
+      });
+    })
+    .flat(2);
 };
 
-const Performance: NextPage<Props> = ({ analytics }) => {
-  const impressionAnalytics = analytics.filter(
-    (obj: { event: string }) => obj.event === "reels_init"
-  );
+const Performance: NextPage<Props> = ({ summarizedEvents }) => {
+  // const viewAnalytics = analytics.filter(
+  //   (obj: { event: string }) => obj.event === "reels_story_viewed"
+  // );
 
-  const viewAnalytics = analytics.filter(
-    (obj: { event: string }) => obj.event === "reels_story_viewed"
-  );
-
-  const interactionAnalytics = analytics.filter(
-    (obj: { event: string }) =>
-      obj.event === "cta_clicked" || obj.event === "reels_interacted"
-  );
+  // const interactionAnalytics = analytics.filter(
+  //   (obj: { event: string }) =>
+  //     obj.event === "cta_clicked" || obj.event === "reels_interacted"
+  // );
 
   const screens = useBreakpoint();
 
   const [plan, setPlan] = useState("Basic");
-  const impressions = groupByDate(impressionAnalytics);
-  const viewEvents = groupByDate(viewAnalytics);
-  const interactionEvents = groupByDate(interactionAnalytics);
+  // const impressions = groupByDate(impressionAnalytics);
+  // const viewEvents = groupByDate(viewAnalytics);
+  // const interactionEvents = groupByDate(interactionAnalytics);
 
-  const reach = viewEvents.map((viewEvent) => {
-    const impression = impressions.find(
+  const impressionsSummarized = groupEventsByKeys(summarizedEvents, "init");
+  const viewsSummarized = groupEventsByKeys(summarizedEvents, "storyViews");
+
+  const likesSummarized = groupEventsByKeys(summarizedEvents, "likes");
+  const sharesSummarized = groupEventsByKeys(summarizedEvents, "shares");
+
+  // Merge likes and shares such that their counts of the same date are added together
+  const interactionSummarized = likesSummarized.map((like) => {
+    const share = sharesSummarized.find(
+      (share) => share.date === like.date
+    ) || { count: 0 };
+
+    return {
+      date: like.date,
+      count: like.count + share.count,
+    };
+  });
+
+  const reach = viewsSummarized.map((viewEvent) => {
+    const impression = impressionsSummarized.find(
       (impression) => impression.date === viewEvent.date
     );
 
@@ -74,8 +106,8 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     };
   });
 
-  const engagement = interactionEvents.map((interactionEvent) => {
-    const viewEvent = viewEvents.find(
+  const engagement = interactionSummarized.map((interactionEvent) => {
+    const viewEvent = viewsSummarized.find(
       (viewEvent) => viewEvent.date === interactionEvent.date
     );
 
@@ -93,6 +125,7 @@ const Performance: NextPage<Props> = ({ analytics }) => {
     });
   }, []);
 
+  // TODO: To be removed later when we have real data
   const ANALYTICS_SUMMARY = {
     impressions: {
       daily: {
@@ -119,11 +152,11 @@ const Performance: NextPage<Props> = ({ analytics }) => {
       number: ANALYTICS_SUMMARY.impressions.daily.current,
       label: `${ANALYTICS_SUMMARY.impressions.daily.change}%`,
       increase: true,
-      children: impressions ? (
+      children: impressionsSummarized ? (
         <div className="h-[300px] w-full">
-          {!!impressions.length && (
+          {!!impressionsSummarized.length && (
             <AreaChart
-              analytics={impressions}
+              analytics={impressionsSummarized}
               event={{
                 name: "Impressions",
                 description:
@@ -131,7 +164,7 @@ const Performance: NextPage<Props> = ({ analytics }) => {
               }}
             />
           )}
-          {!impressions?.length && <div>Loading...</div>}
+          {!impressionsSummarized?.length && <div>Loading...</div>}
         </div>
       ) : null,
       link: false,

@@ -332,13 +332,11 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
           {!shopify && (
             <>
               <p>
-                You can now seamlessly integrate Reelife in our Shopify Stores.
-                Just head over to Shopify App Store and download Reelife
-                Companion App.{" "}
-                <a target="_blank" href="https://apps.shopify.com/">
-                  Direct Link
-                </a>
+                You can now seamlessly integrate Reelife in your Shopify Online
+                Store 2.0. Please head over to Shopify Theme Customizer follow
+                these steps:
               </p>
+              <p>Step 1:</p>
               <p>
                 Once you have installed the app, you can verify your domain
                 ownership by clicking on the button below.

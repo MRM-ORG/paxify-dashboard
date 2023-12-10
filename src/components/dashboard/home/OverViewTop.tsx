@@ -7,31 +7,45 @@ import { getUserSubscriptionStatus } from "@/apiCalls/auth";
 import { getUser } from "@/utils/auth";
 
 type Props = {
-  analytics: any;
+  summarizedEvents: any;
 };
 
-const OverViewTop: NextPage<Props> = ({ analytics }) => {
+const countEvents = (events: any, key: string) => {
+  return Object.keys(events).reduce((acc, year) => {
+    const months = events[year];
+    Object.keys(months).forEach((month) => {
+      const days = months[month];
+      Object.keys(days).forEach((day) => {
+        const dayEvents = days[day];
+        acc += dayEvents[key];
+      });
+    });
+    return acc;
+  }, 0);
+};
+
+const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
   const [plan, setPlan] = useState("Basic");
+
+  const totalImpressions = useMemo(() => {
+    return countEvents(summarizedEvents, "init");
+  }, [summarizedEvents]);
+
   const totalStoryViews = useMemo(() => {
-    return analytics.filter(
-      (obj: { event: string }) => obj.event === "reels_story_viewed"
-    ).length;
-  }, [analytics]);
+    return countEvents(summarizedEvents, "storyViews");
+  }, [summarizedEvents]);
 
-  const totalStoryInit = useMemo(() => {
-    return analytics.filter(
-      (obj: { event: string }) => obj.event === "reels_init"
-    ).length;
-  }, [analytics]);
-
+  // TODO: For Pro plan, this will be broken down into likes, shares to be shown individually
   const totalInteractions = useMemo(() => {
-    return analytics.filter(
-      (obj: { event: string }) =>
-        obj.event === "cta_clicked" || obj.event === "reels_interacted"
-    ).length;
-  }, [analytics]);
+    return (
+      countEvents(summarizedEvents, "likes") +
+      countEvents(summarizedEvents, "shares")
+    );
+  }, [summarizedEvents]);
 
-  const reachRate = totalStoryViews / totalStoryInit;
+  console.log("ALL ANALYTICS", summarizedEvents);
+
+  const reachRate = totalStoryViews / totalImpressions;
   const engagementRate = totalInteractions / totalStoryViews;
 
   useEffect(() => {
@@ -69,7 +83,7 @@ const OverViewTop: NextPage<Props> = ({ analytics }) => {
 
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
-              {totalStoryInit.toLocaleString()}
+              {totalImpressions.toLocaleString()}
             </h1>
 
             <div className="flex items-center mt-3 gap-1">

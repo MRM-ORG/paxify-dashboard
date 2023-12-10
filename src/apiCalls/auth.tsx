@@ -52,6 +52,26 @@ export async function fetchUserStores(uid: string): Promise<any> {
     });
 }
 
+export async function fetchSummarizedEvents(
+  uid: string,
+  storeId: string
+): Promise<any> {
+  const API = `${BACKEND_URL}/firebase/eventSummaries/${uid}/${storeId}`;
+
+  return axios
+    .get(API)
+    .then((response) => {
+      return response.data;
+    })
+    .then((responseJson) => {
+      return Promise.resolve(responseJson);
+    })
+    .catch((error) => {
+      const result = error.result;
+      return Promise.reject(result);
+    });
+}
+
 export async function getStoreVerificationStatus(
   uid: string,
   storeId: string

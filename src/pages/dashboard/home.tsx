@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
 
-import { fetchUserStores } from "@/apiCalls/auth";
+import { fetchSummarizedEvents, fetchUserStores } from "@/apiCalls/auth";
 import DashboardLayout from "@/components/dashboard/Layout";
 import Instances from "@/components/dashboard/home/Instances";
 import OverViewTop from "@/components/dashboard/home/OverViewTop";
@@ -10,8 +10,8 @@ import axios from "axios";
 import type { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
-  const [analytics, setAnalytics] = useState<any[]>([]);
   const [hasStores, setHasStores] = useState(false);
+  const [summarizedEvents, setSummarizedEvents] = useState<any[]>([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -20,25 +20,10 @@ const Page: NextPageWithLayout = () => {
         if (Array.isArray(stores)) {
           setHasStores(stores[0]?.verified);
         }
-        if (Array.isArray(stores)) {
-          Promise.all(
-            stores?.map((store) => {
-              const apiUrl = `${BACKEND_URL}/firebase/events/${user?.uid}/${store?.id}`;
-              return axios.get(apiUrl);
-            })
-          ).then((response) => {
-            const analytics = response[0]?.data?.data;
-            if (!analytics) return;
-            const filteredAnalytics = Object.keys(analytics).map(
-              (key: string) => {
-                // @ts-ignore
-                return analytics[key];
-              }
-            );
 
-            setAnalytics(filteredAnalytics);
-          });
-        }
+        fetchSummarizedEvents(user?.uid, stores[0]?.id).then((res) => {
+          setSummarizedEvents(res.data);
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -51,9 +36,9 @@ const Page: NextPageWithLayout = () => {
 
   return (
     <div className="md:py-4 md:px-10">
-      <OverViewTop analytics={analytics} />
-      <Instances analytics={analytics} />
-      <Stories analytics={analytics} />
+      <OverViewTop summarizedEvents={summarizedEvents} />
+      <Instances summarizedEvents={summarizedEvents} />
+      <Stories />
     </div>
   );
 };
