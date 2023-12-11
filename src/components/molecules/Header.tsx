@@ -15,6 +15,7 @@ import Profile from "../atoms/icons/profile";
 import Stores from "../atoms/icons/stores";
 import { LogoContainer } from "../pages/Login";
 import Image from "next/image";
+import Help from "../atoms/icons/help";
 
 interface IHeaderProps {
   activeTab: number;
@@ -127,6 +128,11 @@ const SidebarOptions = [
     id: 3,
     title: "Subscriptions",
     icon: <Card />,
+  },
+  {
+    id: 5,
+    title: "Instructions",
+    icon: <Help />,
   },
 ];
 

@@ -8,6 +8,8 @@ export const USER_REGISTER = () => `/register`;
 export const DASHBOARD_STORES = () => `/`;
 export const DASHBOARD_ANALYTICS = () => `/analytics`;
 export const DASHBOARD_SUBSCRIPTIONS = () => `/subscriptions`;
-export const DASHBOARD_PROFILE = () => `/profile`;
+export const DASHBOARD_PROFILE = () => `/dashboard/settings`;
 
 export const MAIN_DASHBOARD = () => `/dashboard/home`;
+
+export const INSTRUCTIONS = () => `/instructions`;

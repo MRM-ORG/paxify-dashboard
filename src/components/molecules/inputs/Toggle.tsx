@@ -65,7 +65,7 @@ const Toggle = (props: IToggleProps) => {
           }
           className={selected ? "" : "disabled"}></DialogButton>
       </Container>
-      Yearly
+      Quarterly
     </Row>
   );
 };

@@ -1,4 +1,4 @@
-import Reels from "../../molecules/Reels";
+import Reels from "../../pages/Reels";
 import { Statistic } from "antd";
 import { NextPage } from "next";
 import { useRef } from "react";

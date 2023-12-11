@@ -1,9 +1,11 @@
 import { navigateNewPage } from "@/utils/navigate";
 import {
   DASHBOARD_ANALYTICS,
+  DASHBOARD_PROFILE,
   DASHBOARD_STORES,
   DASHBOARD_SUBSCRIPTIONS,
   HOME_PAGE,
+  INSTRUCTIONS,
   MAIN_DASHBOARD,
   USER_LOGIN,
 } from "@/utils/routes";
@@ -48,6 +50,8 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
       setActiveTab(1);
     } else if (path === DASHBOARD_SUBSCRIPTIONS()) {
       setActiveTab(3);
+    } else if (path === INSTRUCTIONS()) {
+      setActiveTab(5);
     }
   }, []);
 
@@ -58,10 +62,15 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   };
 
   const mapTabToRoute = (tab: any) => {
+    console.log("TAB", tab);
     if (tab === 0) {
       return DASHBOARD_STORES;
+    } else if (tab === 2) {
+      return DASHBOARD_PROFILE;
     } else if (tab === 3) {
       return DASHBOARD_SUBSCRIPTIONS;
+    } else if (tab === 5) {
+      return INSTRUCTIONS;
     } else {
       return MAIN_DASHBOARD;
     }

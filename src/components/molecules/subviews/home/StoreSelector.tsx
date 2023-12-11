@@ -104,6 +104,11 @@ const Heading = styled.h1`
   font-weight: 600;
 `;
 
+const Steps = styled.div`
+  max-height: 500px;
+  overflow: auto;
+`;
+
 const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   const [stores, setStores] = useState<any>([]);
   const [activeStore, setActiveStore] = useState<any>();
@@ -115,15 +120,37 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   const [shopify, setIsShopify] = useState(true);
   const [deleteStoreModal, setDeleteStoreModal] = useState(false);
 
-  let VERIFICATION_SCRIPT_SHOPIFY: any = null;
   let VERIFICATION_SCRIPT_MANUAL: any = null;
 
   try {
     const signInUser = JSON.parse(localStorage.getItem("user") as string);
     const { uid } = signInUser;
 
-    VERIFICATION_SCRIPT_SHOPIFY = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src={{ "https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/auth.js" }} defer="defer"></script>`;
-    VERIFICATION_SCRIPT_MANUAL = `<script>var uid = '${uid}'; var storeId = '${activeStore?.id}';</script><script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/auth.js"></script>`;
+    VERIFICATION_SCRIPT_MANUAL = `<script>
+    var uid = '${uid}', storeId = '${activeStore?.id}';
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/paxify-reelife.min.css">
+  <style>
+    #paxify div:empty { display: block; }
+    .container { width: 100%; height: 110px; }
+    .skeleton { border-radius: 100%; width: 70px; height: 70px; float: left; margin: 20px 20px 20px 0; background-color: #eee; }
+    @media (min-width: 769px) { .container { display: flex; align-items: center; justify-content: center; } }
+  </style>
+  <script id="authScript" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/auth.js" defer></script>
+  <script defer id="paxifyReelife" src="https://cdn.jsdelivr.net/gh/paxify-llc/builds@latest/reelife/paxify-reelife.js"></script>
+  <script>
+    document.getElementById('paxifyReelife').onload = function () {
+      new ReelsInitializer({ uid: uid, storeId: storeId, elementId: 'paxify' }).render();
+    };
+  </script>
+  <div id="paxify">
+    <div class="container">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+  `;
   } catch (error) {
     console.error(error);
     alert("An error occured, please try again later.");
@@ -178,7 +205,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   }, [showInstructions]);
 
   useEffect(() => {
-    isCopied && navigator.clipboard.writeText(VERIFICATION_SCRIPT_SHOPIFY);
+    isCopied && navigator.clipboard.writeText(VERIFICATION_SCRIPT_MANUAL);
 
     setTimeout(() => {
       setIsCopied(false);
@@ -322,7 +349,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
         isVisible={showInstructions}
         onClose={() => setShowInstructions(false)}>
         <Instructions>
-          <h2>Instructions</h2>
+          <h2>Installation Instructions</h2>
 
           <TabbedSelector
             tabs={["Shopify Store", "Other Store - Manual Installation"]}
@@ -330,21 +357,58 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
           />
 
           {!shopify && (
-            <>
+            <Steps>
               <p>
                 You can now seamlessly integrate Reelife in your Shopify Online
-                Store 2.0. Please head over to Shopify Theme Customizer follow
-                these steps:
+                Store. Copy this script and head over to Shopify Theme
+                Customizer.
               </p>
-              <p>Step 1:</p>
+              <br />
+              <Script onClick={() => setIsCopied(true)}>
+                <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
+                {!isCopied ? <Copy /> : <CopyDone />}
+              </Script>
+              <br />
               <p>
-                Once you have installed the app, you can verify your domain
-                ownership by clicking on the button below.
+                Add a block <b>Custom Liquid</b> by clicking on{" "}
+                <b>Add Section</b>.
               </p>
+              <br />
+              <br />
+              <img
+                width="100%"
+                src="/instructions/Theme Customizer Step 1.png"
+                alt="Theme Customizer Step 1"
+              />
+              <br />
+              <p>
+                Past the script copied earlier in the <b>Custom Liquid </b>{" "}
+                section. Note that this script is specific to your store and
+                should not be shared with anyone else.
+              </p>
+              <br />
+              <img
+                width="100%"
+                src="/instructions/Theme Customizer Step 2.png"
+                alt="Theme Customizer Step 2"
+              />
+              <br />
+              <p>
+                Once added, you can adjust the padding and background by
+                changing the options as per your needs. Click Save and open the
+                website for the changes to take effect.
+              </p>
+              <p>
+                After completing the above steps, click on the Verify button to
+                check the status of integration. If it is successful, you can
+                now go to the Dashboard tab to create your first story and start
+                using Reelife in your store.
+              </p>
+              <br />
               <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
                 Verify
               </PrimaryButton>
-            </>
+            </Steps>
           )}
 
           {shopify && (
@@ -360,33 +424,15 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
                 </a>{" "}
                 for FREE consultation and assistance.
               </p>
-              {/* <p>
+              <p>
                 To verify domain ownership, please add the following script to
                 the <b> head</b> tag. Don’t add more than one script to your
                 store.
               </p>
-              <Script onClick={() => setIsCopied(true)}>
-                <Code>{VERIFICATION_SCRIPT_MANUAL}</Code>
-                {!isCopied ? <Copy /> : <CopyDone />}
-              </Script>
-              <p>
-                Now that you have verified your domain ownership, please
-                download the Reelife liquid file and add it to your store.
-              </p>
-              <Script onClick={handleLiquidFileDownload}>
-                <b>Paxify-Reelife.liquid</b>
-              </Script>
-              <p>
-                Once downloaded, this will act like any other liquid file. You
-                can add it to your store codebase and start using Reelife by
-                Paxify. In case you need help, please contact us at{" "}
-                <a href="mailto:support@paxify.io">
-                  <b>support@paxify.io</b>
-                </a>
-              </p>
+
               <PrimaryButton width="200px" onClick={checkIfStoreVerified}>
                 Verify
-              </PrimaryButton> */}
+              </PrimaryButton>
             </>
           )}
 

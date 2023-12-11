@@ -1,10 +1,10 @@
-import StoreSelector from "@/components/molecules/subviews/home/StoreSelector";
+import Instructions from "@/components/pages/Instructions";
 import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
 
-export default function HomePage() {
+export default function InstructionsPage() {
   return (
     <ProtectedAuthWrapper>
-      <StoreSelector />
+      <Instructions />
     </ProtectedAuthWrapper>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { loadReels } from "./reelsLoader";
+import { loadReels } from "../molecules/reelsLoader";
 
 const TARGET_ID = "paxify-app-preview";
 
