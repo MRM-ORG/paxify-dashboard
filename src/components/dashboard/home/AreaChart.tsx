@@ -203,7 +203,7 @@ type MyDatum = { date: Date; count: number };
 type Props = {
   analytics: any;
   event: {
-    name: "Impressions" | "Reach" | "Engagement";
+    name: "Impressions" | "Reach" | "Engagement" | "Likes" | "Shares";
     description: string;
   };
 };

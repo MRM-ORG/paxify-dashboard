@@ -1,6 +1,6 @@
 export const THEME = {
   primary: "#343f52",
-  primary1: "#605dba",
+  primary1: "#7431f8",
   primary2: "rgb(14 0 74)",
 
   white: "#ffffff",
@@ -26,7 +26,7 @@ export const THEME = {
   danger: "#FF4545",
   danger25: "#FFF6F6",
 
-  buttonPrimary: "#605dba",
+  buttonPrimary: "#7431f8",
 
   gradient: `linear-gradient(90deg, #0093B8 0%, #09DBA9 100%);`,
 };

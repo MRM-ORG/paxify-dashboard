@@ -31,7 +31,6 @@ const StoryPage: NextPage<Props> = ({ stories }) => {
     }
 
     const filteredStories = stories.filter((story: any) => {
-      console.log("story", story);
       return story?.player[0]?.layout?.title
         ?.toLowerCase()
         .includes(searchString.toLowerCase());
