@@ -13,6 +13,7 @@ const countEvents = (events: any, key: string) => {
   if (!events) return 0;
 
   return Object?.keys(events)?.reduce((acc: number, event: any) => {
+    if (!events?.[event]?.[key]) return acc;
     const count = events?.[event]?.[key];
     acc += count;
     return acc;
