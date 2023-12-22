@@ -4445,7 +4445,7 @@ react-charts@^3.0.0-beta.55:
 
 react-color@^2.19.3:
   version "2.19.3"
-  resolved "https://registry.npmjs.org/react-color/-/react-color-2.19.3.tgz"
+  resolved "https://registry.yarnpkg.com/react-color/-/react-color-2.19.3.tgz#ec6c6b4568312a3c6a18420ab0472e146aa5683d"
   integrity sha512-LEeGE/ZzNLIsFWa1TMe8y5VYqr7bibneWmvJwm1pCn/eNmrabWDh659JSPn9BuaMpEfU83WTOJfnCcjDZwNQTA==
   dependencies:
     "@icons/material" "^0.2.4"

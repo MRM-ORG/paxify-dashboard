@@ -43,6 +43,8 @@ type Props = {
 // };
 
 const groupEventsByKeys = (analytics: any, key: string) => {
+  if (!analytics) return [];
+
   return Object.keys(analytics)
     .map((year) => {
       const months = analytics[year];
@@ -50,10 +52,12 @@ const groupEventsByKeys = (analytics: any, key: string) => {
         const days = months[month];
         return Object.keys(days).map((day) => {
           const dayEvents = days[day];
-          return {
-            date: `${day}/${Number(month) + 1}/${year}`,
-            count: dayEvents[key],
-          };
+          if (dayEvents) {
+            return {
+              date: `${day}/${Number(month) + 1}/${year}`,
+              count: dayEvents[key],
+            };
+          }
         });
       });
     })
@@ -77,38 +81,42 @@ const Performance: NextPage<Props> = ({ summarizedEvents }) => {
   // const viewEvents = groupByDate(viewAnalytics);
   // const interactionEvents = groupByDate(interactionAnalytics);
 
+  console.log("SUMMARIZED EVENTS:", summarizedEvents);
+
   const impressionsSummarized = groupEventsByKeys(summarizedEvents, "init");
   const viewsSummarized = groupEventsByKeys(summarizedEvents, "storyViews");
 
   const likesSummarized = groupEventsByKeys(summarizedEvents, "likes");
   const sharesSummarized = groupEventsByKeys(summarizedEvents, "shares");
 
+  console.log("Impressions:", impressionsSummarized);
+
   // Merge likes and shares such that their counts of the same date are added together
   const interactionSummarized = likesSummarized.map((like) => {
     const share = sharesSummarized.find(
-      (share) => share.date === like.date
+      (share) => share?.date === like?.date
     ) || { count: 0 };
 
     return {
-      date: like.date,
-      count: like.count + share.count,
+      date: like?.date,
+      count: like?.count + share?.count,
     };
   });
 
   const reach = viewsSummarized.map((viewEvent) => {
     const impression = impressionsSummarized.find(
-      (impression) => impression.date === viewEvent.date
+      (impression) => impression?.date === viewEvent?.date
     );
 
     return {
-      date: viewEvent.date,
-      count: impression ? (viewEvent.count / impression.count) * 100 : 0,
+      date: viewEvent?.date,
+      count: impression ? (viewEvent?.count / impression.count) * 100 : 0,
     };
   });
 
   const engagement = interactionSummarized.map((interactionEvent) => {
     const viewEvent = viewsSummarized.find(
-      (viewEvent) => viewEvent.date === interactionEvent.date
+      (viewEvent) => viewEvent?.date === interactionEvent.date
     );
 
     return {
@@ -223,7 +231,11 @@ const Performance: NextPage<Props> = ({ summarizedEvents }) => {
       className="h-auto"
       extra={Extra}
       style={{ marginTop: "0px" }}
-      title={<h1 className="font-bold text-lg">Analytics at a glance</h1>}>
+      title={
+        <h1 className="font-bold text-lg">
+          Performance Over Time: Your Story Insights
+        </h1>
+      }>
       <Tabs
         defaultActiveKey="Impression"
         tabPosition={screens.lg ? "bottom" : "bottom"}

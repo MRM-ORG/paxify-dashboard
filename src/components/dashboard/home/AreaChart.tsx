@@ -78,14 +78,11 @@ function aggregateDataWeekly1(dailyData: DataPoint[]): DataPoint[] {
   return weeklyData;
 }
 
-function getWeekNumber(date: any) {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-  const yearStart = new Date(d.getFullYear(), 0, 1);
+function getWeekNumber(today: Date) {
+  const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
   // @ts-ignore
-  const weekNumber = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return weekNumber;
+  const pastDaysOfYear = (today - firstDayOfYear) / 86400000;
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
 function getFirstDateOfWeek(date: any) {
@@ -106,12 +103,19 @@ function getMonthYear(date: any) {
 }
 
 function aggregateDataWeekly(data: DataPoint[]) {
+  const filteredData = data.filter((item) => item);
+  console.log("RAW DATA:", filteredData);
+
   const groupedData: any = {};
 
-  data.forEach((item) => {
-    const dateParts = item.date.toString().split("/");
+  filteredData.forEach((item) => {
+    if (!item) return;
+    if (!item?.date) return;
+    const dateParts = item?.date?.toString()?.split("/");
     const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
     const weekNumber = getWeekNumber(date);
+
+    console.log("WEEK NUMBER:", weekNumber, "DATE:", date);
 
     if (!groupedData[weekNumber]) {
       groupedData[weekNumber] = {
@@ -122,6 +126,8 @@ function aggregateDataWeekly(data: DataPoint[]) {
 
     groupedData[weekNumber].count += item.count;
   });
+
+  console.log("GROUPED DATA:", groupedData);
 
   return Object.values(groupedData);
 }
@@ -181,7 +187,8 @@ function aggregateDataMonthly(data: DataPoint[]) {
   const groupedData: any = {};
 
   data.forEach((item) => {
-    const dateParts = item.date.toString().split("/");
+    const dateParts = item?.date?.toString().split("/");
+    if (!dateParts) return;
     const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
     const monthYear = getMonthYear(date);
 
@@ -243,7 +250,7 @@ const AreaChart: NextPage<Props> = ({ analytics, event }) => {
   const primaryAxis: any = React.useMemo(
     (): AxisOptions<MyDatum> => ({
       getValue: (datum) =>
-        datum.date.toLocaleString(undefined, {
+        datum?.date?.toLocaleString("en-US", {
           month: "short",
           day: "numeric",
         }),

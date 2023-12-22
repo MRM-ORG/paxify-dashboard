@@ -10,45 +10,48 @@ type Props = {
 };
 
 const countEvents = (events: any, key: string) => {
-  return Object.keys(events).reduce((acc, year) => {
-    const months = events[year];
-    Object.keys(months).forEach((month) => {
-      const days = months[month];
-      Object.keys(days).forEach((day) => {
-        const dayEvents = days[day];
-        acc += dayEvents[key];
-      });
-    });
+  if (!events) return 0;
+
+  return Object?.keys(events)?.reduce((acc: number, event: any) => {
+    const count = events?.[event]?.[key];
+    acc += count;
     return acc;
   }, 0);
 };
 
 const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+
+  const currentMonthEvents = summarizedEvents?.[currentYear]?.[currentMonth];
+
+  console.log("SUMMARY: ALL:", summarizedEvents, currentYear, currentMonth);
+  console.log("SUMMARY:", currentMonthEvents);
   const [plan, setPlan] = useState("Basic");
 
   const totalImpressions = useMemo(() => {
-    return countEvents(summarizedEvents, "init");
-  }, [summarizedEvents]);
+    return countEvents(currentMonthEvents, "init");
+  }, [currentMonthEvents]);
 
   const totalStoryViews = useMemo(() => {
-    return countEvents(summarizedEvents, "storyViews");
-  }, [summarizedEvents]);
+    return countEvents(currentMonthEvents, "storyViews");
+  }, [currentMonthEvents]);
 
   const totalStoryLikes = useMemo(() => {
-    return countEvents(summarizedEvents, "likes");
-  }, [summarizedEvents]);
+    return countEvents(currentMonthEvents, "likes");
+  }, [currentMonthEvents]);
 
   const totalStoryShares = useMemo(() => {
-    return countEvents(summarizedEvents, "shares");
-  }, [summarizedEvents]);
+    return countEvents(currentMonthEvents, "shares");
+  }, [currentMonthEvents]);
 
-  // TODO: For Pro plan, this will be broken down into likes, shares to be shown individually
   const totalInteractions = useMemo(() => {
     return (
-      countEvents(summarizedEvents, "likes") +
-      countEvents(summarizedEvents, "shares")
+      countEvents(currentMonthEvents, "likes") +
+      countEvents(currentMonthEvents, "shares")
     );
-  }, [summarizedEvents]);
+  }, [currentMonthEvents]);
 
   const reachRate = totalStoryViews / totalImpressions;
   const engagementRate = totalInteractions / totalStoryViews;
@@ -67,7 +70,10 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
     <div className="p-4 bg-white rounded-[10px] mb-5">
       <div className="flex items-center justify-between max-md:mt-8">
         <div>
-          <h1 className="text-[18px] font-[900] text-[#151D48]">Overview</h1>
+          <h1 className="text-[18px] font-[900] text-[#151D48]">
+            {new Date().toLocaleString("default", { month: "long" })}, At a
+            Glance!
+          </h1>
         </div>
         {/* <div className="flex justify-between flex-wrap">
             <DatePicker.RangePicker className=" lg:w-auto w-full" />
@@ -90,7 +96,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
 
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
-              {totalImpressions.toLocaleString()}
+              {totalImpressions?.toLocaleString() ?? 0}
             </h1>
 
             <div className="flex items-center mt-3 gap-1">
@@ -120,7 +126,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
               {plan !== "Basic" && !isNaN(reachRate) ? (
-                <div>{(Number(reachRate) * 100).toFixed(2)}%</div>
+                <div>{(Number(reachRate) * 100).toFixed(2) ?? 0}%</div>
               ) : (
                 <div className="blur-sm">--------</div>
               )}
@@ -162,7 +168,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
               {plan !== "Basic" && !isNaN(engagementRate) ? (
-                <div>{(Number(engagementRate) * 100).toFixed(2)}%</div>
+                <div>{(Number(engagementRate) * 100).toFixed(2) ?? 0}%</div>
               ) : (
                 <div className="blur-sm">--------</div>
               )}
@@ -204,7 +210,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
               {plan === "Professional" && !isNaN(likeRate) ? (
-                <div>{(Number(likeRate) * 100).toFixed(2)}%</div>
+                <div>{(Number(likeRate) * 100).toFixed(2) ?? 0}%</div>
               ) : (
                 <div className="blur-sm">--------</div>
               )}
@@ -244,7 +250,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           <div>
             <h1 className="text-[#151D48] text-[20px] font-[900] mt-4">
               {plan === "Professional" && !isNaN(shareRate) ? (
-                <div>{(Number(shareRate) * 100).toFixed(2)}%</div>
+                <div>{(Number(shareRate) * 100).toFixed(2) ?? 0}%</div>
               ) : (
                 <div className="blur-sm">--------</div>
               )}

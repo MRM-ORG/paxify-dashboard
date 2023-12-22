@@ -55,8 +55,7 @@ const AudiencePage = () => {
             <Button
               className="bg-[#8b62ff] audience-btn"
               type="primary"
-              icon={<PlusOutlined />}
-            >
+              icon={<PlusOutlined />}>
               New Audience
             </Button>
           </div>
@@ -67,13 +66,11 @@ const AudiencePage = () => {
             <div
               key={item?.id}
               className="w-full  p-4 rounded-[10px] mt-8"
-              style={{ background: item.background }}
-            >
+              style={{ background: item.background }}>
               <div className="flex items-center justify-between">
                 <div
                   className="bg-[#FA5A7D] px-[15px] py-[8px] rounded-[20px] flex items-center gap-2"
-                  style={{ background: item.iconBg }}
-                >
+                  style={{ background: item.iconBg }}>
                   <div className="flex items-center gap-2">
                     {item.icon}
                     <h1 className="text-[14px] font-[400] text-white">
