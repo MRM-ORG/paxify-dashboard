@@ -27,12 +27,11 @@ export const signInUser = async (email: string, password: string) => {
       email,
       password
     );
-    const user = userCredential.user;
-    localStorage.setItem("user", JSON.stringify(user));
-    navigateNewPage(HOME_PAGE());
-  } catch (error: any) {
+
+    return userCredential.user;
+  } catch (error) {
     console.error(error);
-    alert(error?.message);
+    alert(error);
   }
 };
 

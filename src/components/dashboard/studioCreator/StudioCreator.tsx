@@ -372,8 +372,11 @@ const StudioCreator = () => {
       <button className="saveButton" onClick={saveImage}>
         Save
       </button>
+
+      <div className="hidePromotion" />
+
       <Modal
-        title="Your Story"
+        title="Save Story"
         style={{ marginBottom: "20px" }}
         open={open}
         onOk={handleOk}
@@ -382,10 +385,10 @@ const StudioCreator = () => {
         footer={
           <div>
             <Button key="add-more" onClick={showAddMoreModal}>
-              Add More
+              Add a Sub-Story
             </Button>
-            <Button key="submit" type="primary" onClick={handleOk}>
-              {!confirmLoading ? "Submit" : "Please Wait.."}
+            <Button key="submit" type="default" onClick={handleOk}>
+              {!confirmLoading ? "Save" : "Please Wait.."}
             </Button>
           </div>
         }>

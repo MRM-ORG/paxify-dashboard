@@ -90,18 +90,24 @@ const Login: React.FC = () => {
       // @ts-ignore
       const userObj = JSON.parse(user);
 
-      if (userObj.emailVerified) {
-        navigateNewPage(HOME_PAGE());
+      if (!userObj) {
+        return;
       }
+
+      userObj?.emailVerified && navigateNewPage(HOME_PAGE());
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
     }
   }, []);
 
   const onLogin = async (values: any) => {
     setIsLoading(true);
-    await signInUser(values.email, values.password);
-    setIsLoading(false);
+    signInUser(values.email, values.password).then((user) => {
+      localStorage.setItem("user", JSON.stringify(user));
+      navigateNewPage(HOME_PAGE());
+      setIsLoading(false);
+    });
   };
 
   return (

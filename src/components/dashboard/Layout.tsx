@@ -39,7 +39,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [hasStores, setHasStores] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
   const pathParts = pathname.split("/").filter((part) => part !== "");
   const lastPart = pathParts[pathParts.length - 1];
@@ -131,7 +131,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </Header>
             <Content>{children}</Content>
-            <Footer style={{ textAlign: "center" }}>© 2023 Reellife</Footer>
+            <Footer style={{ textAlign: "center" }}>© 2024 Reellife</Footer>
           </Layout>
         </Layout>
       )}

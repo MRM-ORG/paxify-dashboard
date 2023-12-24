@@ -83,7 +83,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
 
       <div className="flex flex-col items-start gap-4 lg:flex-row">
         <div
-          className="w-full max-w-sm p-4 rounded-[10px] mt-8"
+          className="w-full max-w-sm p-4 rounded-[10px] mt-8 h-[180px]"
           style={{ background: "#F3E8FF" }}>
           <div className="flex items-center justify-between">
             <div
@@ -112,7 +112,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
         </div>
 
         <div
-          className="w-full max-w-sm  p-4 rounded-[10px] mt-8"
+          className="w-full max-w-sm  p-4 rounded-[10px] mt-8 h-[180px]"
           style={{ background: "#FFE2E5" }}>
           <div className="flex items-center justify-between">
             <div
@@ -154,7 +154,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           </div>
         </div>
         <div
-          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8"
+          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8 h-[180px]"
           style={{ background: "#DCFCE7" }}>
           <div className="flex items-center justify-between">
             <div
@@ -176,7 +176,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
             </h1>
             <div className="flex items-center mt-3 gap-1">
               <p className="text-[#425166] text-[12px] font-[600]">
-                Engagement Rate
+                Engagement
               </p>
               {plan === "Basic" && (
                 <Tooltip
@@ -196,7 +196,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
           </div>
         </div>
         <div
-          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8"
+          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8 h-[180px]"
           style={{ background: "#FBFDD9" }}>
           <div className="flex items-center justify-between">
             <div
@@ -231,12 +231,12 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
             </div>
             <p className="text-[#4079ED] text-[10px] font-[600] mt-3">
               {/* +8% from yesterday */}
-              People who are liking your stories
+              People who are liking the stories
             </p>
           </div>
         </div>
         <div
-          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8"
+          className="w-full w-full max-w-sm  p-4 rounded-[10px] mt-8 h-[180px]"
           style={{ background: "#F2DFF6" }}>
           <div className="flex items-center justify-between">
             <div
@@ -273,7 +273,7 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
             </div>
             <p className="text-[#4079ED] text-[10px] font-[600] mt-3">
               {/* +8% from yesterday */}
-              People who are sharing your stories
+              People who are sharing the stories
             </p>
           </div>
         </div>

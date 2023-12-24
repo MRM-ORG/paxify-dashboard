@@ -105,10 +105,24 @@ body > div:first-child {
   width: 100px;
   height: 30px;
   border-radius: 5px;
-  left: 200px;
-  bottom: -55px;
-  background: #bf83ff;
+  right: 20px;
+  top: 130px;
+  background: rgba(0, 0, 0, 0.85);
   color: white;
+  transition: transform 0.2s ease-in-out;
+}
+
+.saveButton:hover {
+  transform: scale(1.2);
+}
+
+.hidePromotion {
+  width: 180px;
+  height: 30px;
+  position: absolute;
+  right: 15px;
+  bottom: -60px;
+  background: #f5f5f5;
 }
 
 /* For screens larger than extra small (xs) */
@@ -164,7 +178,8 @@ body > div:first-child {
 
 .bp4-navbar .polotno-panel-container {
   /* background-color: #161630 !important; */
-  background-color: #f5f5f5 !important;
+  /* background-color: #f5f5f5 !important; */
+  background: rgba(0, 0, 0, 0.15) !important;
   color: #0a0a0a !important;
   border: none !important;
   outline: none !important;

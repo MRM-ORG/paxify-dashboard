@@ -190,9 +190,9 @@ export const items: MenuItem[] = [
     </Link>
   ),
   getItem(
-    "Studio Creator",
-    "/dashboard/studio_creator",
-    <Link href="/dashboard/studio_creator">
+    "Story Creator",
+    "/dashboard/studio",
+    <Link href="/dashboard/studio">
       <svg
         width="20"
         height="20"

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Spacer from "../atoms/Spacer";
+import Link from "next/link";
 
 const Container = styled.div`
   padding: 20px;
@@ -71,11 +72,15 @@ const Instructions: React.FC = () => {
         <div>
           <Subheading>Step 2</Subheading>
           <Text>
-            After opting for the right plan, you will be redirected to this
-            dashboard. At this point, you are ready to register the store you
-            need Reelife to be integrated with. To do so, click on the Add
-            Stores tab from the left sidebar and fill out the form. Click on
-            Validate to register your store with us.
+            After opting for the right plan, you are ready to register the
+            store. To do so, navigate to the{" "}
+            <Link href="/">
+              <b>Add Stores</b>
+            </Link>{" "}
+            tab from the left sidebar and fill in the required details. Label
+            can be anything you would like your store to be referred to and
+            domain name is the URL of your store. Click on Validate to register
+            your store with us.
           </Text>
         </div>
       </Flex>
@@ -84,9 +89,9 @@ const Instructions: React.FC = () => {
           <Subheading>Step 3</Subheading>
           <Text>
             Click on Tooltip icon next to the store verification badge. It will
-            open a modal disclosing the script that needs to be added to your
-            website. Please follow the instructions based on your website
-            (Shopify/ Others).
+            open integration steps to complete adding Reelife to your store.
+            Please follow the instructions based on your website (Shopify/
+            Others).
           </Text>
         </div>
         <Image width="600px" src="/instructions/Step 3.png" alt="Step 3" />
