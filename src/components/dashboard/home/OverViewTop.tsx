@@ -27,8 +27,6 @@ const OverViewTop: NextPage<Props> = ({ summarizedEvents }) => {
 
   const currentMonthEvents = summarizedEvents?.[currentYear]?.[currentMonth];
 
-  console.log("SUMMARY: ALL:", summarizedEvents, currentYear, currentMonth);
-  console.log("SUMMARY:", currentMonthEvents);
   const [plan, setPlan] = useState("Basic");
 
   const totalImpressions = useMemo(() => {

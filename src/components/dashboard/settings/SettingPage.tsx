@@ -19,7 +19,7 @@ const SettingPage = () => {
 
     const fetchProfile = async () => {
       const profile = await getUserProfile(user.uid);
-      console.log("profile", profile);
+
       setProfile(profile);
     };
 

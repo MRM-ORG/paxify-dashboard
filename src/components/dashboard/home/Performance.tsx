@@ -81,15 +81,11 @@ const Performance: NextPage<Props> = ({ summarizedEvents }) => {
   // const viewEvents = groupByDate(viewAnalytics);
   // const interactionEvents = groupByDate(interactionAnalytics);
 
-  console.log("SUMMARIZED EVENTS:", summarizedEvents);
-
   const impressionsSummarized = groupEventsByKeys(summarizedEvents, "init");
   const viewsSummarized = groupEventsByKeys(summarizedEvents, "storyViews");
 
   const likesSummarized = groupEventsByKeys(summarizedEvents, "likes");
   const sharesSummarized = groupEventsByKeys(summarizedEvents, "shares");
-
-  console.log("Impressions:", impressionsSummarized);
 
   // Merge likes and shares such that their counts of the same date are added together
   const interactionSummarized = likesSummarized.map((like) => {

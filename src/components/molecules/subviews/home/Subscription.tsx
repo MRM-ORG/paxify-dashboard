@@ -82,7 +82,7 @@ const PLANS: ISubscriptionPlan[] = [
     features: [
       {
         id: 1,
-        label: "Upto 5 Stories",
+        label: "Upto 3 Stories",
       },
       {
         id: 2,
@@ -424,7 +424,6 @@ const Subscription: React.FC<IProfileProps> = () => {
   };
 
   useEffect(() => {
-    console.log("Calling useEffect");
     if (user) {
       getUserSubscriptionStatus(user?.uid)
         .then((res) => {
@@ -443,7 +442,6 @@ const Subscription: React.FC<IProfileProps> = () => {
 
     getCustomerSubscriptions(user?.uid as string, userSubscription.stripeId)
       .then((res) => {
-        console.log("Subscriptions:", res.data);
         setActiveSubscriptions(res.data);
       })
       .finally(() => setHasCustomerSubscription(true));

@@ -23,7 +23,6 @@ const Page: NextPageWithLayout = () => {
 
         fetchSummarizedEvents(user?.uid, stores[0]?.id).then((res) => {
           const events = res.data;
-          console.log(events);
           setSummarizedEvents(events);
         });
       })

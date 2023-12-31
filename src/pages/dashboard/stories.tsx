@@ -21,7 +21,6 @@ const Page: NextPageWithLayout = () => {
               return axios.get(apiUrl);
             })
           ).then((response) => {
-            console.log("RES:", response);
             const newStories = response?.map((res) => res?.data?.data).flat();
             const filteredStories = newStories.filter((story) => story);
             setStories(filteredStories);

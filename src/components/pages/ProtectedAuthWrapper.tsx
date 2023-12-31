@@ -62,7 +62,6 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   };
 
   const mapTabToRoute = (tab: any) => {
-    console.log("TAB", tab);
     if (tab === 0) {
       return DASHBOARD_STORES;
     } else if (tab === 2) {

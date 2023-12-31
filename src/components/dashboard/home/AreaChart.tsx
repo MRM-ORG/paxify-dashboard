@@ -73,8 +73,6 @@ function aggregateDataWeekly1(dailyData: DataPoint[]): DataPoint[] {
     });
   }
 
-  console.log("WEELKY DATA:", weeklyData);
-
   return weeklyData;
 }
 
@@ -104,7 +102,6 @@ function getMonthYear(date: any) {
 
 function aggregateDataWeekly(data: DataPoint[]) {
   const filteredData = data.filter((item) => item);
-  console.log("RAW DATA:", filteredData);
 
   const groupedData: any = {};
 
@@ -115,8 +112,6 @@ function aggregateDataWeekly(data: DataPoint[]) {
     const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
     const weekNumber = getWeekNumber(date);
 
-    console.log("WEEK NUMBER:", weekNumber, "DATE:", date);
-
     if (!groupedData[weekNumber]) {
       groupedData[weekNumber] = {
         date: getFirstDateOfWeek(date),
@@ -126,8 +121,6 @@ function aggregateDataWeekly(data: DataPoint[]) {
 
     groupedData[weekNumber].count += item.count;
   });
-
-  console.log("GROUPED DATA:", groupedData);
 
   return Object.values(groupedData);
 }

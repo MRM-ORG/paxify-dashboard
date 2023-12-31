@@ -77,8 +77,6 @@ const StudioCreator = () => {
       // updatedPlayers[index].enhancements.audio.source = file;
     }
 
-    console.log("updatedPlayers", updatedPlayers);
-
     setPlayers(updatedPlayers);
   };
 
@@ -87,7 +85,6 @@ const StudioCreator = () => {
 
     if (file) {
       const storage = getStorage();
-      console.log("STORAGE:", storage);
       const storageRef = ref(storage, `images/${Date.now()}.png`);
       const reader = new FileReader();
       reader.onload = async (e: any) => {
