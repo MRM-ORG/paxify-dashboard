@@ -6,6 +6,7 @@ import {
 import { BACKEND_URL } from "@/constants";
 import { firebase } from "@/firebase/firebase";
 import { Button, Input, Modal, Select, Tooltip } from "antd";
+import { ChevronLeft, ChevronRight } from "tabler-icons-react";
 import axios from "axios";
 import { Dayjs } from "dayjs";
 import {
@@ -26,18 +27,32 @@ import { SketchPicker } from "react-color";
 import { FaInfoCircle } from "react-icons/fa";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/pagination";
 
 const { Option } = Select;
 
-const Row = styled.div`
-  gap: 25px;
+const Row = styled.div<{ gap?: string }>`
+  gap: ${(props) => props.gap || "10px"};
   display: flex;
 `;
 
-const ColorPicker = styled(SketchPicker)`
-  bottom: 135px;
-  z-index: 2;
+const ColorPicker = styled(SketchPicker)<{ top?: string; left?: string }>`
+  top: 10%;
+  left: 20%;
+  z-index: 2000;
   position: absolute;
+`;
+
+const ColorPickerContainer = styled.h3`
+  gap: 5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
 `;
 
 const Circle = styled.div<{ background: string }>`
@@ -99,16 +114,25 @@ const CallToAction = styled.a<{ color: string }>`
   }
 `;
 
+const SubstoryContainer = styled.div`
+  padding: 20px;
+  margin: 10px 0;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.05);
+`;
+
 const StudioCreator = () => {
   const router = useRouter();
   const store = createStore();
   store.openSidePanel("resize");
   const page = store.addPage();
+  const [swiperKey, setSwiperKey] = useState(0);
   const [subscription, setSubscription] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const ctaColorPickerRef = useRef(null);
   const storyRingColorPickerRef = useRef(null);
+  const [swiperReference, setSwiperReference] = useState({});
   const [showCTAColorPicker, setShowCTAColorPicker] = useState(false);
   const [showStoryRingColorPicker, setShowStoryRingColorPicker] =
     useState(false);
@@ -200,6 +224,7 @@ const StudioCreator = () => {
     if (!file) {
       return;
     }
+    setIsLoading(true);
     const request = await uploadStoryContent(file);
     const url = request.url;
 
@@ -207,6 +232,7 @@ const StudioCreator = () => {
     updatedPlayers[index].layout.author = url;
 
     setPlayers(updatedPlayers);
+    setIsLoading(false);
   };
 
   store.setSize(1080, 1920, true);
@@ -283,6 +309,10 @@ const StudioCreator = () => {
   };
 
   const showAddMoreModal = () => {
+    if (subscription === "Basic") {
+      return;
+    }
+
     addPlayer();
     setImage("");
     setOpen(false);
@@ -301,6 +331,7 @@ const StudioCreator = () => {
       .then((stores) => {
         if (Array.isArray(stores)) {
           setStores(stores);
+          setStoreId(stores[0].id);
         }
         setIsLoading(false);
       })
@@ -441,6 +472,10 @@ const StudioCreator = () => {
     setPlayers(updatedPlayers);
   };
 
+  useEffect(() => {
+    setSwiperKey((prevKey) => prevKey + 1); // Increment key to force rerender fo swiper
+  }, [showCTAColorPicker]);
+
   return (
     <div style={{ height: "auto" }}>
       <div
@@ -476,16 +511,22 @@ const StudioCreator = () => {
 
       <Modal
         title="Save Story"
-        style={{ marginBottom: "20px" }}
+        style={{
+          marginBottom: "20px",
+        }}
         open={open}
         onOk={handleOk}
-        confirmLoading={confirmLoading}
+        confirmLoading={confirmLoading || isLoading}
         onCancel={handleCancel}
         footer={
           <div>
-            {/* <Button key="add-more" onClick={showAddMoreModal}>
+            <Button
+              disabled={subscription === "Basic"}
+              key="add-more"
+              onClick={showAddMoreModal}>
               Add a Sub-Story
-            </Button> */}
+            </Button>
+
             <Button key="submit" type="default" onClick={handleOk}>
               {!confirmLoading ? "Save" : "Please Wait.."}
             </Button>
@@ -502,145 +543,196 @@ const StudioCreator = () => {
             </Option>
           ))}
         </Select>
-        {/* <TimePicker
-          onChange={onTimeChange as any}
-          defaultValue={dayjs("00:00:00", "HH:mm:ss")}
-          size="large"
-          style={{ marginBottom: "20px" }}
-        /> */}
-        {players?.map((player: any, index: number) => (
-          <div key={index}>
-            <Input.TextArea
-              placeholder="Story Label"
-              style={{ marginBottom: "16px" }}
-              value={player?.layout?.title}
-              onChange={(e) => handleTitleChange(index, e.target.value)}
-            />
-            <h3>
-              <b>Call To Action</b> (Leave black to remove the bottom overlay)
-            </h3>
-            <div className="flex gap-3">
-              <Input
-                placeholder="CTA Text"
-                style={{ width: "100%", marginBottom: "16px" }}
-                value={player?.layout?.cta?.text}
-                onChange={(e) => handleCtaTitleChange(index, e.target.value)}
-              />
-              <Input
-                placeholder="CTA Link"
-                style={{ width: "100%", marginBottom: "16px" }}
-                value={player?.layout?.cta?.link}
-                onChange={(e) => handleCtaLinkChange(index, e.target.value)}
+
+        <div>
+          <ColorPickerContainer>
+            <b>Story Ring Color</b>
+
+            {subscription === "Basic" && (
+              <Tooltip title="Please upgrade your plan to change this setting">
+                <FaInfoCircle
+                  size={15}
+                  className="text-[#4079ED] text-[10px] font-[600]"
+                />
+              </Tooltip>
+            )}
+          </ColorPickerContainer>
+          <Circle
+            style={{
+              cursor: subscription === "Basic" ? "not-allowed" : "pointer",
+            }}
+            background={storyRingColor}
+            onClick={() =>
+              setShowStoryRingColorPicker(!showStoryRingColorPicker)
+            }></Circle>
+
+          {subscription !== "Basic" && showStoryRingColorPicker && (
+            <div ref={storyRingColorPickerRef}>
+              <ColorPicker
+                color={storyRingColor}
+                onChangeComplete={(color) => setStoryRingColor(color.hex)}
               />
             </div>
-            <h3>
-              <b>Author Image</b>
-            </h3>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(event) => uploadAuthorImageToFirebase(event, index)}
-              style={{ width: "100%", marginBottom: "16px" }}
-            />
-            <h3
-              style={{
-                gap: "5px",
-                display: "flex",
-                alignItems: "center",
-              }}>
-              <b>Audio</b>
-              {subscription === "Basic" && (
-                <Tooltip title="Please upgrade your plan to change this setting">
-                  <FaInfoCircle
-                    size={15}
-                    className="text-[#4079ED] text-[10px] font-[600]"
-                  />
-                </Tooltip>
-              )}
-            </h3>
-            <Input
-              disabled={subscription === "Basic"}
-              type="file"
-              accept="audio/*"
-              onChange={(newValue) => handleAudioChange(newValue, index)}
-              style={{ width: "100%", marginBottom: "16px" }}
-            />
+          )}
+        </div>
 
-            <Row>
-              <div>
-                <h3 style={{ marginBottom: "16px" }}>
-                  <b>CTA Background Color</b>
-                </h3>
-                <Circle
-                  background={player?.layout?.cta?.backgroundColor}
-                  onClick={() =>
-                    setShowCTAColorPicker(!showCTAColorPicker)
-                  }></Circle>
-              </div>
-
-              <div>
-                <h3
-                  style={{
-                    gap: "5px",
-                    marginBottom: "16px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}>
-                  <b>Story Ring Color</b>
-
-                  {subscription === "Basic" && (
-                    <Tooltip title="Please upgrade your plan to change this setting">
-                      <FaInfoCircle
-                        size={15}
-                        className="text-[#4079ED] text-[10px] font-[600]"
+        <Swiper
+          onInit={(ev) => setSwiperReference(ev)}
+          modules={[Navigation, Pagination]}
+          spaceBetween={50}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          allowTouchMove={false}
+          navigation={{
+            nextEl: "#swiper-button-next",
+            prevEl: "#swiper-button-prev",
+          }}
+          onSlideChange={() => console.log("slide change")}
+          onSwiper={(swiper) => console.log(swiper)}>
+          {players?.map((player: any, index: number) => (
+            <SwiperSlide key={index}>
+              <Row gap="0">
+                {players.length > 1 && (
+                  <button
+                    // @ts-ignore
+                    onClick={() => swiperReference.slidePrev()}
+                    id="swiper-button-prev">
+                    <ChevronLeft size={24} strokeWidth={2} color={"black"} />
+                  </button>
+                )}
+                <div>
+                  <h3>
+                    <b>Sub-Story {index + 1}</b>
+                  </h3>
+                  <SubstoryContainer>
+                    <Input
+                      placeholder="Story Label"
+                      style={{ marginBottom: "16px" }}
+                      value={player?.layout?.title}
+                      onChange={(e) => handleTitleChange(index, e.target.value)}
+                    />
+                    <h3>
+                      <b>Call To Action</b> (Leave blank to remove the bottom
+                      overlay)
+                    </h3>
+                    <div className="flex gap-3">
+                      <Input
+                        placeholder="CTA Text"
+                        style={{ width: "100%", marginBottom: "16px" }}
+                        value={player?.layout?.cta?.text}
+                        onChange={(e) =>
+                          handleCtaTitleChange(index, e.target.value)
+                        }
                       />
-                    </Tooltip>
-                  )}
-                </h3>
-                <Circle
-                  background={storyRingColor}
-                  onClick={() =>
-                    setShowStoryRingColorPicker(!showStoryRingColorPicker)
-                  }></Circle>
-              </div>
-            </Row>
+                      <Input
+                        placeholder="CTA Link"
+                        style={{ width: "100%", marginBottom: "16px" }}
+                        value={player?.layout?.cta?.link}
+                        onChange={(e) =>
+                          handleCtaLinkChange(index, e.target.value)
+                        }
+                      />
+                    </div>
+                    <Row>
+                      <div>
+                        <h3>
+                          <b>Author Image</b>
+                        </h3>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(event) =>
+                            uploadAuthorImageToFirebase(event, index)
+                          }
+                          style={{ width: "100%", marginBottom: "16px" }}
+                        />
+                      </div>
+                      <div>
+                        <h3
+                          style={{
+                            gap: "5px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}>
+                          <b>Audio</b>
+                          {subscription === "Basic" && (
+                            <Tooltip title="Please upgrade your plan to change this setting">
+                              <FaInfoCircle
+                                size={15}
+                                className="text-[#4079ED] text-[10px] font-[600]"
+                              />
+                            </Tooltip>
+                          )}
+                        </h3>
+                        <Input
+                          disabled={subscription === "Basic"}
+                          type="file"
+                          accept="audio/*"
+                          onChange={(newValue) =>
+                            handleAudioChange(newValue, index)
+                          }
+                          style={{ width: "100%", marginBottom: "16px" }}
+                        />
+                      </div>
+                    </Row>
 
-            {showCTAColorPicker && (
-              <div ref={ctaColorPickerRef}>
-                <ColorPicker
-                  color={player?.layout?.cta?.backgroundColor}
-                  onChangeComplete={(color) =>
-                    handleCtaColorChange(color, index)
-                  }
-                />
-              </div>
-            )}
+                    <Row>
+                      <div>
+                        <ColorPickerContainer>
+                          <b>CTA Background Color</b>
+                        </ColorPickerContainer>
+                        <Circle
+                          style={{
+                            cursor:
+                              subscription === "Basic"
+                                ? "not-allowed"
+                                : "pointer",
+                          }}
+                          background={player?.layout?.cta?.backgroundColor}
+                          onClick={() =>
+                            setShowCTAColorPicker(!showCTAColorPicker)
+                          }></Circle>
+                      </div>
+                    </Row>
 
-            {subscription !== "Basic" && showStoryRingColorPicker && (
-              <div ref={storyRingColorPickerRef}>
-                <ColorPicker
-                  color={storyRingColor}
-                  onChangeComplete={(color) => setStoryRingColor(color.hex)}
-                />
-              </div>
-            )}
+                    {showCTAColorPicker && (
+                      <div ref={ctaColorPickerRef}>
+                        <ColorPicker
+                          color={player?.layout?.cta?.backgroundColor}
+                          onChangeComplete={(color) =>
+                            handleCtaColorChange(color, index)
+                          }
+                        />
+                      </div>
+                    )}
 
-            <OverlayPreview>
-              <AuthorPreview src={player?.layout?.author} />
-              <CTAContainer>
-                <div style={{ color: "white" }}>
-                  {player.layout.title || "Story Label"}
+                    <OverlayPreview>
+                      <AuthorPreview src={player?.layout?.author} />
+                      <CTAContainer>
+                        <div style={{ color: "white" }}>
+                          {player.layout.title || "Story Label"}
+                        </div>
+                        <CallToAction
+                          target="_blank"
+                          color={player?.layout?.cta?.backgroundColor}
+                          href={player?.layout?.cta?.link}>
+                          {player?.layout?.cta?.text || "Call To Action"}
+                        </CallToAction>
+                      </CTAContainer>
+                    </OverlayPreview>
+                  </SubstoryContainer>
                 </div>
-                <CallToAction
-                  target="_blank"
-                  color={player?.layout?.cta?.backgroundColor}
-                  href={player?.layout?.cta?.link}>
-                  {player?.layout?.cta?.text || "Call To Action"}
-                </CallToAction>
-              </CTAContainer>
-            </OverlayPreview>
-          </div>
-        ))}
+                {players.length > 1 && (
+                  <button // @ts-ignore
+                    onClick={() => swiperReference.slideNext()}
+                    id="swiper-button-next">
+                    <ChevronRight size={24} strokeWidth={2} color={"black"} />
+                  </button>
+                )}
+              </Row>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </Modal>
     </div>
   );
