@@ -1,35 +1,118 @@
-import React, { useEffect, useState } from "react";
-import { createStore } from "polotno/model/store";
-import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from "polotno";
-import { Toolbar } from "polotno/toolbar/toolbar";
-import { ZoomButtons } from "polotno/toolbar/zoom-buttons";
-import { SidePanel } from "polotno/side-panel";
-import { Workspace } from "polotno/canvas/workspace";
+import {
+  fetchUserStores,
+  getUserSubscriptionStatus,
+  uploadStoryContent,
+} from "@/apiCalls/auth";
+import { BACKEND_URL } from "@/constants";
+import { firebase } from "@/firebase/firebase";
+import { Button, Input, Modal, Select, Tooltip } from "antd";
+import axios from "axios";
+import { Dayjs } from "dayjs";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadString,
 } from "firebase/storage";
-import { firebase } from "@/firebase/firebase";
-import { Button, Input, Modal, Select, TimePicker } from "antd";
-import { CirclePicker } from "react-color";
-import axios from "axios";
-import { BACKEND_URL } from "@/constants";
-import { fetchUserStores } from "@/apiCalls/auth";
 import { useRouter } from "next/router";
-import dayjs, { Dayjs } from "dayjs";
+import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from "polotno";
+import { Workspace } from "polotno/canvas/workspace";
+import { createStore } from "polotno/model/store";
+import { SidePanel } from "polotno/side-panel";
+import { Toolbar } from "polotno/toolbar/toolbar";
+import { ZoomButtons } from "polotno/toolbar/zoom-buttons";
+import React, { useEffect, useRef, useState } from "react";
+import { SketchPicker } from "react-color";
+import { FaInfoCircle } from "react-icons/fa";
+import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 
 const { Option } = Select;
+
+const Row = styled.div`
+  gap: 25px;
+  display: flex;
+`;
+
+const ColorPicker = styled(SketchPicker)`
+  bottom: 135px;
+  z-index: 2;
+  position: absolute;
+`;
+
+const Circle = styled.div<{ background: string }>`
+  position: relative;
+  background: ${(props) => props.background};
+  border: ${(props) => (props.background ? "none" : "1px solid")};
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 16px;
+`;
+
+const OverlayPreview = styled.div`
+  font-size: 14px;
+  gap: 12px;
+  height: 100px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.5);
+  transition: all 0.5s ease-in-out;
+
+  &:hover {
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+  }
+`;
+
+const AuthorPreview = styled.img`
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+`;
+
+const CTAContainer = styled.div`
+  width: 80%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CallToAction = styled.a<{ color: string }>`
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  background: ${(props) => props.color};
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+`;
 
 const StudioCreator = () => {
   const router = useRouter();
   const store = createStore();
   store.openSidePanel("resize");
   const page = store.addPage();
+  const [subscription, setSubscription] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const ctaColorPickerRef = useRef(null);
+  const storyRingColorPickerRef = useRef(null);
+  const [showCTAColorPicker, setShowCTAColorPicker] = useState(false);
+  const [showStoryRingColorPicker, setShowStoryRingColorPicker] =
+    useState(false);
+  const [storyRingColor, setStoryRingColor] = useState("#e1306c");
   const [image, setImage] = useState("");
   const [stores, setStores] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +121,38 @@ const StudioCreator = () => {
   const [name, setName] = useState("");
   const [time, setTime] = useState("");
   const [audioFile, setAudioFile] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (
+        ctaColorPickerRef.current &&
+        // @ts-ignore
+        !ctaColorPickerRef.current.contains(event.target)
+      ) {
+        setShowCTAColorPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ctaColorPickerRef]);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (
+        storyRingColorPickerRef.current &&
+        // @ts-ignore
+        !storyRingColorPickerRef.current.contains(event.target)
+      ) {
+        setShowStoryRingColorPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [storyRingColorPickerRef]);
 
   const onTimeChange = (time: Dayjs, timeString: string) => {
     setTime(timeString);
@@ -82,38 +197,20 @@ const StudioCreator = () => {
 
   const uploadAuthorImageToFirebase = async (event: any, index: number) => {
     const file = event.target.files?.[0];
-
-    if (file) {
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${Date.now()}.png`);
-      const reader = new FileReader();
-      reader.onload = async (e: any) => {
-        // The result property contains the base64 string
-        const base64Image = e.target.result.split(",")[1];
-
-        try {
-          await uploadString(storageRef, base64Image, "base64", {
-            contentType: "image/png",
-          });
-          const downloadURL = await getDownloadURL(storageRef);
-          const updatedPlayers = [...players];
-          updatedPlayers[index].layout.author = downloadURL;
-
-          setPlayers(updatedPlayers);
-        } catch (error) {
-          console.error("Error uploading image:", error);
-        }
-
-        // Pass the base64 image to the onChange event handler
-      };
-
-      // Read the file as a data URL
-      reader.readAsDataURL(file);
+    if (!file) {
+      return;
     }
+    const request = await uploadStoryContent(file);
+    const url = request.url;
+
+    const updatedPlayers = [...players];
+    updatedPlayers[index].layout.author = url;
+
+    setPlayers(updatedPlayers);
   };
+
   store.setSize(1080, 1920, true);
   store.setScale(0.4);
-  // console.log("store width", store.width);
   const [players, setPlayers] = useState([
     // Initialize with a single player
     {
@@ -195,6 +292,11 @@ const StudioCreator = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     setUser(user?.uid);
     setName(user?.email.split("@")[0]);
+
+    getUserSubscriptionStatus(user?.uid).then((res) =>
+      setSubscription(res?.plan?.plan)
+    );
+
     fetchUserStores(user.uid)
       .then((stores) => {
         if (Array.isArray(stores)) {
@@ -240,7 +342,7 @@ const StudioCreator = () => {
           console.error("Error uploading image:", error);
         }
       }
-      if (player.enhancements.audio.src) {
+      if (subscription !== "Basic" && player.enhancements.audio.src) {
         const audioFile = player.enhancements.audio.src;
         const storage = getStorage(firebase);
         const audioStorageRef = ref(
@@ -269,7 +371,7 @@ const StudioCreator = () => {
           status: false,
           container: {
             border: {
-              color: "#e1306c",
+              color: storyRingColor,
               width: 3,
             },
             background: {
@@ -381,9 +483,9 @@ const StudioCreator = () => {
         onCancel={handleCancel}
         footer={
           <div>
-            <Button key="add-more" onClick={showAddMoreModal}>
+            {/* <Button key="add-more" onClick={showAddMoreModal}>
               Add a Sub-Story
-            </Button>
+            </Button> */}
             <Button key="submit" type="default" onClick={handleOk}>
               {!confirmLoading ? "Save" : "Please Wait.."}
             </Button>
@@ -409,13 +511,13 @@ const StudioCreator = () => {
         {players?.map((player: any, index: number) => (
           <div key={index}>
             <Input.TextArea
-              placeholder="Story Heading..."
+              placeholder="Story Label"
               style={{ marginBottom: "16px" }}
               value={player?.layout?.title}
               onChange={(e) => handleTitleChange(index, e.target.value)}
             />
             <h3>
-              <b>CTA</b>
+              <b>Call To Action</b> (Leave black to remove the bottom overlay)
             </h3>
             <div className="flex gap-3">
               <Input
@@ -440,22 +542,103 @@ const StudioCreator = () => {
               onChange={(event) => uploadAuthorImageToFirebase(event, index)}
               style={{ width: "100%", marginBottom: "16px" }}
             />
-            <h3>
+            <h3
+              style={{
+                gap: "5px",
+                display: "flex",
+                alignItems: "center",
+              }}>
               <b>Audio</b>
+              {subscription === "Basic" && (
+                <Tooltip title="Please upgrade your plan to change this setting">
+                  <FaInfoCircle
+                    size={15}
+                    className="text-[#4079ED] text-[10px] font-[600]"
+                  />
+                </Tooltip>
+              )}
             </h3>
             <Input
+              disabled={subscription === "Basic"}
               type="file"
               accept="audio/*"
               onChange={(newValue) => handleAudioChange(newValue, index)}
               style={{ width: "100%", marginBottom: "16px" }}
             />
-            <h3 style={{ marginBottom: "16px" }}>
-              <b>CTA BackgroundColor</b>
-            </h3>
-            <CirclePicker
-              color={player?.layout?.cta?.backgroundColor}
-              onChangeComplete={(color) => handleCtaColorChange(color, index)}
-            />
+
+            <Row>
+              <div>
+                <h3 style={{ marginBottom: "16px" }}>
+                  <b>CTA Background Color</b>
+                </h3>
+                <Circle
+                  background={player?.layout?.cta?.backgroundColor}
+                  onClick={() =>
+                    setShowCTAColorPicker(!showCTAColorPicker)
+                  }></Circle>
+              </div>
+
+              <div>
+                <h3
+                  style={{
+                    gap: "5px",
+                    marginBottom: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}>
+                  <b>Story Ring Color</b>
+
+                  {subscription === "Basic" && (
+                    <Tooltip title="Please upgrade your plan to change this setting">
+                      <FaInfoCircle
+                        size={15}
+                        className="text-[#4079ED] text-[10px] font-[600]"
+                      />
+                    </Tooltip>
+                  )}
+                </h3>
+                <Circle
+                  background={storyRingColor}
+                  onClick={() =>
+                    setShowStoryRingColorPicker(!showStoryRingColorPicker)
+                  }></Circle>
+              </div>
+            </Row>
+
+            {showCTAColorPicker && (
+              <div ref={ctaColorPickerRef}>
+                <ColorPicker
+                  color={player?.layout?.cta?.backgroundColor}
+                  onChangeComplete={(color) =>
+                    handleCtaColorChange(color, index)
+                  }
+                />
+              </div>
+            )}
+
+            {subscription !== "Basic" && showStoryRingColorPicker && (
+              <div ref={storyRingColorPickerRef}>
+                <ColorPicker
+                  color={storyRingColor}
+                  onChangeComplete={(color) => setStoryRingColor(color.hex)}
+                />
+              </div>
+            )}
+
+            <OverlayPreview>
+              <AuthorPreview src={player?.layout?.author} />
+              <CTAContainer>
+                <div style={{ color: "white" }}>
+                  {player.layout.title || "Story Label"}
+                </div>
+                <CallToAction
+                  target="_blank"
+                  color={player?.layout?.cta?.backgroundColor}
+                  href={player?.layout?.cta?.link}>
+                  {player?.layout?.cta?.text || "Call To Action"}
+                </CallToAction>
+              </CTAContainer>
+            </OverlayPreview>
           </div>
         ))}
       </Modal>

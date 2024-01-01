@@ -14,6 +14,8 @@ import {
   PicCenterOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
+import Link from "next/link";
+import LoadingPage from "@/components/molecules/subviews/loading/LoadingPage";
 
 const { Option } = Select;
 
@@ -28,6 +30,7 @@ type Props = {
 
 const StoryPage: NextPage<Props> = ({ stories }) => {
   const [searchString, setSearchString] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   const [stores, setStores] = React.useState<any>([]);
   const [filteredStories, setFilteredStories] = React.useState<any[]>(stories);
 
@@ -53,13 +56,17 @@ const StoryPage: NextPage<Props> = ({ stories }) => {
   }, [stories]);
 
   useEffect(() => {
+    setIsLoading(true);
+
     try {
       const user = getUser();
       if (!user) return;
       const { uid } = user;
+
       fetchUserStores(uid).then((stores) => {
         if (Array.isArray(stores)) {
           setStores(stores);
+          setIsLoading(false);
         }
       });
     } catch (error) {
@@ -102,7 +109,11 @@ const StoryPage: NextPage<Props> = ({ stories }) => {
       </div>
 
       {/* <SketchPicker /> */}
-      <Stories stores={stores} stories={filteredStories} />
+      {!!filteredStories.length && (
+        <Stories stores={stores} stories={filteredStories} />
+      )}
+
+      <LoadingPage isLoading={isLoading} />
     </div>
   );
 };

@@ -159,3 +159,23 @@ export async function deleteStore(uid: string, storeId: string): Promise<any> {
       return Promise.reject(result);
     });
 }
+
+export async function uploadStoryContent(file: File): Promise<any> {
+  const API = `${BACKEND_URL}/firebase/upload-content`;
+
+  const fileData = new FormData();
+  fileData.append("file", file);
+
+  try {
+    const response = await axios.post(API, fileData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return Promise.resolve(response.data);
+  } catch (error: any) {
+    const result = error.response ? error.response.data : error;
+    return Promise.reject(result);
+  }
+}
