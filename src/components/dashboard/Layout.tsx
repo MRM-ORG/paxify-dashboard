@@ -125,7 +125,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         ? user.email.split("@")[0]
                         : "Profile"}
                     </span>
-                    <span>Admin</span>
+                    {/* <span>Admin</span> */}
                   </div>
                 </div>
               </div>

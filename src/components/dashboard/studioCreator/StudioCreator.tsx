@@ -347,6 +347,13 @@ const StudioCreator = () => {
   const handleOk = async () => {
     setConfirmLoading(true);
 
+    const hasEmptyLabel = players.some((player) => !player.layout.title.trim());
+
+    if (hasEmptyLabel) {
+      setConfirmLoading(false);
+      return alert("Please enter Story Label for all the sub-stories");
+    }
+
     // Create a promise array to upload all content.sources in parallel
     const uploadPromises = players.map(async (player, index) => {
       if (
@@ -358,6 +365,8 @@ const StudioCreator = () => {
         const storage = getStorage(firebase);
         const storageRef = ref(storage, `images/${Date.now()}_${index}.png`);
 
+        console.log("Storage Ref:", storageRef, base64Data);
+
         // Upload the base64 data to Firebase Storage
         const uploadTask = uploadString(storageRef, base64Data, "base64", {
           contentType: "image/png",
@@ -367,6 +376,7 @@ const StudioCreator = () => {
         try {
           await uploadTask;
           const downloadURL = await getDownloadURL(storageRef);
+          console.log("Download URL:", downloadURL);
           player.content.source = downloadURL; // Update content.source with the download URL
           player.layout.timer = time;
         } catch (error) {
@@ -418,7 +428,6 @@ const StudioCreator = () => {
         user: { uid: user, storeId: storeId },
       };
 
-      // Make the API call to save the story
       axios.post(`${BACKEND_URL}/firebase/story`, story).then(() => {
         setConfirmLoading(false);
         router.push("/dashboard/stories");
@@ -444,7 +453,6 @@ const StudioCreator = () => {
         setImage(res);
         showModal();
       });
-    // store.saveAsImage({ fileName: 'polotno.png' });
   };
 
   const handleTitleChange = (index: number, newValue: any) => {
