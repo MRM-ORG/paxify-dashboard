@@ -4,7 +4,6 @@ import {
   DASHBOARD_PROFILE,
   DASHBOARD_STORES,
   DASHBOARD_SUBSCRIPTIONS,
-  HOME_PAGE,
   INSTRUCTIONS,
   MAIN_DASHBOARD,
   USER_LOGIN,
@@ -14,6 +13,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
 import { isUserVerified } from "@/utils/auth";
+import { isChromiumBasedBrowser } from "@/utils/helpers";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -86,6 +86,13 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
       navigateNewPage(USER_LOGIN());
     } else {
       setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const isSupported = isChromiumBasedBrowser();
+    if (!isSupported) {
+      alert("We recommend using Google Chrome for the best experience.");
     }
   }, []);
 

@@ -12,7 +12,6 @@ import styled from "styled-components";
 import Spacer from "../atoms/Spacer";
 import HyperlinkButton from "../atoms/buttons/HyperlinkButton";
 import PrimaryButton from "../atoms/buttons/PrimaryButton";
-import Logo from "../atoms/icons/logo";
 import FormikLabelledTextInput from "../molecules/inputs/formik/FormikLabelledTextInput";
 import {
   LoginForm,
@@ -105,8 +104,8 @@ const Login: React.FC = () => {
     setIsLoading(true);
     signInUser(values.email, values.password).then((user) => {
       localStorage.setItem("user", JSON.stringify(user));
-      navigateNewPage(HOME_PAGE());
       setIsLoading(false);
+      navigateNewPage(HOME_PAGE());
     });
   };
 

@@ -1,12 +1,9 @@
 import { webAuth } from "@/firebase/firebase";
-import {
-  User,
-  sendEmailVerification,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import axios from "axios";
+import { User, signOut } from "firebase/auth";
+import { BACKEND_URL } from "../constants";
 import { navigateNewPage } from "./navigate";
-import { HOME_PAGE, USER_LOGIN } from "./routes";
+import { USER_LOGIN } from "./routes";
 
 export const signOutUser = () => {
   return signOut(webAuth)
@@ -22,13 +19,13 @@ export const signOutUser = () => {
 
 export const signInUser = async (email: string, password: string) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      webAuth,
+    const response = await axios.post(`${BACKEND_URL}/firebase/login`, {
       email,
-      password
-    );
+      password,
+    });
 
-    return userCredential.user;
+    const userCredential = response.data;
+    return userCredential;
   } catch (error) {
     console.error(error);
     alert(error);

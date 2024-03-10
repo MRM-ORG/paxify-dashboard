@@ -116,6 +116,31 @@ export const checkIfWithinSubscriptionThreshold = (
   return false;
 };
 
+export const isChromiumBasedBrowser = () => {
+  // @ts-expect-error - Property 'chrome' does not exist on type 'Window & typeof globalThis'
+  let isChromium = window.chrome;
+  let winNav = window.navigator;
+  let vendorName = winNav.vendor;
+  // @ts-expect-error - Property 'opr' does not exist on type 'Window & typeof globalThis'
+  let isOpera = typeof window.opr !== "undefined";
+  let isIEedge = winNav.userAgent.indexOf("Edg") > -1;
+  let isIOSChrome = winNav.userAgent.match("CriOS");
+
+  if (isIOSChrome) {
+    return true;
+  } else if (
+    isChromium !== null &&
+    typeof isChromium !== "undefined" &&
+    vendorName === "Google Inc." &&
+    isOpera === false &&
+    isIEedge === false
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 export const getLiquidFileContents = (uid: string, storeId: string) =>
   `{% capture reelsSettingsLiquid %}
   {
