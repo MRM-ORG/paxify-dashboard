@@ -1,3 +1,5 @@
+import { isUserVerified } from "@/utils/auth";
+import { isChromiumBasedBrowser } from "@/utils/helpers";
 import { navigateNewPage } from "@/utils/navigate";
 import {
   DASHBOARD_ANALYTICS,
@@ -8,12 +10,11 @@ import {
   MAIN_DASHBOARD,
   USER_LOGIN,
 } from "@/utils/routes";
-import { THEME } from "@/utils/theme";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../molecules/Header";
-import { isUserVerified } from "@/utils/auth";
-import { isChromiumBasedBrowser } from "@/utils/helpers";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface IProtectedAdminPageWrapperProps {
   children: React.ReactNode;
@@ -21,9 +22,8 @@ interface IProtectedAdminPageWrapperProps {
 
 const RightPane = styled.div`
   overflow: auto;
-  height: 100vh;
   display: flex;
-  // background-color: ${THEME.background0};
+  height: 100vh;
 `;
 
 const Grid = styled.div`
@@ -33,6 +33,17 @@ const Grid = styled.div`
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
+`;
+
+const WarningToast = styled.div`
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: #fff;
+  padding: 12px;
+  text-align: center;
+  font-size: 1.25rem;
+  background-color: #d5c72f;
 `;
 
 const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
@@ -76,6 +87,24 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
   };
 
   useEffect(() => {
+    console.info("Checking for chromium based browser");
+
+    if (!isChromiumBasedBrowser()) {
+      toast.warn("For best experience, we recommend using Chrome browser. ", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     // Check firebase auth status here
     const user = localStorage.getItem("user");
 
@@ -89,19 +118,26 @@ const ProtectedAuthWrapper: React.FC<IProtectedAdminPageWrapperProps> = (
     }
   }, []);
 
-  useEffect(() => {
-    const isSupported = isChromiumBasedBrowser();
-    if (!isSupported) {
-      alert("We recommend using Google Chrome for the best experience.");
-    }
-  }, []);
-
   return (
     !isLoading && (
-      <Grid>
-        <Header onClick={handleNavigation} activeTab={activeTab} />
-        <RightPane>{props.children}</RightPane>
-      </Grid>
+      <div>
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          theme="colored"
+          transition={Bounce}
+        />
+        <Grid>
+          <Header onClick={handleNavigation} activeTab={activeTab} />
+          <RightPane>{props.children}</RightPane>
+        </Grid>
+      </div>
     )
   );
 };
