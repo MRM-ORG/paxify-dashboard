@@ -32,6 +32,24 @@ function MyDocument() {
           rel="stylesheet"
         />
 
+        <script
+          id="gtag"
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-NMJB8MNNKM"></script>
+
+        <script
+          id="ga-data"
+          dangerouslySetInnerHTML={{
+            __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'G-NMJB8MNNKM');
+              `,
+          }}
+        />
+
         <Script id="vwoCode" strategy="beforeInteractive">
           {`
             window._vwo_code=window._vwo_code || (function() {
