@@ -2,6 +2,7 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 import Script from "next/script";
 import { StyleProvider, createCache, extractStyle } from "@ant-design/cssinjs";
 import type { DocumentContext } from "next/document";
+import { GTM_HEAD_SCRIPT } from "@/constants";
 
 function MyDocument() {
   return (
@@ -32,11 +33,7 @@ function MyDocument() {
           rel="stylesheet"
         />
 
-        <script
-          id="gtag"
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-NMJB8MNNKM"></script>
-
+        <script id="gtag" async src={GTM_HEAD_SCRIPT}></script>
         <script
           id="ga-data"
           dangerouslySetInnerHTML={{

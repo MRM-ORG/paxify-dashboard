@@ -2,6 +2,10 @@ import type { MenuProps } from "antd";
 import getConfig from "next/config";
 import Link from "next/link";
 
+const GTM_CONTAINER_ID = "GTM-TCNJ8V45";
+export const GTM_HEAD_SCRIPT = `https://www.googletagmanager.com/gtm.js?id=${GTM_CONTAINER_ID}`;
+export const GTM_BODY_IFRAME = `https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`;
+
 const { publicRuntimeConfig } = getConfig();
 
 export const BACKEND_URL = publicRuntimeConfig.BACKEND_URL;
