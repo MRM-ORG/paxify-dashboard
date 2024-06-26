@@ -56,7 +56,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     getUserSubscriptionStatus(user?.uid).then((res) => {
       // console.log("STORES:", res);
       setHasSubscription(res.plan.isActive);

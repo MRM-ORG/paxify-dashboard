@@ -1,6 +1,5 @@
 import { fetchUserStores } from "@/apiCalls/auth";
 import ViewAnalytics from "@/components/molecules/subviews/home/ViewAnalytics";
-import ProtectedAuthWrapper from "@/components/pages/ProtectedAuthWrapper";
 import { useEffect, useState } from "react";
 
 export default function AnalyticsPage() {
@@ -14,7 +13,7 @@ export default function AnalyticsPage() {
   const [storeEvents, setStoreEvents] = useState<any>(null);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     fetchUserStores(user.uid)
       .then((stores) => {
         if (Array.isArray(stores)) {

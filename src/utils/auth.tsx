@@ -8,7 +8,7 @@ import { USER_LOGIN } from "./routes";
 export const signOutUser = () => {
   return signOut(webAuth)
     .then(() => {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       navigateNewPage(USER_LOGIN());
     })
     .catch((error) => {
@@ -33,7 +33,7 @@ export const signInUser = async (email: string, password: string) => {
 };
 
 export const isUserVerified = () => {
-  const user = localStorage.getItem("user") as string;
+  const user = sessionStorage.getItem("user") as string;
   try {
     const userObj = JSON.parse(user);
     return userObj.emailVerified;
@@ -48,7 +48,7 @@ export const getUser = (): User | null => {
     return null;
   }
 
-  const user = localStorage.getItem("user") as string;
+  const user = sessionStorage.getItem("user") as string;
   try {
     const userObj = JSON.parse(user);
     return userObj;

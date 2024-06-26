@@ -101,7 +101,7 @@ const SignUp: React.FC = () => {
         registerUser(uid, payload)
           .then(() => {
             sendEmailVerification(user).then(() => {
-              localStorage.setItem("user", JSON.stringify(user));
+              sessionStorage.setItem("user", JSON.stringify(user));
               alert(
                 "We have sent you a verification email. Please verify your email to continue."
               );

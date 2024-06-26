@@ -84,7 +84,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
     try {
       // @ts-ignore
       const userObj = JSON.parse(user);
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
   const onLogin = async (values: any) => {
     setIsLoading(true);
     signInUser(values.email, values.password).then((user) => {
-      localStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("user", JSON.stringify(user));
       setIsLoading(false);
       navigateNewPage(HOME_PAGE());
     });

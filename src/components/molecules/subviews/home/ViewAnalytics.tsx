@@ -112,7 +112,7 @@ const ViewAnalytics: React.FC<IViewAnalyticsProps> = ({
       return;
     }
     (async () => {
-      const user = JSON.parse(localStorage.getItem("user") as string);
+      const user = JSON.parse(sessionStorage.getItem("user") as string);
 
       const apiResponse = await getStoreEvents(
         user.uid,

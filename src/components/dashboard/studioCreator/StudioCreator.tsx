@@ -319,7 +319,7 @@ const StudioCreator = () => {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     setUser(user?.uid);
     setName(user?.email.split("@")[0]);
 

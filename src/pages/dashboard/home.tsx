@@ -5,8 +5,6 @@ import DashboardLayout from "@/components/dashboard/Layout";
 import Instances from "@/components/dashboard/home/Instances";
 import OverViewTop from "@/components/dashboard/home/OverViewTop";
 import Stories from "@/components/dashboard/home/Stories";
-import { BACKEND_URL } from "@/constants";
-import axios from "axios";
 import type { NextPageWithLayout } from "../_app";
 
 const Page: NextPageWithLayout = () => {
@@ -14,7 +12,7 @@ const Page: NextPageWithLayout = () => {
   const [summarizedEvents, setSummarizedEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     fetchUserStores(user?.uid)
       .then((stores) => {
         if (Array.isArray(stores)) {

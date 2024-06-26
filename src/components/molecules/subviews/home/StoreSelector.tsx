@@ -123,7 +123,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   let VERIFICATION_SCRIPT_MANUAL: any = null;
 
   try {
-    const signInUser = JSON.parse(localStorage.getItem("user") as string);
+    const signInUser = JSON.parse(sessionStorage.getItem("user") as string);
     const { uid } = signInUser;
 
     VERIFICATION_SCRIPT_MANUAL = `<script>
@@ -153,13 +153,12 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   `;
   } catch (error) {
     console.error(error);
-    alert("An error occured, please try again later.");
   }
 
   const checkIfStoreVerified = () => {
     setIsLoading(true);
 
-    const user = JSON.parse(localStorage.getItem("user") as string);
+    const user = JSON.parse(sessionStorage.getItem("user") as string);
     const { uid } = user;
 
     getStoreVerificationStatus(uid, activeStore.id)
@@ -171,7 +170,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   };
 
   const handleStoreDeletion = () => {
-    const signInUser = JSON.parse(localStorage.getItem("user") as string);
+    const signInUser = JSON.parse(sessionStorage.getItem("user") as string);
     const { uid } = signInUser;
 
     if (!uid || !activeStore?.id) return;
@@ -187,7 +186,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
     if (isVerified) return;
 
     try {
-      const user = JSON.parse(localStorage.getItem("user") as string);
+      const user = JSON.parse(sessionStorage.getItem("user") as string);
       const { uid } = user;
       setIsLoading(true);
       setActiveUser(uid);
@@ -213,7 +212,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
   }, [isCopied]);
 
   const handleLiquidFileDownload = () => {
-    const user = JSON.parse(localStorage.getItem("user") as string);
+    const user = JSON.parse(sessionStorage.getItem("user") as string);
     const { uid } = user;
     const storeId = activeStore.id;
     const fileContent = getLiquidFileContents(uid, storeId);
@@ -263,7 +262,7 @@ const StoreSelector: React.FC<IStoreSelectorProps> = () => {
             if (!store) return;
 
             const loggedInUser = JSON.parse(
-              localStorage.getItem("user") as string
+              sessionStorage.getItem("user") as string
             );
             const { uid } = loggedInUser;
 

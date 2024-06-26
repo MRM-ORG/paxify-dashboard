@@ -7,7 +7,7 @@ const InteractionCard = () => {
   const [stories, setStories] = useState<any[]>([]);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     fetchUserStores(user?.uid)
       .then((stores) => {
         if (Array.isArray(stores)) {
